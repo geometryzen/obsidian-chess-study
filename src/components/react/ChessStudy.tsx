@@ -393,6 +393,13 @@ export const ChessStudy = ({
 								new Notice('Could not copy to clipboard:', e);
 							}
 						}}
+						onSettingsButtonClick={() => {
+							try {
+								new Notice("I'm afraid I can't do that Dave!");
+							} catch (e) {
+								new Notice('Something is rotten in Denmark:', e);
+							}
+						}}
 					/>
 				</div>
 			</div>

@@ -120,7 +120,7 @@ export default class ChessStudyPlugin extends Plugin {
 						);
 					} catch (e) {
 						console.log(e);
-						new Notice('There was an error during PGN parsing.', 0);
+						new Notice('Oops! There was an error during PGN parsing.', 0);
 					}
 				};
 

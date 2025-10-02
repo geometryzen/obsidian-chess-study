@@ -53,6 +53,7 @@ interface PgnViewerProps {
 	onForwardButtonClick: () => void;
 	onSaveButtonClick: () => void;
 	onCopyButtonClick: () => void;
+	onSettingsButtonClick: () => void;
 }
 
 export const PgnViewer = React.memo((props: PgnViewerProps) => {

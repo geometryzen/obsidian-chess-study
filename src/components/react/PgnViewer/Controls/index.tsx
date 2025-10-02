@@ -1,4 +1,11 @@
-import { ArrowLeft, ArrowRight, Copy, Save, Undo2 } from 'lucide-react';
+import {
+	ArrowBigLeft,
+	ArrowBigRight,
+	Copy,
+	Save,
+	Settings,
+	Undo2,
+} from 'lucide-react';
 import * as React from 'react';
 
 export interface ControlActions {
@@ -7,6 +14,7 @@ export interface ControlActions {
 	onForwardButtonClick: () => void;
 	onSaveButtonClick: () => void;
 	onCopyButtonClick: () => void;
+	onSettingsButtonClick: () => void;
 }
 
 export const Controls = (props: ControlActions) => {
@@ -14,10 +22,10 @@ export const Controls = (props: ControlActions) => {
 		<div>
 			<div className="button-section">
 				<button title="Back" onClick={() => props.onBackButtonClick()}>
-					<ArrowLeft />
+					<ArrowBigLeft />
 				</button>
 				<button title="Forward" onClick={() => props.onForwardButtonClick()}>
-					<ArrowRight />
+					<ArrowBigRight />
 				</button>
 				<button title="Save" onClick={() => props.onSaveButtonClick()}>
 					<Save strokeWidth={'1px'} />
@@ -29,6 +37,9 @@ export const Controls = (props: ControlActions) => {
 				</button>
 				<button title="Undo" onClick={() => props.onUndoButtonClick()}>
 					<Undo2 />
+				</button>
+				<button title="Settings" onClick={() => props.onSettingsButtonClick()}>
+					<Settings />
 				</button>
 			</div>
 		</div>
