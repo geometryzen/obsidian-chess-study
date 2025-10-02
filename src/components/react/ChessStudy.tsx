@@ -206,7 +206,7 @@ export const ChessStudy = ({
 
 					if (currentMoveId) {
 						const currentMoveIndex = moves.findIndex(
-							(move) => move.moveId === currentMoveId
+							(move) => move.moveId === currentMoveId,
 						);
 
 						const { variant, moveIndex } = findMoveIndex(moves, currentMoveId);
@@ -328,7 +328,7 @@ export const ChessStudy = ({
 			currentMove: chessStudyData.moves[chessStudyData.moves.length - 1] ?? null,
 			isViewOnly: false,
 			study: chessStudyData,
-		}
+		},
 	);
 
 	const onSaveButtonClick = useCallback(async () => {

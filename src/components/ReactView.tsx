@@ -19,7 +19,7 @@ export class ReactView extends MarkdownRenderChild {
 		app: App,
 		settings: ChessStudyPluginSettings,
 		data: ChessStudyFileData,
-		dataAdapter: ChessStudyDataAdapter
+		dataAdapter: ChessStudyDataAdapter,
 	) {
 		super(containerEL);
 		this.source = source;
@@ -40,7 +40,7 @@ export class ReactView extends MarkdownRenderChild {
 					chessStudyData={this.data}
 					dataAdapter={this.dataAdapter}
 				/>
-			</React.StrictMode>
+			</React.StrictMode>,
 		);
 	}
 

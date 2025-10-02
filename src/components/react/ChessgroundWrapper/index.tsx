@@ -96,7 +96,7 @@ export const ChessgroundWrapper = React.memo(
 				<div ref={ref} className={`height-width-100`} />
 			</div>
 		);
-	}
+	},
 );
 
 ChessgroundWrapper.displayName = 'ChessgroundWrapper';

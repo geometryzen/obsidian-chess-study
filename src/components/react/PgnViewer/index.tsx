@@ -68,7 +68,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 
 	const movePairs = useMemo(
 		() => chunkArray(history, 2, firstPlayer === 'b'),
-		[firstPlayer, history]
+		[firstPlayer, history],
 	);
 
 	return (

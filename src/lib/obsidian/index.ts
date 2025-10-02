@@ -7,7 +7,7 @@ type ChessStudyAppConfig = ChessStudyPluginSettings & {
 
 export const parseUserConfig = (
 	settings: ChessStudyPluginSettings,
-	content: string
+	content: string,
 ): ChessStudyAppConfig => {
 	const chessStudyConfig: ChessStudyAppConfig = {
 		...settings,

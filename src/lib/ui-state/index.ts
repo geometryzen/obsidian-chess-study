@@ -12,7 +12,7 @@ interface MovePosition {
 
 export const findMoveIndex = (
 	moves: ChessStudyMove[],
-	moveId: string
+	moveId: string,
 ): MovePosition => {
 	for (const [iMainLine, move] of moves.entries()) {
 		if (move.moveId === moveId) return { variant: null, moveIndex: iMainLine };
@@ -38,7 +38,7 @@ export const displayMoveInHistory = (
 	options: { offset: number; selectedMoveId: string | null } = {
 		offset: 0,
 		selectedMoveId: null,
-	}
+	},
 ): Draft<GameState> => {
 	let moveToDisplay: ChessStudyMove | VariantMove | null = null;
 
@@ -125,7 +125,7 @@ export const displayMoveInHistory = (
 };
 
 export const getCurrentMove = (
-	draft: Draft<GameState>
+	draft: Draft<GameState>,
 ): Draft<ChessStudyMove> | Draft<VariantMove> | null => {
 	const currentMoveId = draft.currentMove?.moveId;
 	const moves = draft.study.moves;

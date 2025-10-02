@@ -22,7 +22,7 @@ export class ChessStringModal extends Modal {
 				.onChange((value) => {
 					this.chessString = value;
 				})
-				.inputEl.setCssStyles({ width: '100%', height: '250px' })
+				.inputEl.setCssStyles({ width: '100%', height: '250px' }),
 		);
 
 		new Setting(contentEl).addButton((btn) =>
@@ -32,7 +32,7 @@ export class ChessStringModal extends Modal {
 				.onClick(() => {
 					this.close();
 					this.onSubmit(this.chessString);
-				})
+				}),
 		);
 	}
 

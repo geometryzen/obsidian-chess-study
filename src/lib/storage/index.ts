@@ -48,14 +48,14 @@ export class ChessStudyDataAdapter {
 
 		console.log(
 			`Writing file to ${normalizePath(
-				`${this.storagePath}/${chessStudyId}.json`
-			)}`
+				`${this.storagePath}/${chessStudyId}.json`,
+			)}`,
 		);
 
 		await this.adapter.write(
 			normalizePath(`${this.storagePath}/${chessStudyId}.json`),
 			JSON.stringify(data, null, 2),
-			{}
+			{},
 		);
 
 		return chessStudyId;
@@ -63,11 +63,11 @@ export class ChessStudyDataAdapter {
 
 	async loadFile(id: string): Promise<ChessStudyFileData> {
 		console.log(
-			`Reading file from ${normalizePath(`${this.storagePath}/${id}.json`)}`
+			`Reading file from ${normalizePath(`${this.storagePath}/${id}.json`)}`,
 		);
 
 		const data = await this.adapter.read(
-			normalizePath(`${this.storagePath}/${id}.json`)
+			normalizePath(`${this.storagePath}/${id}.json`),
 		);
 
 		const jsonData = JSON.parse(data);

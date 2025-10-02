@@ -32,7 +32,7 @@ export const CommentSection = React.memo(
 		}, [currentComment, editor]);
 
 		return <EditorContent editor={editor} />;
-	}
+	},
 );
 
 CommentSection.displayName = 'CommentSection';

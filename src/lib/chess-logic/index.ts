@@ -13,7 +13,7 @@ export function toDests(chess: Chess): Map<Square, Square[]> {
 		if (ms.length)
 			dests.set(
 				s,
-				ms.map((m) => m.to)
+				ms.map((m) => m.to),
 			);
 	});
 	return dests;

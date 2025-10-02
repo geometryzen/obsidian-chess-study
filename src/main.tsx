@@ -37,7 +37,7 @@ export default class ChessStudyPlugin extends Plugin {
 	settings: ChessStudyPluginSettings;
 	dataAdapter: ChessStudyDataAdapter;
 	storagePath = normalizePath(
-		`${this.app.vault.configDir}/plugins/${this.manifest.id}/storage/`
+		`${this.app.vault.configDir}/plugins/${this.manifest.id}/storage/`,
 	);
 
 	async onload() {
@@ -47,7 +47,7 @@ export default class ChessStudyPlugin extends Plugin {
 		// Register Data Adapter
 		this.dataAdapter = new ChessStudyDataAdapter(
 			this.app.vault.adapter,
-			this.storagePath
+			this.storagePath,
 		);
 
 		await this.dataAdapter.createStorageFolderIfNotExists();
@@ -116,7 +116,7 @@ export default class ChessStudyPlugin extends Plugin {
 
 						editor.replaceRange(
 							`\`\`\`chessStudy\nchessStudyId: ${id}\n\`\`\``,
-							cursorPosition
+							cursorPosition,
 						);
 					} catch (e) {
 						console.log(e);
@@ -137,22 +137,29 @@ export default class ChessStudyPlugin extends Plugin {
 				if (!chessStudyId.trim().length)
 					return new Notice(
 						"No chessStudyId parameter found, please add one manually if the file already exists or add it via the 'Insert PGN-Editor at cursor position' command.",
-						0
+						0,
 					);
 
 				try {
 					const data = await this.dataAdapter.loadFile(chessStudyId);
 
 					ctx.addChild(
-						new ReactView(el, source, this.app, this.settings, data, this.dataAdapter)
+						new ReactView(
+							el,
+							source,
+							this.app,
+							this.settings,
+							data,
+							this.dataAdapter,
+						),
 					);
 				} catch (e) {
 					new Notice(
 						`There was an error while trying to load ${chessStudyId}.json. You can check the plugin folder if the file exist and if not add one via the 'Insert PGN-Editor at cursor position' command.`,
-						0
+						0,
 					);
 				}
-			}
+			},
 		);
 
 		console.log('Chess Study Plugin successfully loaded');
