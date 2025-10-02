@@ -25,7 +25,7 @@
 		"chessground": "9.2.1",
 		"immer": "^10.0.2",
 		"lucide-react": "0.220.0",
-		"nanoid": "4.0.2",
+		"nanoid": "5.1.6",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
 		"use-immer": "^0.9.0"
