@@ -1,0 +1,199 @@
+/* General */
+.chess-study button:active {
+	transform: translateY(1px);
+}
+
+.chess-study .vertical-align {
+	display: flex;
+	align-items: center;
+}
+
+.chess-study .center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.chess-study .height-width-100 {
+	width: 100%;
+	height: 100%;
+}
+
+.chess-study .table {
+	display: table;
+}
+
+.chess-study {
+	height: 100%;
+	max-width: 750px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-secondary-alt);
+	border-radius: 5px;
+}
+
+.chess-study *,
+.chess-study *::before,
+.chess-study *::after {
+	box-sizing: border-box;
+}
+.chess-study * {
+	margin: 0;
+}
+
+.chess-study input,
+.chess-study button,
+.chess-study textarea,
+.chess-study select {
+	font: inherit;
+}
+
+.chess-study p,
+.chess-study h1,
+.chess-study h2,
+.chess-study h3,
+.chess-study h4,
+.chess-study h5,
+.chess-study h6 {
+	overflow-wrap: break-word;
+}
+
+/* Container */
+.chess-study .chessground-pgn-container {
+	display: flex;
+	height: 450px;
+}
+
+.chess-study .chessground-pgn-container .chessground-container {
+	flex: 0 0 450px;
+	height: 100%;
+}
+
+.chess-study .chessground-pgn-container .pgn-container {
+	flex: 1;
+	height: 100%;
+}
+
+/* PGN Viewer */
+
+.chess-study .move-item-section {
+	height: 380px;
+}
+
+.chess-study .button-section {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	gap: 4px;
+	height: 32px;
+}
+
+/* Move Items */
+
+.chess-study .move-item-container {
+	display: grid;
+	grid-template-columns: 0.15fr 0.425fr 0.425fr;
+	grid-auto-rows: minmax(35px, auto);
+	width: 100%;
+	max-height: 380px;
+	overflow-y: scroll;
+}
+
+.chess-study .move-item-container > * {
+	margin: 0;
+}
+
+.chess-study .move-item {
+	padding-left: 8px;
+	user-select: none;
+}
+
+.chess-study .move-item:hover {
+	background-color: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l)));
+	color: var(--text-on-accent);
+	cursor: pointer;
+}
+
+.chess-study .move-item.active {
+	background-color: hsl(
+		var(--accent-h),
+		var(--accent-s),
+		calc(var(--accent-l) - 10%)
+	);
+	color: var(--text-on-accent);
+	font-weight: bold;
+}
+
+/* Variant Move Items */
+
+.chess-study .variants-container {
+	grid-column: span 3 / auto;
+	display: flex;
+	flex-direction: column;
+	border-bottom: 1px solid var(--color-base-50);
+}
+
+.chess-study .variant-container {
+	grid-column: span 3 / auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.chess-study .move-indicator {
+	color: var(--color-base-60);
+	text-align: center;
+	background-color: var(--color-base-10);
+	user-select: none;
+	cursor: default;
+}
+
+.chess-study .variant-move-item {
+	padding-left: 6px;
+	user-select: none;
+	cursor: pointer;
+}
+
+.chess-study .variant-move-item-container {
+	display: flex;
+	flex-wrap: wrap;
+	padding: 4px 0;
+	border-top: 1px solid var(--color-base-50);
+}
+
+.chess-study .variant-move-item.active,
+.chess-study .variant-move-item:hover {
+	color: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) - 10%));
+}
+
+.chess-study .variant-move-indicator {
+	font-weight: bold;
+}
+
+/* Comment Section */
+
+.chess-study .editor-input {
+	min-height: 150px;
+	resize: none;
+	font-size: 15px;
+	caret-color: rgb(5, 5, 5);
+	position: relative;
+	tab-size: 1;
+	outline: 0;
+	padding: 15px 10px;
+	caret-color: #444;
+}
+
+.chess-study .CommentSection {
+	height: 250px;
+	padding-top: 5px;
+	overflow: scroll;
+	border-top: 1px solid var(--background-secondary-alt);
+}
+
+.chess-study .ProseMirror,
+.chess-study .CommentSection > div {
+	width: 100%;
+	height: 100%;
+}
