@@ -395,7 +395,7 @@ export const ChessStudy = ({
 						}}
 						onSettingsButtonClick={() => {
 							try {
-								new Notice("I'm afraid I can't do that Dave!");
+								new Notice("I'm afraid I can't do that Dave??");
 							} catch (e) {
 								new Notice('Something is rotten in Denmark:', e);
 							}

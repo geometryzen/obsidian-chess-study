@@ -1,6 +1,7 @@
 import { Chess, QUEEN, SQUARES, Square } from 'chess.js';
 import { Api } from 'chessground/api';
 import { Config } from 'chessground/config';
+import { getChessDataFormat } from '../fen-or-pgn';
 
 export function toColor(chess: Chess) {
 	return chess.turn() === 'w' ? 'white' : 'black';
@@ -44,4 +45,27 @@ export function playOtherSide(cg: Api, chess: Chess) {
 
 		return move;
 	};
+}
+
+export function parseChessString(chessStringTrimmed: string): {
+	chess: Chess;
+	format: 'FEN' | 'PGN';
+} {
+	const format = getChessDataFormat(chessStringTrimmed);
+	switch (format) {
+		case 'FEN': {
+			return { chess: new Chess(chessStringTrimmed), format };
+		}
+		case 'PGN': {
+			const chess = new Chess();
+
+			chess.loadPgn(chessStringTrimmed, {
+				strict: false,
+			});
+			return { chess, format };
+		}
+		default: {
+			throw new Error('Chess string must be FEN or PGN.');
+		}
+	}
 }

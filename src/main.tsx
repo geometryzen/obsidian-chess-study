@@ -1,4 +1,3 @@
-import { Chess } from 'chess.js';
 import { Editor, Notice, Plugin, normalizePath } from 'obsidian';
 import {
 	CURRENT_STORAGE_VERSION,
@@ -19,6 +18,7 @@ import 'chessground/assets/chessground.base.css';
 import 'chessground/assets/chessground.brown.css';
 import 'chessground/assets/chessground.cburnett.css';
 import { nanoid } from 'nanoid';
+import { parseChessString } from './lib/chess-logic';
 import { parseUserConfig } from './lib/obsidian';
 import './main.css';
 
@@ -66,16 +66,7 @@ export default class ChessStudyPlugin extends Plugin {
 					try {
 						const chessStringTrimmed = chessString?.trim() ?? '';
 
-						const isFen = chessStringTrimmed.includes('/');
-
-						const chess = isFen ? new Chess(chessStringTrimmed) : new Chess();
-
-						if (!isFen) {
-							//Try to parse the PGN
-							chess.loadPgn(chessStringTrimmed, {
-								strict: false,
-							});
-						}
+						const { chess, format } = parseChessString(chessStringTrimmed);
 
 						const chessStudyFileData: ChessStudyFileData = {
 							version: CURRENT_STORAGE_VERSION,
@@ -107,7 +98,7 @@ export default class ChessStudyPlugin extends Plugin {
 									return move.isBigPawn();
 								},
 							})),
-							rootFEN: isFen ? chessStringTrimmed : ROOT_FEN,
+							rootFEN: format === 'FEN' ? chessStringTrimmed : ROOT_FEN,
 						};
 
 						this.dataAdapter.createStorageFolderIfNotExists();
@@ -120,7 +111,10 @@ export default class ChessStudyPlugin extends Plugin {
 						);
 					} catch (e) {
 						console.log(e);
-						new Notice('Oops! There was an error during PGN parsing.', 0);
+						new Notice(
+							`Oops?? There was an error during PGN parsing. Cause: ${e}`,
+							0,
+						);
 					}
 				};
 

@@ -1,4 +1,4 @@
-import { App, Modal, Setting } from 'obsidian';
+import { App, ButtonComponent, Modal, Setting } from 'obsidian';
 import { ChessString } from 'src/main';
 
 export class ChessStringModal extends Modal {
@@ -10,7 +10,7 @@ export class ChessStringModal extends Modal {
 		this.onSubmit = onSubmit;
 	}
 
-	onOpen() {
+	onOpen(): void {
 		const { contentEl } = this;
 
 		contentEl.createEl('h1', {
@@ -25,7 +25,7 @@ export class ChessStringModal extends Modal {
 				.inputEl.setCssStyles({ width: '100%', height: '250px' }),
 		);
 
-		new Setting(contentEl).addButton((btn) =>
+		new Setting(contentEl).addButton((btn: ButtonComponent) =>
 			btn
 				.setButtonText('Submit')
 				.setCta()
@@ -36,7 +36,7 @@ export class ChessStringModal extends Modal {
 		);
 	}
 
-	onClose() {
+	onClose(): void {
 		const { contentEl } = this;
 		contentEl.empty();
 	}
