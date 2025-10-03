@@ -69,12 +69,3 @@ export function getChessDataFormat(data: string): 'PGN' | 'FEN' | undefined {
 		return void 0;
 	}
 }
-
-// Example Usage:
-const fenString = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-const pgnString =
-	'[Event "Casual Game"]\n[Site "Example"]\n1. e4 e5 2. Nf3 Nc6';
-
-console.log(getChessDataFormat(fenString)); // Output: FEN
-console.log(getChessDataFormat(pgnString)); // Output: PGN
-console.log(getChessDataFormat('Invalid String')); // Output: Unknown
