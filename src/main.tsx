@@ -65,8 +65,10 @@ export default class ChessStudyPlugin extends Plugin {
 				const onSubmit = async (chessString: ChessString | undefined) => {
 					try {
 						const chessStringTrimmed = chessString?.trim() ?? '';
+						const chessStringOrStartPos =
+							chessStringTrimmed.length > 0 ? chessStringTrimmed : ROOT_FEN;
 
-						const { chess, format } = parseChessString(chessStringTrimmed);
+						const { chess, format } = parseChessString(chessStringOrStartPos);
 
 						const chessStudyFileData: ChessStudyFileData = {
 							version: CURRENT_STORAGE_VERSION,
@@ -98,7 +100,7 @@ export default class ChessStudyPlugin extends Plugin {
 									return move.isBigPawn();
 								},
 							})),
-							rootFEN: format === 'FEN' ? chessStringTrimmed : ROOT_FEN,
+							rootFEN: format === 'FEN' ? chessStringOrStartPos : ROOT_FEN,
 						};
 
 						this.dataAdapter.createStorageFolderIfNotExists();
