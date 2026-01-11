@@ -232,6 +232,7 @@ export const ChessStudy = ({
 									isKingsideCastle: () => false,
 									isQueensideCastle: () => false,
 									isBigPawn: () => false,
+									isNullMove: () => false,
 								};
 								variantMoves.push(move);
 
@@ -261,6 +262,7 @@ export const ChessStudy = ({
 									isKingsideCastle: () => false,
 									isQueensideCastle: () => false,
 									isBigPawn: () => false,
+									isNullMove: () => false,
 								};
 								moves.push(move);
 
@@ -288,6 +290,7 @@ export const ChessStudy = ({
 									isKingsideCastle: () => false,
 									isQueensideCastle: () => false,
 									isBigPawn: () => false,
+									isNullMove: () => false,
 								};
 
 								currentMove.variants.push({
@@ -312,6 +315,7 @@ export const ChessStudy = ({
 							isKingsideCastle: () => false,
 							isQueensideCastle: () => false,
 							isBigPawn: () => false,
+							isNullMove: () => false,
 						};
 						moves.push(move);
 
@@ -385,12 +389,20 @@ export const ChessStudy = ({
 							})
 						}
 						onSaveButtonClick={onSaveButtonClick}
-						onCopyButtonClick={() => {
+						onCopyFenButtonClick={() => {
 							try {
 								navigator.clipboard.writeText(chessLogic.fen());
-								new Notice('Copied to clipboard!');
+								new Notice('Copied FEN to clipboard!');
 							} catch (e) {
-								new Notice('Could not copy to clipboard:', e);
+								new Notice('Could not copy FEN to clipboard:', e);
+							}
+						}}
+						onCopyPgnButtonClick={() => {
+							try {
+								navigator.clipboard.writeText(chessLogic.pgn());
+								new Notice('Copied PGN to clipboard!');
+							} catch (e) {
+								new Notice('Could not copy PGN to clipboard:', e);
 							}
 						}}
 						onSettingsButtonClick={() => {
@@ -406,7 +418,15 @@ export const ChessStudy = ({
 			{viewComments && (
 				<div className="CommentSection">
 					<CommentSection
-						currentComment={gameState.currentMove?.comment ?? null}
+						currentComment={
+							gameState.currentMove
+								? gameState.currentMove.comment
+									? gameState.currentMove.comment
+									: null
+								: gameState.study.comment
+									? gameState.study.comment
+									: null
+						}
 						setComments={(comment: JSONContent) =>
 							dispatch({ type: 'SYNC_COMMENT', comment: comment })
 						}

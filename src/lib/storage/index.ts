@@ -29,7 +29,8 @@ export interface ChessStudyMove extends Move {
 
 export interface ChessStudyFileData {
 	version: string;
-	header: { title: string | null };
+	headers: Record<string, string>;
+	comment: JSONContent | null;
 	moves: ChessStudyMove[];
 	rootFEN: string;
 }

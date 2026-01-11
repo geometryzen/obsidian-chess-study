@@ -21,6 +21,7 @@ import { nanoid } from 'nanoid';
 import { parseChessString } from './lib/chess-logic';
 import { parseUserConfig } from './lib/obsidian';
 import './main.css';
+import { JSONContent } from '@tiptap/react';
 
 type FEN = string;
 type PGN = string;
@@ -70,17 +71,39 @@ export default class ChessStudyPlugin extends Plugin {
 
 						const { chess, format } = parseChessString(chessStringOrStartPos);
 
+						function findComment(
+							fen: string,
+						): { type: string; text: string | undefined }[] | null {
+							const comments = chess.getComments();
+							for (let i = 0; i < comments.length; i++) {
+								const c = comments[i];
+								if (c.fen == fen) {
+									return [{ type: 'text', text: c.comment }];
+								}
+							}
+							return null;
+						}
+
+						function gameComment(): JSONContent | null {
+							const cs = findComment(ROOT_FEN);
+							if (Array.isArray(cs)) {
+								if (cs.length > 0) {
+									return cs[0];
+								}
+							}
+							return null;
+						}
+
 						const chessStudyFileData: ChessStudyFileData = {
 							version: CURRENT_STORAGE_VERSION,
-							header: {
-								title: chess.header()['opening'] || null,
-							},
+							headers: chess.getHeaders(),
+							comment: gameComment(), // seems to return the last comment
 							moves: chess.history({ verbose: true }).map((move) => ({
 								...move,
 								moveId: nanoid(),
 								variants: [],
 								shapes: [],
-								comment: null,
+								comment: findComment(move.after),
 								isCapture: () => {
 									return move.isCapture();
 								},
@@ -98,6 +121,9 @@ export default class ChessStudyPlugin extends Plugin {
 								},
 								isBigPawn: () => {
 									return move.isBigPawn();
+								},
+								isNullMove: () => {
+									return move.isNullMove();
 								},
 							})),
 							rootFEN: format === 'FEN' ? chessStringOrStartPos : ROOT_FEN,

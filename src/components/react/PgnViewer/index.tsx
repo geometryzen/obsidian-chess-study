@@ -52,7 +52,8 @@ interface PgnViewerProps {
 	onBackButtonClick: () => void;
 	onForwardButtonClick: () => void;
 	onSaveButtonClick: () => void;
-	onCopyButtonClick: () => void;
+	onCopyFenButtonClick: () => void;
+	onCopyPgnButtonClick: () => void;
 	onSettingsButtonClick: () => void;
 }
 

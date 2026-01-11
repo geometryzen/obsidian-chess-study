@@ -1,6 +1,7 @@
 import {
 	ArrowBigLeft,
 	ArrowBigRight,
+	Clipboard,
 	Copy,
 	Save,
 	Settings,
@@ -13,7 +14,8 @@ export interface ControlActions {
 	onBackButtonClick: () => void;
 	onForwardButtonClick: () => void;
 	onSaveButtonClick: () => void;
-	onCopyButtonClick: () => void;
+	onCopyFenButtonClick: () => void;
+	onCopyPgnButtonClick: () => void;
 	onSettingsButtonClick: () => void;
 }
 
@@ -32,8 +34,11 @@ export const Controls = (props: ControlActions) => {
 				</button>
 			</div>
 			<div className="button-section">
-				<button title="Copy FEN" onClick={() => props.onCopyButtonClick()}>
+				<button title="Copy FEN" onClick={() => props.onCopyFenButtonClick()}>
 					<Copy strokeWidth={'1px'} />
+				</button>
+				<button title="Copy PGN" onClick={() => props.onCopyPgnButtonClick()}>
+					<Clipboard strokeWidth={'1px'} />
 				</button>
 				<button title="Undo" onClick={() => props.onUndoButtonClick()}>
 					<Undo2 />
