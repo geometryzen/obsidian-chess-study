@@ -56,7 +56,7 @@ export const ChessStudy = ({
 	dataAdapter,
 }: AppProps) => {
 	// Parse Obsidian / Code Block Settings
-	const { boardColor, boardOrientation, viewComments, chessStudyId } =
+	const { boardColor, boardOrientation, readOnly, viewComments, chessStudyId } =
 		parseUserConfig(pluginSettings, source);
 
 	// Setup Chessground API

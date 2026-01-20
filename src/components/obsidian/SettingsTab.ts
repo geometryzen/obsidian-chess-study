@@ -4,12 +4,14 @@ import ChessStudyPlugin from 'src/main';
 export interface ChessStudyPluginSettings {
 	boardOrientation: 'white' | 'black';
 	boardColor: 'green' | 'brown';
+	readOnly: true | false;
 	viewComments: true | false;
 }
 
 export const DEFAULT_SETTINGS: ChessStudyPluginSettings = {
 	boardOrientation: 'white',
 	boardColor: 'green',
+	readOnly: false,
 	viewComments: true,
 };
 
@@ -52,6 +54,20 @@ export class SettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.boardColor)
 					.onChange((boardColor) => {
 						this.plugin.settings.boardColor = boardColor as 'green' | 'brown';
+						this.plugin.saveSettings();
+					});
+			});
+
+		new Setting(containerEl)
+			.setName('Read Only')
+			.setDesc('Sets the default value of the readOnly property')
+			.addDropdown((dropdown) => {
+				dropdown.addOption('true', 'True');
+				dropdown.addOption('false', 'False');
+				dropdown
+					.setValue(this.plugin.settings.readOnly.toString())
+					.onChange((readOnly) => {
+						this.plugin.settings.readOnly = readOnly === 'true';
 						this.plugin.saveSettings();
 					});
 			});

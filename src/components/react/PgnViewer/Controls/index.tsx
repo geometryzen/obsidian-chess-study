@@ -43,10 +43,10 @@ export const Controls = (props: ControlActions) => {
 				<button title="Undo" onClick={() => props.onUndoButtonClick()}>
 					<Undo2 />
 				</button>
-				<button title="Settings" onClick={() => props.onSettingsButtonClick()}>
-					<Settings />
-				</button>
 			</div>
 		</div>
 	);
 };
+// <button title="Settings" onClick={() => props.onSettingsButtonClick()}>
+//	<Settings />
+// </button>

@@ -81,6 +81,7 @@ Here are the available settings for a `chessStudy` code block:
 | `boardOrientation` | `white` \| `black` | Orientation of the board                         |
 | `boardColor`       | `green` \| `brown` | Color of the board                               |
 | `viewComments`     | `true`  \| `false` | Whether to display the comments section          |
+| `readOnly`         | `true`  \| `false` | Determines whether the study can be changed      |
 
 You can permanently set some settings in the [Obsidian](https://obsidian.md/) plugin settings for Obsidian Chess Study.
 

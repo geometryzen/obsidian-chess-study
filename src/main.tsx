@@ -133,8 +133,9 @@ export default class ChessStudyPlugin extends Plugin {
 
 						const id = await this.dataAdapter.saveFile(chessStudyFileData);
 
+						// TODO: It would be nice for the boardOrientation and viewComments to be in the UI as configuration options.
 						editor.replaceRange(
-							`\`\`\`chessStudy\nchessStudyId: ${id}\n\`\`\``,
+							`\`\`\`chessStudy\nchessStudyId: ${id}\nboardOrientation: white\nviewComments: false\n\`\`\``,
 							cursorPosition,
 						);
 					} catch (e) {
