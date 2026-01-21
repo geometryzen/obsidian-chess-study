@@ -3,9 +3,22 @@ import { ChessString } from 'src/main';
 
 export class ChessStringModal extends Modal {
 	chessString: ChessString;
-	onSubmit: (pgn: string) => void;
+	boardOrientation: 'white' | 'black' = 'white';
+	viewComments: boolean = false;
+	onSubmit: (
+		pgn: string,
+		boardOrientation: 'white' | 'black',
+		viewComments: boolean,
+	) => void;
 
-	constructor(app: App, onSubmit: (pgn: string) => void) {
+	constructor(
+		app: App,
+		onSubmit: (
+			pgn: string,
+			boardOrientation: 'white' | 'black',
+			viewComments: boolean,
+		) => void,
+	) {
 		super(app);
 		this.onSubmit = onSubmit;
 	}
@@ -25,13 +38,31 @@ export class ChessStringModal extends Modal {
 				.inputEl.setCssStyles({ width: '100%', height: '250px' }),
 		);
 
+		new Setting(contentEl).setName('boardOrientation').addDropdown((dropdown) => {
+			dropdown.addOption('white', 'White');
+			dropdown.addOption('black', 'Black');
+			dropdown.setValue('white');
+			dropdown.onChange((boardOrientation) => {
+				this.boardOrientation =
+					boardOrientation === 'white' ? boardOrientation : 'black';
+			});
+		});
+
+		new Setting(contentEl).setName('viewComments').addToggle((toggle) => {
+			toggle.setValue(false);
+			toggle.setTooltip('Determines whether move comments are displayed', {});
+			toggle.onChange((viewComments) => {
+				this.viewComments = viewComments;
+			});
+		});
+
 		new Setting(contentEl).addButton((btn: ButtonComponent) =>
 			btn
 				.setButtonText('Submit')
 				.setCta()
 				.onClick(() => {
 					this.close();
-					this.onSubmit(this.chessString);
+					this.onSubmit(this.chessString, this.boardOrientation, this.viewComments);
 				}),
 		);
 	}

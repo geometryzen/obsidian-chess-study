@@ -13,6 +13,7 @@ import {
 } from './components/obsidian/SettingsTab';
 
 // these styles must be imported somewhere
+import { JSONContent } from '@tiptap/react';
 import 'assets/board/green.css';
 import 'chessground/assets/chessground.base.css';
 import 'chessground/assets/chessground.brown.css';
@@ -21,7 +22,6 @@ import { nanoid } from 'nanoid';
 import { parseChessString } from './lib/chess-logic';
 import { parseUserConfig } from './lib/obsidian';
 import './main.css';
-import { JSONContent } from '@tiptap/react';
 
 type FEN = string;
 type PGN = string;
@@ -63,7 +63,11 @@ export default class ChessStudyPlugin extends Plugin {
 			editorCallback: (editor: Editor) => {
 				const cursorPosition = editor.getCursor();
 
-				const onSubmit = async (chessString: ChessString | undefined) => {
+				const onSubmit = async (
+					chessString: ChessString | undefined,
+					boardOrientation: 'white' | 'black',
+					viewComments: boolean,
+				) => {
 					try {
 						const chessStringTrimmed = chessString?.trim() ?? '';
 						const chessStringOrStartPos =
@@ -135,7 +139,7 @@ export default class ChessStudyPlugin extends Plugin {
 
 						// TODO: It would be nice for the boardOrientation and viewComments to be in the UI as configuration options.
 						editor.replaceRange(
-							`\`\`\`chessStudy\nchessStudyId: ${id}\nboardOrientation: white\nviewComments: false\n\`\`\``,
+							`\`\`\`chessStudy\nchessStudyId: ${id}\nboardOrientation: ${boardOrientation === 'black' ? 'black' : 'white'}\nviewComments: ${viewComments ? 'true' : 'false'}\n\`\`\``,
 							cursorPosition,
 						);
 					} catch (e) {
