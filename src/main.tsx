@@ -4,7 +4,7 @@ import {
 	ChessStudyDataAdapter,
 	ChessStudyFileData,
 } from 'src/lib/storage';
-import { ReactView } from './components/ReactView';
+import { ChessStudyMarkdownRenderChild } from './components/ChessStudyMarkdownRenderChild';
 import { ChessStringModal } from './components/obsidian/ChessStringModal';
 import {
 	ChessStudyPluginSettings,
@@ -41,7 +41,10 @@ export default class ChessStudyPlugin extends Plugin {
 		`${this.app.vault.configDir}/plugins/${this.manifest.id}/storage/`,
 	);
 
-	async onload() {
+	/**
+	 * @override
+	 */
+	async onload(): Promise<void> {
 		// Load Settings
 		await this.loadSettings();
 
@@ -171,7 +174,7 @@ export default class ChessStudyPlugin extends Plugin {
 					const data = await this.dataAdapter.loadFile(chessStudyId);
 
 					ctx.addChild(
-						new ReactView(
+						new ChessStudyMarkdownRenderChild(
 							el,
 							source,
 							this.app,
@@ -192,15 +195,18 @@ export default class ChessStudyPlugin extends Plugin {
 		console.log('Chess Study Plugin successfully loaded');
 	}
 
-	async onunload() {
+	/**
+	 * @override
+	 */
+	async onunload(): Promise<void> {
 		console.log('Chess Study Plugin successfully unloaded');
 	}
 
-	async loadSettings() {
+	async loadSettings(): Promise<void> {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
 
-	async saveSettings() {
+	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
 	}
 }

@@ -5,7 +5,11 @@ import { ChessStudyDataAdapter, ChessStudyFileData } from 'src/lib/storage';
 import { ChessStudyPluginSettings } from './obsidian/SettingsTab';
 import { ChessStudy } from './react/ChessStudy';
 
-export class ReactView extends MarkdownRenderChild {
+/**
+ * This is not the Obsidian Plugin.
+ * Instead it is an implementation that renders inside markdown.
+ */
+export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	root: ReactDOM.Root;
 	source: string;
 	app: App;
@@ -13,6 +17,16 @@ export class ReactView extends MarkdownRenderChild {
 	data: ChessStudyFileData;
 	dataAdapter: ChessStudyDataAdapter;
 
+	/**
+	 * The constructor is called from the Obsidian Plugin onload method.
+	 * We get to define the constructor because we call it, not Obsidian.
+	 * @param containerEL
+	 * @param source
+	 * @param app
+	 * @param settings
+	 * @param data
+	 * @param dataAdapter
+	 */
 	constructor(
 		containerEL: HTMLElement,
 		source: string,
@@ -29,7 +43,7 @@ export class ReactView extends MarkdownRenderChild {
 		this.dataAdapter = dataAdapter;
 	}
 
-	onload() {
+	onload(): void {
 		this.root = ReactDOM.createRoot(this.containerEl);
 		this.root.render(
 			<React.StrictMode>
@@ -44,7 +58,7 @@ export class ReactView extends MarkdownRenderChild {
 		);
 	}
 
-	onunload() {
+	onunload(): void {
 		this.root.unmount();
 	}
 }

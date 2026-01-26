@@ -41,8 +41,8 @@ export const ChessgroundWrapper = React.memo(
 					animation: { enabled: true, duration: 100 },
 					check: chess.isCheck(),
 					// coordinates: true,
-					coordinatesOnSquares: true,
-					// disableContextMenu: false,
+					// coordinatesOnSquares: false,
+					// disableContextMenu: true,
 					movable: {
 						free: false,
 						color: toColor(chess),
@@ -50,6 +50,7 @@ export const ChessgroundWrapper = React.memo(
 					},
 					highlight: {
 						check: true,
+						lastMove: true,
 					},
 					drawable: {
 						onChange: (shapes) => {
