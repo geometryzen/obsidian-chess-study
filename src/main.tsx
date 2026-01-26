@@ -5,7 +5,7 @@ import {
 	ChessStudyFileData,
 } from 'src/lib/storage';
 import { ChessStudyMarkdownRenderChild } from './components/ChessStudyMarkdownRenderChild';
-import { ChessStringModal } from './components/obsidian/ChessStringModal';
+import { ChessStudyInsertModal } from './components/obsidian/ChessStudyInsertModal';
 import {
 	ChessStudyPluginSettings,
 	DEFAULT_SETTINGS,
@@ -154,7 +154,7 @@ export default class ChessStudyPlugin extends Plugin {
 					}
 				};
 
-				new ChessStringModal(this.app, onSubmit).open();
+				new ChessStudyInsertModal(this.app, onSubmit).open();
 			},
 		});
 

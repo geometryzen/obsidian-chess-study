@@ -1,10 +1,14 @@
 import { App, ButtonComponent, Modal, Setting } from 'obsidian';
 import { ChessString } from 'src/main';
 
-export class ChessStringModal extends Modal {
+/**
+ * The Modal Dialog that pops up when creating a new Chess Study.
+ */
+export class ChessStudyInsertModal extends Modal {
 	chessString: ChessString;
 	boardOrientation: 'white' | 'black' = 'white';
-	viewComments: boolean = false;
+	#viewComments: boolean = false;
+
 	onSubmit: (
 		pgn: string,
 		boardOrientation: 'white' | 'black',
@@ -23,6 +27,9 @@ export class ChessStringModal extends Modal {
 		this.onSubmit = onSubmit;
 	}
 
+	/**
+	 * @override
+	 */
 	onOpen(): void {
 		const { contentEl } = this;
 
@@ -52,7 +59,7 @@ export class ChessStringModal extends Modal {
 			toggle.setValue(false);
 			toggle.setTooltip('Determines whether move comments are displayed', {});
 			toggle.onChange((viewComments) => {
-				this.viewComments = viewComments;
+				this.#viewComments = viewComments;
 			});
 		});
 
@@ -62,11 +69,14 @@ export class ChessStringModal extends Modal {
 				.setCta()
 				.onClick(() => {
 					this.close();
-					this.onSubmit(this.chessString, this.boardOrientation, this.viewComments);
+					this.onSubmit(this.chessString, this.boardOrientation, this.#viewComments);
 				}),
 		);
 	}
 
+	/**
+	 * @override
+	 */
 	onClose(): void {
 		const { contentEl } = this;
 		contentEl.empty();
