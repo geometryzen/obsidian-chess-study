@@ -15,11 +15,13 @@ import { ChessString } from 'src/main';
 export class ChessStudyInsertModal extends Modal {
 	#chessString: ChessString;
 	#boardOrientation: 'white' | 'black' = 'white';
-	#viewComments: boolean = false;
+	#readOnly = false;
+	#viewComments = false;
 
 	onSubmit: (
 		pgn: string,
 		boardOrientation: 'white' | 'black',
+		readOnly: boolean,
 		viewComments: boolean,
 	) => void;
 
@@ -28,6 +30,7 @@ export class ChessStudyInsertModal extends Modal {
 		onSubmit: (
 			pgn: string,
 			boardOrientation: 'white' | 'black',
+			readOnly: boolean,
 			viewComments: boolean,
 		) => void,
 	) {
@@ -70,6 +73,16 @@ export class ChessStudyInsertModal extends Modal {
 			});
 
 		new Setting(contentEl)
+			.setName('readOnly')
+			.addToggle((toggle: ToggleComponent) => {
+				toggle.setValue(false);
+				toggle.setTooltip('Determines whether the study can be changed', {});
+				toggle.onChange((readOnly) => {
+					this.#readOnly = readOnly;
+				});
+			});
+
+		new Setting(contentEl)
 			.setName('viewComments')
 			.addToggle((toggle: ToggleComponent) => {
 				toggle.setValue(false);
@@ -88,6 +101,7 @@ export class ChessStudyInsertModal extends Modal {
 					this.onSubmit(
 						this.#chessString,
 						this.#boardOrientation,
+						this.#readOnly,
 						this.#viewComments,
 					);
 				}),

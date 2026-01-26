@@ -8,18 +8,9 @@ import {
 	Undo2,
 } from 'lucide-react';
 import * as React from 'react';
+import { ControlProps } from './ControlsProps';
 
-export interface ControlActions {
-	onUndoButtonClick: () => void;
-	onBackButtonClick: () => void;
-	onForwardButtonClick: () => void;
-	onSaveButtonClick: () => void;
-	onCopyFenButtonClick: () => void;
-	onCopyPgnButtonClick: () => void;
-	onSettingsButtonClick: () => void;
-}
-
-export const Controls = (props: ControlActions) => {
+export const Controls = (props: ControlProps) => {
 	return (
 		<React.Fragment>
 			<div className="button-section">
@@ -29,9 +20,11 @@ export const Controls = (props: ControlActions) => {
 				<button title="Forward" onClick={() => props.onForwardButtonClick()}>
 					<ArrowBigRight />
 				</button>
-				<button title="Save" onClick={() => props.onSaveButtonClick()}>
-					<Save strokeWidth={'1px'} />
-				</button>
+				{props.readOnly ? null : (
+					<button title="Save" onClick={() => props.onSaveButtonClick()}>
+						<Save strokeWidth={'1px'} />
+					</button>
+				)}
 			</div>
 			<div className="button-section">
 				<button title="Copy FEN" onClick={() => props.onCopyFenButtonClick()}>
@@ -40,9 +33,11 @@ export const Controls = (props: ControlActions) => {
 				<button title="Copy PGN" onClick={() => props.onCopyPgnButtonClick()}>
 					<Clipboard strokeWidth={'1px'} />
 				</button>
-				<button title="Undo" onClick={() => props.onUndoButtonClick()}>
-					<Undo2 />
-				</button>
+				{props.readOnly ? null : (
+					<button title="Undo" onClick={() => props.onUndoButtonClick()}>
+						<Undo2 />
+					</button>
+				)}
 			</div>
 		</React.Fragment>
 	);

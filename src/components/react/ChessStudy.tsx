@@ -378,6 +378,13 @@ export const ChessStudy = ({
 						currentMoveId={gameState.currentMove?.moveId ?? null}
 						firstPlayer={firstPlayer}
 						initialMoveNumber={initialMoveNumber}
+						onMoveItemClick={(moveId: string) =>
+							dispatch({
+								type: 'DISPLAY_SELECTED_MOVE_IN_HISTORY',
+								moveId: moveId,
+							})
+						}
+						readOnly={readOnly}
 						onUndoButtonClick={() =>
 							dispatch({ type: 'REMOVE_LAST_MOVE_FROM_HISTORY' })
 						}
@@ -386,12 +393,6 @@ export const ChessStudy = ({
 						}
 						onForwardButtonClick={() =>
 							dispatch({ type: 'DISPLAY_NEXT_MOVE_IN_HISTORY' })
-						}
-						onMoveItemClick={(moveId: string) =>
-							dispatch({
-								type: 'DISPLAY_SELECTED_MOVE_IN_HISTORY',
-								moveId: moveId,
-							})
 						}
 						onSaveButtonClick={onSaveButtonClick}
 						onCopyFenButtonClick={() => {

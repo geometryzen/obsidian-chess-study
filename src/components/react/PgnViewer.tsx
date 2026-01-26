@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { ChessStudyMove } from 'src/lib/storage';
 import { Controls } from './Controls';
 import { MoveItem, VariantMoveItem } from './MoveItem';
+import { PgnViewerProps } from './PgnViewerProps';
 
 const chunkArray = <T,>(array: T[], chunkSize: number, offsetByOne = false) => {
 	return array.reduce((resultArray, item, index) => {
@@ -41,21 +42,6 @@ export const VariantsContainer = ({
 }) => {
 	return <div className="variants-container">{children}</div>;
 };
-
-interface PgnViewerProps {
-	history: ChessStudyMove[];
-	currentMoveId: string | null;
-	firstPlayer: string;
-	initialMoveNumber: number;
-	onMoveItemClick: (moveId: string) => void;
-	onUndoButtonClick: () => void;
-	onBackButtonClick: () => void;
-	onForwardButtonClick: () => void;
-	onSaveButtonClick: () => void;
-	onCopyFenButtonClick: () => void;
-	onCopyPgnButtonClick: () => void;
-	onSettingsButtonClick: () => void;
-}
 
 export const PgnViewer = React.memo((props: PgnViewerProps) => {
 	const {
