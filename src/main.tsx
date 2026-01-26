@@ -69,6 +69,7 @@ export default class ChessStudyPlugin extends Plugin {
 				const onSubmit = async (
 					chessString: ChessString | undefined,
 					boardOrientation: 'white' | 'black',
+					disableNavigation: boolean,
 					readOnly: boolean,
 					viewComments: boolean,
 				) => {
@@ -143,7 +144,7 @@ export default class ChessStudyPlugin extends Plugin {
 
 						// TODO: It would be nice for the boardOrientation and viewComments to be in the UI as configuration options.
 						editor.replaceRange(
-							`\`\`\`chessStudy\nchessStudyId: ${id}\nboardOrientation: ${boardOrientation === 'black' ? 'black' : 'white'}\nreadOnly: ${readOnly ? 'true' : 'false'}\nviewComments: ${viewComments ? 'true' : 'false'}\n\`\`\``,
+							`\`\`\`chessStudy\nchessStudyId: ${id}\nboardOrientation: ${boardOrientation === 'black' ? 'black' : 'white'}\ndisableNavigation: ${disableNavigation ? 'true' : 'false'}\nreadOnly: ${readOnly ? 'true' : 'false'}\nviewComments: ${viewComments ? 'true' : 'false'}\n\`\`\``,
 							cursorPosition,
 						);
 					} catch (e) {

@@ -75,13 +75,14 @@ Thanks to [@latenitecoding](https://github.com/latenitecoding) for the contribut
 
 Here are the available settings for a `chessStudy` code block:
 
-| Setting            | Possible Values    | Description                                      |
-| ------------------ | ------------------ | ------------------------------------------------ |
-| `chessStudyId`     | Valid nanoid       | Valid ID for a file stored in the plugin storage |
-| `boardOrientation` | `white` \| `black` | Orientation of the board                         |
-| `boardColor`       | `green` \| `brown` | Color of the board                               |
-| `viewComments`     | `true`  \| `false` | Whether to display the comments section          |
-| `readOnly`         | `true`  \| `false` | Determines whether the study can be changed      |
+| Setting             | Possible Values    | Description                                      |
+| ------------------- | ------------------ | ------------------------------------------------ |
+| `chessStudyId`      | Valid nanoid       | Valid ID for a file stored in the plugin storage |
+| `boardOrientation`  | `white` \| `black` | Orientation of the board                         |
+| `boardColor`        | `green` \| `brown` | Color of the board                               |
+| `viewComments`      | `true`  \| `false` | Whether to display the comments section          |
+| `disableNavigation` | `true`  \| `false` | Determines whether the study can be changed      |
+| `readOnly`          | `true`  \| `false` | Determines whether the study can be changed      |
 
 You can permanently set some settings in the [Obsidian](https://obsidian.md/) plugin settings for Obsidian Chess Study.
 

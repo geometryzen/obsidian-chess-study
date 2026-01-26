@@ -61,8 +61,14 @@ export const ChessStudy = ({
 	dataAdapter,
 }: AppProps) => {
 	// Parse Obsidian / Code Block Settings
-	const { boardColor, boardOrientation, readOnly, viewComments, chessStudyId } =
-		parseUserConfig(pluginSettings, source);
+	const {
+		boardColor,
+		boardOrientation,
+		disableNavigation,
+		readOnly,
+		viewComments,
+		chessStudyId,
+	} = parseUserConfig(pluginSettings, source);
 
 	// Setup Chessground API
 	const [chessView, setChessView] = useState<Api | null>(null);
@@ -384,6 +390,7 @@ export const ChessStudy = ({
 								moveId: moveId,
 							})
 						}
+						disableNavigation={disableNavigation}
 						readOnly={readOnly}
 						onUndoButtonClick={() =>
 							dispatch({ type: 'REMOVE_LAST_MOVE_FROM_HISTORY' })

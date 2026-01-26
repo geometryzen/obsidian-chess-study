@@ -1,4 +1,5 @@
 export interface ControlProps {
+	disableNavigation: boolean;
 	readOnly: boolean;
 	onUndoButtonClick: () => void;
 	onBackButtonClick: () => void;

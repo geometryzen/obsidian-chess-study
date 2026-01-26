@@ -14,12 +14,16 @@ export const Controls = (props: ControlProps) => {
 	return (
 		<React.Fragment>
 			<div className="button-section">
-				<button title="Back" onClick={() => props.onBackButtonClick()}>
-					<ArrowBigLeft />
-				</button>
-				<button title="Forward" onClick={() => props.onForwardButtonClick()}>
-					<ArrowBigRight />
-				</button>
+				{props.disableNavigation ? null : (
+					<React.Fragment>
+						<button title="Back" onClick={() => props.onBackButtonClick()}>
+							<ArrowBigLeft />
+						</button>
+						<button title="Forward" onClick={() => props.onForwardButtonClick()}>
+							<ArrowBigRight />
+						</button>
+					</React.Fragment>
+				)}
 				{props.readOnly ? null : (
 					<button title="Save" onClick={() => props.onSaveButtonClick()}>
 						<Save strokeWidth={'1px'} />

@@ -4,6 +4,7 @@ import ChessStudyPlugin from 'src/main';
 export interface ChessStudyPluginSettings {
 	boardOrientation: 'white' | 'black';
 	boardColor: 'green' | 'brown';
+	disableNavigation: true | false;
 	readOnly: true | false;
 	viewComments: true | false;
 }
@@ -11,6 +12,7 @@ export interface ChessStudyPluginSettings {
 export const DEFAULT_SETTINGS: ChessStudyPluginSettings = {
 	boardOrientation: 'white',
 	boardColor: 'green',
+	disableNavigation: false,
 	readOnly: false,
 	viewComments: true,
 };
@@ -57,6 +59,20 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 					.setValue(this.#plugin.settings.boardColor)
 					.onChange((boardColor) => {
 						this.#plugin.settings.boardColor = boardColor as 'green' | 'brown';
+						this.#plugin.saveSettings();
+					});
+			});
+
+		new Setting(containerEl)
+			.setName('Disable Navigation')
+			.setDesc('Sets the default value of the disableNavigation property')
+			.addDropdown((dropdown) => {
+				dropdown.addOption('true', 'True');
+				dropdown.addOption('false', 'False');
+				dropdown
+					.setValue(this.#plugin.settings.disableNavigation.toString())
+					.onChange((disableNavigation) => {
+						this.#plugin.settings.disableNavigation = disableNavigation === 'true';
 						this.#plugin.saveSettings();
 					});
 			});
