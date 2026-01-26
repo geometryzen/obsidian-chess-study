@@ -2,7 +2,7 @@ import { App, MarkdownRenderChild } from 'obsidian';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { ChessStudyDataAdapter, ChessStudyFileData } from 'src/lib/storage';
-import { ChessStudyPluginSettings } from './obsidian/SettingsTab';
+import { ChessStudyPluginSettings } from './obsidian/ChessStudyPluginSettingsTab';
 import { ChessStudy } from './react/ChessStudy';
 
 /**
@@ -43,6 +43,9 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 		this.dataAdapter = dataAdapter;
 	}
 
+	/**
+	 * @override
+	 */
 	onload(): void {
 		this.root = ReactDOM.createRoot(this.containerEl);
 		this.root.render(
@@ -58,6 +61,9 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 		);
 	}
 
+	/**
+	 * @override
+	 */
 	onunload(): void {
 		this.root.unmount();
 	}

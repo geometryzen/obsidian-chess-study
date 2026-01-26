@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid';
 import { App, Notice } from 'obsidian';
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
-import { ChessStudyPluginSettings } from 'src/components/obsidian/SettingsTab';
+import { ChessStudyPluginSettings } from 'src/components/obsidian/ChessStudyPluginSettingsTab';
 import { parseUserConfig } from 'src/lib/obsidian';
 import {
 	ChessStudyDataAdapter,
@@ -49,6 +49,11 @@ export type GameActions =
 	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
 
+/**
+ * This is the top-level React component in our Markdown renderer.
+ * @param param0
+ * @returns
+ */
 export const ChessStudy = ({
 	source,
 	pluginSettings,

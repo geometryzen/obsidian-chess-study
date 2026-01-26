@@ -9,8 +9,8 @@ import { ChessStudyInsertModal } from './components/obsidian/ChessStudyInsertMod
 import {
 	ChessStudyPluginSettings,
 	DEFAULT_SETTINGS,
-	SettingsTab,
-} from './components/obsidian/SettingsTab';
+	ChessStudyPluginSettingsTab,
+} from './components/obsidian/ChessStudyPluginSettingsTab';
 
 // these styles must be imported somewhere
 import { JSONContent } from '@tiptap/react';
@@ -57,7 +57,7 @@ export default class ChessStudyPlugin extends Plugin {
 		await this.dataAdapter.createStorageFolderIfNotExists();
 
 		// Add settings tab
-		this.addSettingTab(new SettingsTab(this.app, this));
+		this.addSettingTab(new ChessStudyPluginSettingsTab(this.app, this));
 
 		// Add command
 		this.addCommand({

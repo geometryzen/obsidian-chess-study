@@ -1,12 +1,20 @@
-import { App, ButtonComponent, Modal, Setting } from 'obsidian';
+import {
+	App,
+	ButtonComponent,
+	DropdownComponent,
+	Modal,
+	Setting,
+	TextAreaComponent,
+	ToggleComponent,
+} from 'obsidian';
 import { ChessString } from 'src/main';
 
 /**
  * The Modal Dialog that pops up when creating a new Chess Study.
  */
 export class ChessStudyInsertModal extends Modal {
-	chessString: ChessString;
-	boardOrientation: 'white' | 'black' = 'white';
+	#chessString: ChessString;
+	#boardOrientation: 'white' | 'black' = 'white';
 	#viewComments: boolean = false;
 
 	onSubmit: (
@@ -37,39 +45,49 @@ export class ChessStudyInsertModal extends Modal {
 			text: 'Paste the full PGN/FEN (leave empty for a new game):',
 		});
 
-		new Setting(contentEl).setName('PGN/FEN').addTextArea((text) =>
-			text
-				.onChange((value) => {
-					this.chessString = value;
-				})
-				.inputEl.setCssStyles({ width: '100%', height: '250px' }),
-		);
+		new Setting(contentEl)
+			.setName('PGN/FEN')
+			.addTextArea((text: TextAreaComponent) =>
+				text
+					.onChange((value) => {
+						this.#chessString = value;
+					})
+					.inputEl.setCssStyles({ width: '100%', height: '250px' }),
+			);
 
-		new Setting(contentEl).setName('boardOrientation').addDropdown((dropdown) => {
-			dropdown.addOption('white', 'White');
-			dropdown.addOption('black', 'Black');
-			dropdown.setValue('white');
-			dropdown.onChange((boardOrientation) => {
-				this.boardOrientation =
-					boardOrientation === 'white' ? boardOrientation : 'black';
+		new Setting(contentEl)
+			.setName('boardOrientation')
+			.addDropdown((dropdown: DropdownComponent) => {
+				dropdown.addOption('white', 'White');
+				dropdown.addOption('black', 'Black');
+				dropdown.setValue('white');
+				dropdown.onChange((boardOrientation) => {
+					this.#boardOrientation =
+						boardOrientation === 'white' ? boardOrientation : 'black';
+				});
 			});
-		});
 
-		new Setting(contentEl).setName('viewComments').addToggle((toggle) => {
-			toggle.setValue(false);
-			toggle.setTooltip('Determines whether move comments are displayed', {});
-			toggle.onChange((viewComments) => {
-				this.#viewComments = viewComments;
+		new Setting(contentEl)
+			.setName('viewComments')
+			.addToggle((toggle: ToggleComponent) => {
+				toggle.setValue(false);
+				toggle.setTooltip('Determines whether move comments are displayed', {});
+				toggle.onChange((viewComments) => {
+					this.#viewComments = viewComments;
+				});
 			});
-		});
 
-		new Setting(contentEl).addButton((btn: ButtonComponent) =>
-			btn
+		new Setting(contentEl).addButton((button: ButtonComponent) =>
+			button
 				.setButtonText('Submit')
 				.setCta()
 				.onClick(() => {
 					this.close();
-					this.onSubmit(this.chessString, this.boardOrientation, this.#viewComments);
+					this.onSubmit(
+						this.#chessString,
+						this.#boardOrientation,
+						this.#viewComments,
+					);
 				}),
 		);
 	}

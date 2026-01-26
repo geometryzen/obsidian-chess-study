@@ -1,5 +1,5 @@
 import { parseYaml } from 'obsidian';
-import { ChessStudyPluginSettings } from 'src/components/obsidian/SettingsTab';
+import { ChessStudyPluginSettings } from 'src/components/obsidian/ChessStudyPluginSettingsTab';
 
 type ChessStudyAppConfig = ChessStudyPluginSettings & {
 	chessStudyId: string;

@@ -15,14 +15,17 @@ export const DEFAULT_SETTINGS: ChessStudyPluginSettings = {
 	viewComments: true,
 };
 
-export class SettingsTab extends PluginSettingTab {
-	plugin: ChessStudyPlugin;
+export class ChessStudyPluginSettingsTab extends PluginSettingTab {
+	#plugin: ChessStudyPlugin;
 
 	constructor(app: App, plugin: ChessStudyPlugin) {
 		super(app, plugin);
-		this.plugin = plugin;
+		this.#plugin = plugin;
 	}
 
+	/**
+	 * @override
+	 */
 	display(): void {
 		const { containerEl } = this;
 
@@ -36,10 +39,10 @@ export class SettingsTab extends PluginSettingTab {
 				dropdown.addOption('black', 'Black');
 
 				dropdown
-					.setValue(this.plugin.settings.boardOrientation)
+					.setValue(this.#plugin.settings.boardOrientation)
 					.onChange((orientation) => {
-						this.plugin.settings.boardOrientation = orientation as 'white' | 'black';
-						this.plugin.saveSettings();
+						this.#plugin.settings.boardOrientation = orientation as 'white' | 'black';
+						this.#plugin.saveSettings();
 					});
 			});
 
@@ -51,10 +54,10 @@ export class SettingsTab extends PluginSettingTab {
 				dropdown.addOption('brown', 'Brown');
 
 				dropdown
-					.setValue(this.plugin.settings.boardColor)
+					.setValue(this.#plugin.settings.boardColor)
 					.onChange((boardColor) => {
-						this.plugin.settings.boardColor = boardColor as 'green' | 'brown';
-						this.plugin.saveSettings();
+						this.#plugin.settings.boardColor = boardColor as 'green' | 'brown';
+						this.#plugin.saveSettings();
 					});
 			});
 
@@ -65,10 +68,10 @@ export class SettingsTab extends PluginSettingTab {
 				dropdown.addOption('true', 'True');
 				dropdown.addOption('false', 'False');
 				dropdown
-					.setValue(this.plugin.settings.readOnly.toString())
+					.setValue(this.#plugin.settings.readOnly.toString())
 					.onChange((readOnly) => {
-						this.plugin.settings.readOnly = readOnly === 'true';
-						this.plugin.saveSettings();
+						this.#plugin.settings.readOnly = readOnly === 'true';
+						this.#plugin.saveSettings();
 					});
 			});
 
@@ -79,10 +82,10 @@ export class SettingsTab extends PluginSettingTab {
 				dropdown.addOption('true', 'True');
 				dropdown.addOption('false', 'False');
 				dropdown
-					.setValue(this.plugin.settings.viewComments.toString())
+					.setValue(this.#plugin.settings.viewComments.toString())
 					.onChange((viewComments) => {
-						this.plugin.settings.viewComments = viewComments === 'true';
-						this.plugin.saveSettings();
+						this.#plugin.settings.viewComments = viewComments === 'true';
+						this.#plugin.saveSettings();
 					});
 			});
 	}
