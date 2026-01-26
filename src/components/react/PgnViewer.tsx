@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import { ChessStudyMove } from 'src/lib/storage';
 import { Controls } from './Controls';
-import { MoveItem, VariantMoveItem } from './MoveItems';
+import { MoveItem, VariantMoveItem } from './MoveItem';
 
 const chunkArray = <T,>(array: T[], chunkSize: number, offsetByOne = false) => {
 	return array.reduce((resultArray, item, index) => {

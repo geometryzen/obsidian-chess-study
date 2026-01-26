@@ -42,13 +42,15 @@ export class ChessStudyInsertModal extends Modal {
 		const { contentEl } = this;
 
 		contentEl.createEl('h1', {
-			text: 'Paste the full PGN/FEN (leave empty for a new game):',
+			text: 'Insert Chess Study',
 		});
 
 		new Setting(contentEl)
 			.setName('PGN/FEN')
 			.addTextArea((text: TextAreaComponent) =>
 				text
+					.setValue('')
+					.setPlaceholder('Paste PGN or FEN. Leave empty for a new game.')
 					.onChange((value) => {
 						this.#chessString = value;
 					})

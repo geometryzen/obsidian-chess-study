@@ -21,7 +21,7 @@ export interface ControlActions {
 
 export const Controls = (props: ControlActions) => {
 	return (
-		<div>
+		<React.Fragment>
 			<div className="button-section">
 				<button title="Back" onClick={() => props.onBackButtonClick()}>
 					<ArrowBigLeft />
@@ -44,9 +44,11 @@ export const Controls = (props: ControlActions) => {
 					<Undo2 />
 				</button>
 			</div>
-		</div>
+		</React.Fragment>
 	);
 };
+// In theory you can add more button-section(s) and they appear as rows in the output.
+// However, they spill over the comments section, so two rows is the maximum.
 // <button title="Settings" onClick={() => props.onSettingsButtonClick()}>
 //	<Settings />
 // </button>

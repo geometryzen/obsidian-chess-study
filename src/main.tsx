@@ -4,7 +4,7 @@ import {
 	ChessStudyDataAdapter,
 	ChessStudyFileData,
 } from 'src/lib/storage';
-import { ChessStudyMarkdownRenderChild } from './components/ChessStudyMarkdownRenderChild';
+import { ChessStudyMarkdownRenderChild } from './components/obsidian/ChessStudyMarkdownRenderChild';
 import { ChessStudyInsertModal } from './components/obsidian/ChessStudyInsertModal';
 import {
 	ChessStudyPluginSettings,

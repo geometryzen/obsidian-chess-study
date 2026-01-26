@@ -83,7 +83,7 @@ export const ChessgroundWrapper = React.memo(
 			});
 		}, [addMoveToHistory, api, chess]);
 
-		//Sync View Only
+		// Sync View Only
 		useEffect(() => {
 			api?.set({ viewOnly: isViewOnly });
 		}, [isViewOnly, api]);
