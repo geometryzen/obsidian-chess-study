@@ -1,6 +1,6 @@
 import { JSONContent } from '@tiptap/react';
-import { Chess, Move } from 'chess.js';
-import { Api } from 'chessground/api';
+import { Chess as ChessModel, Move } from 'chess.js';
+import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
 import { nanoid } from 'nanoid';
 import { App, Notice } from 'obsidian';
@@ -71,11 +71,11 @@ export const ChessStudy = ({
 	} = parseUserConfig(pluginSettings, source);
 
 	// Setup Chessground API
-	const [chessView, setChessView] = useState<Api | null>(null);
+	const [chessView, setChessView] = useState<ChessView | null>(null);
 
 	// Setup Chess.js API
 	const [initialChessLogic, firstPlayer, initialMoveNumber] = useMemo(() => {
-		const chess = new Chess(chessStudyData.rootFEN);
+		const chess = new ChessModel(chessStudyData.rootFEN);
 
 		const firstPlayer = chess.turn();
 		const initialMoveNumber = chess.moveNumber();
@@ -247,7 +247,7 @@ export const ChessStudy = ({
 								};
 								variantMoves.push(move);
 
-								const tempChess = new Chess(newMove.after);
+								const tempChess = new ChessModel(newMove.after);
 
 								draft.currentMove = move;
 
@@ -367,9 +367,7 @@ export const ChessStudy = ({
 						}}
 						boardColor={boardColor}
 						chess={chessLogic}
-						addMoveToHistory={(move: Move) =>
-							dispatch({ type: 'ADD_MOVE_TO_HISTORY', move })
-						}
+						onMove={(move: Move) => dispatch({ type: 'ADD_MOVE_TO_HISTORY', move })}
 						isViewOnly={gameState.isViewOnly}
 						syncShapes={(shapes: DrawShape[]) =>
 							dispatch({ type: 'SYNC_SHAPES', shapes })

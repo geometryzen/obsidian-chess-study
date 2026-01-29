@@ -2,8 +2,9 @@ import { Chess } from 'chess.js';
 import { Api as ChessgroundApi } from 'chessground/api';
 import { Draft } from 'immer';
 import { GameState } from 'src/components/react/ChessStudy';
-import { toColor, toDests } from '../chess-logic';
+import { legalMoves } from '../chess-logic';
 import { ChessStudyMove, VariantMove } from '../storage';
+import { turnColor } from '../turnColor';
 
 interface MovePosition {
 	variant: { parentMoveIndex: number; variantIndex: number } | null;
@@ -88,10 +89,10 @@ export const displayMoveInHistory = (
 			check: chess.isCheck(),
 			movable: {
 				free: false,
-				color: toColor(chess),
-				dests: toDests(chess),
+				color: turnColor(chess),
+				dests: legalMoves(chess),
 			},
-			turnColor: toColor(chess),
+			turnColor: turnColor(chess),
 		});
 
 		draft.currentMove = moveToDisplay;
@@ -107,10 +108,10 @@ export const displayMoveInHistory = (
 			check: chess.isCheck(),
 			movable: {
 				free: false,
-				color: toColor(chess),
-				dests: toDests(chess),
+				color: turnColor(chess),
+				dests: legalMoves(chess),
 			},
-			turnColor: toColor(chess),
+			turnColor: turnColor(chess),
 		});
 
 		draft.currentMove = null;

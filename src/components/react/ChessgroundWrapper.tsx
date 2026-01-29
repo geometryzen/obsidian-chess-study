@@ -1,17 +1,19 @@
 import { Chess, Move } from 'chess.js';
-import { Chessground as ChessgroundApi } from 'chessground';
+import { Chessground } from 'chessground';
 import { Api } from 'chessground/api';
 import { Config } from 'chessground/config';
 import { DrawShape } from 'chessground/draw';
+import { Key, MoveMetadata } from 'chessground/types';
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
-import { playOtherSide, toColor, toDests } from 'src/lib/chess-logic';
+import { playOtherSide, legalMoves } from 'src/lib/chess-logic';
+import { turnColor } from 'src/lib/turnColor';
 
 export interface ChessgroundProps {
 	api: Api | null;
 	setApi: React.Dispatch<React.SetStateAction<Api>>;
 	chess: Chess;
-	addMoveToHistory: (move: Move) => void;
+	onMove: (move: Move) => void;
 	syncShapes: (shapes: DrawShape[]) => void;
 	isViewOnly: boolean;
 	shapes: DrawShape[];
@@ -24,7 +26,7 @@ export const ChessgroundWrapper = React.memo(
 		api,
 		setApi,
 		chess,
-		addMoveToHistory,
+		onMove,
 		syncShapes: setShapes,
 		isViewOnly,
 		shapes,
@@ -36,17 +38,17 @@ export const ChessgroundWrapper = React.memo(
 		//Chessground Init
 		useEffect(() => {
 			if (ref.current && !api) {
-				const chessgroundApi = ChessgroundApi(ref.current, {
+				const board = Chessground(ref.current, {
 					fen: chess.fen(),
-					animation: { enabled: true, duration: 100 },
+					animation: { enabled: true, duration: 200 },
 					check: chess.isCheck(),
 					// coordinates: true,
 					// coordinatesOnSquares: false,
 					// disableContextMenu: true,
 					movable: {
 						free: false,
-						color: toColor(chess),
-						dests: toDests(chess),
+						color: turnColor(chess),
+						dests: legalMoves(chess),
 					},
 					highlight: {
 						check: true,
@@ -57,31 +59,31 @@ export const ChessgroundWrapper = React.memo(
 							setShapes(shapes);
 						},
 					},
-					turnColor: toColor(chess),
+					turnColor: turnColor(chess),
 					...config,
 				});
-
-				setApi(chessgroundApi);
+				setApi(board);
 			} else if (ref.current && api) {
 				api.set(config);
 			}
-		}, [addMoveToHistory, api, chess, config, setApi, setShapes]);
+		}, [onMove, api, chess, config, setApi, setShapes]);
 
-		//Sync Chess Logic
+		// Sync Chess Logic
 		useEffect(() => {
 			api?.set({
 				movable: {
 					events: {
-						//Hook up the Chessground UI changes to our App State
-						after: (orig, dest, _metadata) => {
+						// Hook up the Chessground UI changes to our App State
+						after: (orig: Key, dest: Key, _metadata: MoveMetadata) => {
 							const handler = playOtherSide(api, chess);
-
-							addMoveToHistory(handler(orig, dest));
+							// This name assumes a particulat usage
+							const move: Move = handler(orig, dest);
+							onMove(move);
 						},
 					},
 				},
 			});
-		}, [addMoveToHistory, api, chess]);
+		}, [onMove, api, chess]);
 
 		// Sync View Only
 		useEffect(() => {

@@ -2,12 +2,14 @@ import { Chess, QUEEN, SQUARES, Square } from 'chess.js';
 import { Api } from 'chessground/api';
 import { Config } from 'chessground/config';
 import { getChessDataFormat } from '../fen-or-pgn';
+import { turnColor } from '../turnColor';
 
-export function toColor(chess: Chess) {
-	return chess.turn() === 'w' ? 'white' : 'black';
-}
-
-export function toDests(chess: Chess): Map<Square, Square[]> {
+/**
+ * Gets the set of legal moves for the current position.
+ *
+ * @see https://github.com/ornicar/chessground-examples
+ */
+export function legalMoves(chess: Chess): Map<Square, Square[]> {
 	const dests = new Map();
 	SQUARES.forEach((s) => {
 		const ms = chess.moves({ square: s, verbose: true });
@@ -20,27 +22,36 @@ export function toDests(chess: Chess): Map<Square, Square[]> {
 	return dests;
 }
 
-export function playOtherSide(cg: Api, chess: Chess) {
-	return (orig: string, dest: string) => {
-		const move = chess.move({ from: orig, to: dest, promotion: QUEEN });
+/**
+ * Returns a function that updates the chess model and view based on the move
+ *
+ * @see https://github.com/ornicar/chessground-examples
+ */
+export function playOtherSide(view: Api, chess: Chess) {
+	return (from: string, to: string) => {
+		const move = chess.move({ from, to, promotion: QUEEN });
 
-		const commonTurnProperties: Partial<Config> = {
-			turnColor: toColor(chess),
+		const viewConfig: Partial<Config> = {
+			// I'm not sure what thi does! You can comment it out and not much changes.
+			// turnColor: turnColor(chess),
 			movable: {
-				color: toColor(chess),
-				dests: toDests(chess),
+				// Only allow moves by whoevers turn it is.
+				color: turnColor(chess),
+				// Only allow legal moves.
+				dests: legalMoves(chess),
 			},
+			// this highlights the checked king in red.
 			check: chess.isCheck(),
 		};
 
 		if (move.isEnPassant() || move.promotion) {
-			//Handle En Passant && Promote to Queen by default
-			cg.set({
+			// Handle En Passant && Promote to Queen by default
+			view.set({
 				fen: chess.fen(),
-				...commonTurnProperties,
+				...viewConfig,
 			});
 		} else {
-			cg.set(commonTurnProperties);
+			view.set(viewConfig);
 		}
 
 		return move;
