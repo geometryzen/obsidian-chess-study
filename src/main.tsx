@@ -80,9 +80,9 @@ export default class ChessStudyPlugin extends Plugin {
 
 						const { chess, format } = parseChessString(chessStringOrStartPos);
 
-						function findComment(
+						const findComment = (
 							fen: string,
-						): { type: string; text: string | undefined }[] | null {
+						): { type: string; text: string | undefined }[] | null => {
 							const comments = chess.getComments();
 							for (let i = 0; i < comments.length; i++) {
 								const c = comments[i];
@@ -91,9 +91,9 @@ export default class ChessStudyPlugin extends Plugin {
 								}
 							}
 							return null;
-						}
+						};
 
-						function gameComment(): JSONContent | null {
+						const gameComment = (): JSONContent | null => {
 							const cs = findComment(ROOT_FEN);
 							if (Array.isArray(cs)) {
 								if (cs.length > 0) {
@@ -101,7 +101,7 @@ export default class ChessStudyPlugin extends Plugin {
 								}
 							}
 							return null;
-						}
+						};
 
 						const chessStudyFileData: ChessStudyFileData = {
 							version: CURRENT_STORAGE_VERSION,

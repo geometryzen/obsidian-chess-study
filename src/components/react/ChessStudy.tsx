@@ -15,9 +15,11 @@ import {
 	VariantMove,
 } from 'src/lib/storage';
 import {
-	displayMoveInHistory,
+	displayRelativeMoveInHistory,
 	findMoveIndex,
 	getCurrentMove,
+	getMoveById,
+	displayMove,
 } from 'src/lib/ui-state';
 import { useImmerReducer } from 'use-immer';
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
@@ -93,36 +95,40 @@ export const ChessStudy = ({
 
 	const [chessLogic, setChessLogic] = useState(initialChessLogic);
 
+	// Why are we using use-immer instead of React's useReducer hook?
+	// The purpose is to have immutable state and the immer librray helps with the handling.
+	// This may be more efficient than using mutable state?
 	const [gameState, dispatch] = useImmerReducer<GameState, GameActions>(
-		(draft, action) => {
-			const hasNoMoves = draft.study.moves.length === 0;
+		// The first argument is the reducer function
+		(state, action) => {
+			const hasNoMoves = state.study.moves.length === 0;
 			switch (action.type) {
 				case 'DISPLAY_NEXT_MOVE_IN_HISTORY': {
-					if (!chessView || hasNoMoves) return draft;
+					if (!chessView || hasNoMoves) return state;
 
-					displayMoveInHistory(draft, chessView, setChessLogic, {
+					displayRelativeMoveInHistory(state, chessView, setChessLogic, {
 						offset: 1,
 						selectedMoveId: null,
 					});
 
-					return draft;
+					return state;
 				}
 				case 'DISPLAY_PREVIOUS_MOVE_IN_HISTORY': {
-					if (!chessView || hasNoMoves) return draft;
+					if (!chessView || hasNoMoves) return state;
 
-					displayMoveInHistory(draft, chessView, setChessLogic, {
+					displayRelativeMoveInHistory(state, chessView, setChessLogic, {
 						offset: -1,
 						selectedMoveId: null,
 					});
 
-					return draft;
+					return state;
 				}
 				case 'REMOVE_LAST_MOVE_FROM_HISTORY': {
-					if (!chessView || hasNoMoves) return draft;
+					if (!chessView || hasNoMoves) return state;
 
-					const moves = draft.study.moves;
+					const moves = state.study.moves;
 
-					const currentMoveId = draft.currentMove?.moveId;
+					const currentMoveId = state.currentMove?.moveId;
 
 					if (currentMoveId) {
 						const { variant, moveIndex } = findMoveIndex(moves, currentMoveId);
@@ -134,7 +140,7 @@ export const ChessStudy = ({
 							const isLastMove = moveIndex === variantMoves.length - 1;
 
 							if (isLastMove) {
-								displayMoveInHistory(draft, chessView, setChessLogic, {
+								displayRelativeMoveInHistory(state, chessView, setChessLogic, {
 									offset: -1,
 									selectedMoveId: currentMoveId,
 								});
@@ -146,7 +152,7 @@ export const ChessStudy = ({
 							}
 
 							if (isLastMove) {
-								draft.currentMove =
+								state.currentMove =
 									variantMoves.length > 0
 										? variantMoves[variantMoves.length - 1]
 										: moves[variant.parentMoveIndex];
@@ -155,7 +161,7 @@ export const ChessStudy = ({
 							const isLastMove = moveIndex === moves.length - 1;
 
 							if (isLastMove) {
-								displayMoveInHistory(draft, chessView, setChessLogic, {
+								displayRelativeMoveInHistory(state, chessView, setChessLogic, {
 									offset: -1,
 									selectedMoveId: currentMoveId,
 								});
@@ -164,54 +170,54 @@ export const ChessStudy = ({
 							moves.pop();
 
 							if (isLastMove) {
-								draft.currentMove = moves.length > 0 ? moves[moves.length - 1] : null;
+								state.currentMove = moves.length > 0 ? moves[moves.length - 1] : null;
 							}
 						}
 					}
 
-					return draft;
+					return state;
 				}
 				case 'DISPLAY_SELECTED_MOVE_IN_HISTORY': {
-					if (!chessView || hasNoMoves) return draft;
+					if (!chessView || hasNoMoves) return state;
 
-					const selectedMoveId = action.moveId;
-
-					displayMoveInHistory(draft, chessView, setChessLogic, {
-						offset: 0,
-						selectedMoveId: selectedMoveId,
-					});
-
-					return draft;
+					const move = getMoveById(state.study.moves, action.moveId);
+					displayMove(chessView, setChessLogic, move);
+					state.currentMove = move;
+					return state;
 				}
 				case 'SYNC_SHAPES': {
-					if (!chessView || hasNoMoves) return draft;
+					if (!chessView || hasNoMoves) return state;
 
-					const move = getCurrentMove(draft);
+					const move = getCurrentMove(state);
 
 					if (move) {
 						move.shapes = action.shapes;
-						draft.currentMove = move;
+						state.currentMove = move;
 					}
 
-					return draft;
+					return state;
 				}
 				case 'SYNC_COMMENT': {
-					if (!chessView || hasNoMoves) return draft;
+					if (!chessView || hasNoMoves) return state;
 
-					const move = getCurrentMove(draft);
+					const move = getCurrentMove(state);
 
 					if (move) {
 						move.comment = action.comment;
-						draft.currentMove = move;
+						state.currentMove = move;
 					}
 
-					return draft;
+					return state;
 				}
 				case 'ADD_MOVE_TO_HISTORY': {
+					// There seems to be a bug whereby if you hit the Back button to get positioned
+					// just before the first move, then making the first move adds it to the move list as if it were a new move.
 					const newMove = action.move;
 
-					const moves = draft.study.moves;
-					const currentMoveId = draft.currentMove?.moveId;
+					const moves = state.study.moves;
+					const currentMoveId = state.currentMove?.moveId;
+					console.log('currentMove', state.currentMove);
+					console.log('currentMoveId', currentMoveId);
 
 					const moveId = nanoid();
 
@@ -249,7 +255,7 @@ export const ChessStudy = ({
 
 								const tempChess = new ChessModel(newMove.after);
 
-								draft.currentMove = move;
+								state.currentMove = move;
 
 								chessView?.set({
 									fen: newMove.after,
@@ -257,7 +263,7 @@ export const ChessStudy = ({
 								});
 							}
 						} else {
-							//handle main line
+							// handle main line
 							const isLastMove = currentMoveIndex === moves.length - 1;
 
 							if (isLastMove) {
@@ -277,7 +283,7 @@ export const ChessStudy = ({
 								};
 								moves.push(move);
 
-								draft.currentMove = move;
+								state.currentMove = move;
 							} else {
 								const currentMove = moves[moveIndex];
 
@@ -285,8 +291,8 @@ export const ChessStudy = ({
 								const nextMove = moves[moveIndex + 1];
 
 								if (nextMove.san === newMove.san) {
-									draft.currentMove = nextMove;
-									return draft;
+									state.currentMove = nextMove;
+									return state;
 								}
 
 								const move: ChessStudyMove = {
@@ -310,7 +316,7 @@ export const ChessStudy = ({
 									moves: [move],
 								});
 
-								draft.currentMove = move;
+								state.currentMove = move;
 							}
 						}
 					} else {
@@ -330,15 +336,16 @@ export const ChessStudy = ({
 						};
 						moves.push(move);
 
-						draft.currentMove = move;
+						state.currentMove = move;
 					}
 
-					return draft;
+					return state;
 				}
 				default:
 					break;
 			}
 		},
+		// The second argument is the initial state.
 		{
 			currentMove: chessStudyData.moves[chessStudyData.moves.length - 1] ?? null,
 			isViewOnly: false,

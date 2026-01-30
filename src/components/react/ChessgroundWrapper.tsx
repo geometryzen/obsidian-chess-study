@@ -7,7 +7,7 @@ import { Key, MoveMetadata } from 'chessground/types';
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
 import { playOtherSide, legalMoves } from 'src/lib/chess-logic';
-import { turnColor } from 'src/lib/turnColor';
+import { turnColor } from 'src/lib/chess-logic/turnColor';
 
 export interface ChessgroundProps {
 	api: Api | null;

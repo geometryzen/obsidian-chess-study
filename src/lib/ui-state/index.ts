@@ -4,7 +4,7 @@ import { Draft } from 'immer';
 import { GameState } from 'src/components/react/ChessStudy';
 import { legalMoves } from '../chess-logic';
 import { ChessStudyMove, VariantMove } from '../storage';
-import { turnColor } from '../turnColor';
+import { turnColor } from '../chess-logic/turnColor';
 
 interface MovePosition {
 	variant: { parentMoveIndex: number; variantIndex: number } | null;
@@ -32,11 +32,56 @@ export const findMoveIndex = (
 	return { variant: null, moveIndex: -1 };
 };
 
-export const displayMoveInHistory = (
+const getMoveToDisplay = (
+	moves: ChessStudyMove[],
+	moveId: string,
+	offset: number,
+) => {
+	let moveToDisplay: ChessStudyMove | VariantMove | null = null;
+	const { variant, moveIndex } = findMoveIndex(moves, moveId);
+	// Are we in a variant? Are we not? Decide which move to display
+
+	if (variant) {
+		const variantMoves =
+			moves[variant.parentMoveIndex].variants[variant.variantIndex].moves;
+
+		if (typeof variantMoves[moveIndex + offset] !== 'undefined') {
+			return variantMoves[moveIndex + offset];
+		}
+
+		if (typeof moveToDisplay === 'undefined') {
+			moveToDisplay = moves[variant.parentMoveIndex + offset];
+		}
+	} else {
+		if (typeof moves[moveIndex + offset] !== 'undefined') {
+			moveToDisplay = moves[moveIndex + offset];
+		}
+	}
+	return moveToDisplay;
+};
+
+export const getMoveById = (moves: ChessStudyMove[], moveId: string) => {
+	const { variant, moveIndex } = findMoveIndex(moves, moveId);
+	// Are we in a variant? Are we not? Decide which move to display
+
+	if (variant) {
+		const variantMoves =
+			moves[variant.parentMoveIndex].variants[variant.variantIndex].moves;
+
+		if (typeof variantMoves[moveIndex] !== 'undefined') {
+			return variantMoves[moveIndex];
+		}
+
+		return moves[variant.parentMoveIndex];
+	}
+	return moves[moveIndex];
+};
+
+export const displayRelativeMoveInHistory = (
 	draft: Draft<GameState>,
 	chessView: ChessgroundApi,
 	setChessLogic: React.Dispatch<React.SetStateAction<Chess>>,
-	options: { offset: number; selectedMoveId: string | null } = {
+	options: { offset: 0 | 1 | -1; selectedMoveId: string | null } = {
 		offset: 0,
 		selectedMoveId: null,
 	},
@@ -44,41 +89,37 @@ export const displayMoveInHistory = (
 	let moveToDisplay: ChessStudyMove | VariantMove | null = null;
 
 	const { offset, selectedMoveId } = options;
+	console.log('displayMoveInHistory');
+	console.log('offset', offset);
+	console.log('selectedMoveId', selectedMoveId);
 
-	//Figure out where we are
+	// Figure out where we are
 	const currentMove = draft.currentMove;
 
 	if (currentMove) {
 		const currentMoveId = currentMove.moveId;
+		console.log('currentMoveId', currentMoveId);
 
-		const moves = draft.study.moves;
-
-		//If we pass a moveId, find out where that is and offset from there, otherwise take current moveId
+		// If we pass a moveId, find out where that is and offset from there, otherwise take current moveId
 		const baseMoveId = selectedMoveId || currentMoveId;
 
-		const { variant, moveIndex } = findMoveIndex(moves, baseMoveId);
-		//Are we in a variant? Are we not? Decide which move to display
-
-		if (variant) {
-			const variantMoves =
-				moves[variant.parentMoveIndex].variants[variant.variantIndex].moves;
-
-			if (typeof variantMoves[moveIndex + offset] !== 'undefined') {
-				moveToDisplay = variantMoves[moveIndex + offset];
-			}
-
-			if (typeof moveToDisplay === 'undefined') {
-				moveToDisplay = moves[variant.parentMoveIndex + offset];
-			}
+		moveToDisplay = getMoveToDisplay(draft.study.moves, baseMoveId, offset);
+	} else {
+		console.log('currentMove', currentMove);
+		if (offset < 0) {
+			moveToDisplay = draft.study.moves[draft.study.moves.length - 1];
+		} else if (offset > 0) {
+			// An offset of +1 always means that the user wans to go "Forward".
+			// There will be no selected move.
+			moveToDisplay = draft.study.moves[0];
 		} else {
-			if (typeof moves[moveIndex + offset] !== 'undefined') {
-				moveToDisplay = moves[moveIndex + offset];
-			}
+			// The cast tells us that this function should be refactored because offset zero implies a non-null selection.
+			moveToDisplay = getMoveToDisplay(
+				draft.study.moves,
+				selectedMoveId as string,
+				offset,
+			);
 		}
-	} else if (offset < 0) {
-		moveToDisplay = draft.study.moves[draft.study.moves.length - 1];
-	} else if (offset > 0) {
-		moveToDisplay = draft.study.moves[0];
 	}
 
 	if (moveToDisplay) {
@@ -123,6 +164,27 @@ export const displayMoveInHistory = (
 	}
 
 	return draft;
+};
+
+export const displayMove = (
+	chessView: ChessgroundApi,
+	setChessLogic: React.Dispatch<React.SetStateAction<Chess>>,
+	move: VariantMove,
+): void => {
+	const chess = new Chess(move.after);
+
+	chessView.set({
+		fen: move.after,
+		check: chess.isCheck(),
+		movable: {
+			free: false,
+			color: turnColor(chess),
+			dests: legalMoves(chess),
+		},
+		turnColor: turnColor(chess),
+	});
+
+	setChessLogic(chess);
 };
 
 export const getCurrentMove = (

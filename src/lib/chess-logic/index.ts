@@ -2,7 +2,7 @@ import { Chess, QUEEN, SQUARES, Square } from 'chess.js';
 import { Api } from 'chessground/api';
 import { Config } from 'chessground/config';
 import { getChessDataFormat } from '../fen-or-pgn';
-import { turnColor } from '../turnColor';
+import { turnColor } from './turnColor';
 
 /**
  * Gets the set of legal moves for the current position.
