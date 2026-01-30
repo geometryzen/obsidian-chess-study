@@ -1,7 +1,7 @@
 import { Chess } from 'chess.js';
 import { Api as ChessgroundApi } from 'chessground/api';
 import { Draft } from 'immer';
-import { GameState } from 'src/components/react/ChessStudy';
+import { GameCurrentMove, GameState } from 'src/components/react/ChessStudy';
 import { legalMoves } from '../chess-logic';
 import { ChessStudyMove, VariantMove } from '../storage';
 import { turnColor } from '../chess-logic/turnColor';
@@ -77,16 +77,24 @@ export const getMoveById = (moves: ChessStudyMove[], moveId: string) => {
 	return moves[moveIndex];
 };
 
+/**
+ * TODO: refactor the function so
+ * @param state
+ * @param chessView
+ * @param setChessLogic
+ * @param options
+ * @returns
+ */
 export const displayRelativeMoveInHistory = (
-	draft: Draft<GameState>,
+	state: Readonly<Draft<GameState>>,
 	chessView: ChessgroundApi,
 	setChessLogic: React.Dispatch<React.SetStateAction<Chess>>,
-	options: { offset: 0 | 1 | -1; selectedMoveId: string | null } = {
-		offset: 0,
-		selectedMoveId: null,
-	},
-): Draft<GameState> => {
-	let moveToDisplay: ChessStudyMove | VariantMove | null = null;
+	options: { offset: 1 | -1; selectedMoveId: string | null },
+): GameCurrentMove => {
+	let moveToDisplay: Pick<
+		VariantMove,
+		'moveId' | 'comment' | 'shapes' | 'after'
+	> | null = null;
 
 	const { offset, selectedMoveId } = options;
 	console.log('displayMoveInHistory');
@@ -94,87 +102,55 @@ export const displayRelativeMoveInHistory = (
 	console.log('selectedMoveId', selectedMoveId);
 
 	// Figure out where we are
-	const currentMove = draft.currentMove;
+	const currentMove = state.currentMove;
 
 	if (currentMove) {
 		const currentMoveId = currentMove.moveId;
-		console.log('currentMoveId', currentMoveId);
+		console.log('currMoveId', currentMoveId);
 
 		// If we pass a moveId, find out where that is and offset from there, otherwise take current moveId
 		const baseMoveId = selectedMoveId || currentMoveId;
+		console.log('baseMoveId', baseMoveId);
 
-		moveToDisplay = getMoveToDisplay(draft.study.moves, baseMoveId, offset);
+		moveToDisplay = getMoveToDisplay(state.study.moves, baseMoveId, offset);
 	} else {
 		console.log('currentMove', currentMove);
 		if (offset < 0) {
-			moveToDisplay = draft.study.moves[draft.study.moves.length - 1];
-		} else if (offset > 0) {
-			// An offset of +1 always means that the user wans to go "Forward".
-			// There will be no selected move.
-			moveToDisplay = draft.study.moves[0];
+			moveToDisplay = state.study.moves[state.study.moves.length - 1];
 		} else {
-			// The cast tells us that this function should be refactored because offset zero implies a non-null selection.
-			moveToDisplay = getMoveToDisplay(
-				draft.study.moves,
-				selectedMoveId as string,
-				offset,
-			);
+			// An offset of +1 always means that the user wants to go "Forward".
+			// There will be no selected move.
+			moveToDisplay = state.study.moves[0];
 		}
 	}
 
 	if (moveToDisplay) {
-		const chess = new Chess(moveToDisplay.after);
-
-		chessView.set({
-			fen: moveToDisplay.after,
-			check: chess.isCheck(),
-			movable: {
-				free: false,
-				color: turnColor(chess),
-				dests: legalMoves(chess),
-			},
-			turnColor: turnColor(chess),
-		});
-
-		draft.currentMove = moveToDisplay;
-
-		setChessLogic(chess);
-	} else if (offset !== 0) {
-		const chess = draft.study.rootFEN
-			? new Chess(draft.study.rootFEN)
-			: new Chess();
-
-		chessView.set({
-			fen: chess.fen(),
-			check: chess.isCheck(),
-			movable: {
-				free: false,
-				color: turnColor(chess),
-				dests: legalMoves(chess),
-			},
-			turnColor: turnColor(chess),
-		});
-
-		draft.currentMove = null;
-
-		setChessLogic(chess);
+		updateView(chessView, setChessLogic, moveToDisplay.after);
+		return moveToDisplay;
 	} else {
-		console.log(`No move to display found`);
-		return draft;
+		const chess = state.study.rootFEN
+			? new Chess(state.study.rootFEN)
+			: new Chess();
+		updateView(chessView, setChessLogic, chess.fen());
+		return null;
 	}
-
-	return draft;
 };
 
-export const displayMove = (
+/**
+ *
+ * @param chessView
+ * @param setChessLogic
+ * @param fen
+ */
+export const updateView = (
 	chessView: ChessgroundApi,
 	setChessLogic: React.Dispatch<React.SetStateAction<Chess>>,
-	move: VariantMove,
+	fen: string,
 ): void => {
-	const chess = new Chess(move.after);
+	const chess = new Chess(fen);
 
 	chessView.set({
-		fen: move.after,
+		fen,
 		check: chess.isCheck(),
 		movable: {
 			free: false,

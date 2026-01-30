@@ -19,7 +19,7 @@ import {
 	findMoveIndex,
 	getCurrentMove,
 	getMoveById,
-	displayMove,
+	updateView,
 } from 'src/lib/ui-state';
 import { useImmerReducer } from 'use-immer';
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
@@ -36,18 +36,24 @@ interface AppProps {
 	dataAdapter: ChessStudyDataAdapter;
 }
 
+export type GameCurrentMove =
+	| Pick<ChessStudyMove, 'moveId' | 'comment' | 'shapes'>
+	| Pick<VariantMove, 'moveId' | 'comment' | 'shapes'>
+	| null;
+
 export interface GameState {
-	currentMove: ChessStudyMove | VariantMove | null;
+	// What exactly do we need here
+	currentMove: GameCurrentMove;
 	isViewOnly: boolean;
 	study: ChessStudyFileData;
 }
 
 export type GameActions =
-	| { type: 'ADD_MOVE_TO_HISTORY'; move: Move }
-	| { type: 'REMOVE_LAST_MOVE_FROM_HISTORY' }
-	| { type: 'DISPLAY_NEXT_MOVE_IN_HISTORY' }
-	| { type: 'DISPLAY_PREVIOUS_MOVE_IN_HISTORY' }
-	| { type: 'DISPLAY_SELECTED_MOVE_IN_HISTORY'; moveId: string }
+	| { type: 'PLAY_MOVE'; move: Move }
+	| { type: 'REMOVE_LAST_MOVE' }
+	| { type: 'GOTO_NEXT_MOVE' }
+	| { type: 'GOTO_PREV_MOVE' }
+	| { type: 'GOTO_MOVE'; moveId: string }
 	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
 
@@ -103,27 +109,37 @@ export const ChessStudy = ({
 		(state, action) => {
 			const hasNoMoves = state.study.moves.length === 0;
 			switch (action.type) {
-				case 'DISPLAY_NEXT_MOVE_IN_HISTORY': {
+				case 'GOTO_NEXT_MOVE': {
 					if (!chessView || hasNoMoves) return state;
 
-					displayRelativeMoveInHistory(state, chessView, setChessLogic, {
-						offset: 1,
-						selectedMoveId: null,
-					});
+					state.currentMove = displayRelativeMoveInHistory(
+						state,
+						chessView,
+						setChessLogic,
+						{
+							offset: 1,
+							selectedMoveId: null,
+						},
+					);
 
 					return state;
 				}
-				case 'DISPLAY_PREVIOUS_MOVE_IN_HISTORY': {
+				case 'GOTO_PREV_MOVE': {
 					if (!chessView || hasNoMoves) return state;
 
-					displayRelativeMoveInHistory(state, chessView, setChessLogic, {
-						offset: -1,
-						selectedMoveId: null,
-					});
+					state.currentMove = displayRelativeMoveInHistory(
+						state,
+						chessView,
+						setChessLogic,
+						{
+							offset: -1,
+							selectedMoveId: null,
+						},
+					);
 
 					return state;
 				}
-				case 'REMOVE_LAST_MOVE_FROM_HISTORY': {
+				case 'REMOVE_LAST_MOVE': {
 					if (!chessView || hasNoMoves) return state;
 
 					const moves = state.study.moves;
@@ -140,10 +156,15 @@ export const ChessStudy = ({
 							const isLastMove = moveIndex === variantMoves.length - 1;
 
 							if (isLastMove) {
-								displayRelativeMoveInHistory(state, chessView, setChessLogic, {
-									offset: -1,
-									selectedMoveId: currentMoveId,
-								});
+								state.currentMove = displayRelativeMoveInHistory(
+									state,
+									chessView,
+									setChessLogic,
+									{
+										offset: -1,
+										selectedMoveId: currentMoveId,
+									},
+								);
 							}
 
 							variantMoves.pop();
@@ -161,10 +182,15 @@ export const ChessStudy = ({
 							const isLastMove = moveIndex === moves.length - 1;
 
 							if (isLastMove) {
-								displayRelativeMoveInHistory(state, chessView, setChessLogic, {
-									offset: -1,
-									selectedMoveId: currentMoveId,
-								});
+								state.currentMove = displayRelativeMoveInHistory(
+									state,
+									chessView,
+									setChessLogic,
+									{
+										offset: -1,
+										selectedMoveId: currentMoveId,
+									},
+								);
 							}
 
 							moves.pop();
@@ -177,11 +203,11 @@ export const ChessStudy = ({
 
 					return state;
 				}
-				case 'DISPLAY_SELECTED_MOVE_IN_HISTORY': {
+				case 'GOTO_MOVE': {
 					if (!chessView || hasNoMoves) return state;
 
 					const move = getMoveById(state.study.moves, action.moveId);
-					displayMove(chessView, setChessLogic, move);
+					updateView(chessView, setChessLogic, move.after);
 					state.currentMove = move;
 					return state;
 				}
@@ -209,19 +235,22 @@ export const ChessStudy = ({
 
 					return state;
 				}
-				case 'ADD_MOVE_TO_HISTORY': {
+				case 'PLAY_MOVE': {
 					// There seems to be a bug whereby if you hit the Back button to get positioned
 					// just before the first move, then making the first move adds it to the move list as if it were a new move.
-					const newMove = action.move;
+					/**
+					 * The move that was played in the current position.
+					 */
+					// const theMove = action.move;
 
 					const moves = state.study.moves;
-					const currentMoveId = state.currentMove?.moveId;
-					console.log('currentMove', state.currentMove);
-					console.log('currentMoveId', currentMoveId);
 
-					const moveId = nanoid();
+					// TODO: No need to allocate an id here because we may not need it.
+					// const moveId = nanoid();
 
-					if (currentMoveId) {
+					if (state.currentMove) {
+						const currentMoveId = state.currentMove.moveId;
+						console.log('currentMoveId', currentMoveId);
 						const currentMoveIndex = moves.findIndex(
 							(move) => move.moveId === currentMoveId,
 						);
@@ -229,17 +258,17 @@ export const ChessStudy = ({
 						const { variant, moveIndex } = findMoveIndex(moves, currentMoveId);
 
 						if (variant) {
-							//handle variant
+							// handle Variation
 							const parent = moves[variant.parentMoveIndex];
 							const variantMoves = parent.variants[variant.variantIndex].moves;
 
 							const isLastMove = moveIndex === variantMoves.length - 1;
 
-							//Only push if its the last move in the variant because depth can only be 1
+							// Only push if its the last move in the variant because depth can only be 1
 							if (isLastMove) {
-								const move: ChessStudyMove = {
-									...newMove,
-									moveId: moveId,
+								const variantMove: ChessStudyMove = {
+									...action.move,
+									moveId: nanoid(),
 									variants: [],
 									shapes: [],
 									comment: null,
@@ -251,25 +280,25 @@ export const ChessStudy = ({
 									isBigPawn: () => false,
 									isNullMove: () => false,
 								};
-								variantMoves.push(move);
+								variantMoves.push(variantMove);
 
-								const tempChess = new ChessModel(newMove.after);
+								const tempChess = new ChessModel(action.move.after);
 
-								state.currentMove = move;
+								state.currentMove = variantMove;
 
 								chessView?.set({
-									fen: newMove.after,
+									fen: action.move.after,
 									check: tempChess.isCheck(),
 								});
 							}
 						} else {
-							// handle main line
+							// handle Main Line
 							const isLastMove = currentMoveIndex === moves.length - 1;
 
 							if (isLastMove) {
 								const move: ChessStudyMove = {
-									...newMove,
-									moveId: moveId,
+									...action.move,
+									moveId: nanoid(),
 									variants: [],
 									shapes: [],
 									comment: null,
@@ -290,14 +319,14 @@ export const ChessStudy = ({
 								// check if the next move is the same move
 								const nextMove = moves[moveIndex + 1];
 
-								if (nextMove.san === newMove.san) {
+								if (nextMove.san === action.move.san) {
 									state.currentMove = nextMove;
 									return state;
 								}
 
 								const move: ChessStudyMove = {
-									...newMove,
-									moveId: moveId,
+									...action.move,
+									moveId: nanoid(),
 									variants: [],
 									shapes: [],
 									comment: null,
@@ -320,23 +349,42 @@ export const ChessStudy = ({
 							}
 						}
 					} else {
-						const move: ChessStudyMove = {
-							...newMove,
-							moveId: moveId,
-							variants: [],
-							shapes: [],
-							comment: null,
-							isCapture: () => false,
-							isPromotion: () => false,
-							isEnPassant: () => false,
-							isKingsideCastle: () => false,
-							isQueensideCastle: () => false,
-							isBigPawn: () => false,
-							isNullMove: () => false,
-						};
-						moves.push(move);
+						// There is no current move.
+						// This means we are positioned at the beginning of the game.
+						// If there are no moves in the game then add it as the first move.
+						// If there are moves in the game then
+						// TODO: This is probably where we should check the moves and proceed accordingly.
+						if (moves.length === 0) {
+							const move: ChessStudyMove = {
+								...action.move,
+								moveId: nanoid(),
+								variants: [],
+								shapes: [],
+								comment: null,
+								isCapture: () => false,
+								isPromotion: () => false,
+								isEnPassant: () => false,
+								isKingsideCastle: () => false,
+								isQueensideCastle: () => false,
+								isBigPawn: () => false,
+								isNullMove: () => false,
+							};
+							moves.push(move);
 
-						state.currentMove = move;
+							state.currentMove = move;
+						} else {
+							// Do nothing for now.
+							// The problem with doing nothing is that the move will be displayed
+							const firstMove = moves[0];
+
+							if (firstMove.san === action.move.san) {
+								state.currentMove = firstMove;
+								return state;
+							} else {
+								// What do we do if the moves do not match?
+								// I think it becomes a Variation.
+							}
+						}
 					}
 
 					return state;
@@ -374,7 +422,7 @@ export const ChessStudy = ({
 						}}
 						boardColor={boardColor}
 						chess={chessLogic}
-						onMove={(move: Move) => dispatch({ type: 'ADD_MOVE_TO_HISTORY', move })}
+						onMove={(move: Move) => dispatch({ type: 'PLAY_MOVE', move })}
 						isViewOnly={gameState.isViewOnly}
 						syncShapes={(shapes: DrawShape[]) =>
 							dispatch({ type: 'SYNC_SHAPES', shapes })
@@ -391,21 +439,15 @@ export const ChessStudy = ({
 						initialMoveNumber={initialMoveNumber}
 						onMoveItemClick={(moveId: string) =>
 							dispatch({
-								type: 'DISPLAY_SELECTED_MOVE_IN_HISTORY',
+								type: 'GOTO_MOVE',
 								moveId: moveId,
 							})
 						}
 						disableNavigation={disableNavigation}
 						readOnly={readOnly}
-						onUndoButtonClick={() =>
-							dispatch({ type: 'REMOVE_LAST_MOVE_FROM_HISTORY' })
-						}
-						onBackButtonClick={() =>
-							dispatch({ type: 'DISPLAY_PREVIOUS_MOVE_IN_HISTORY' })
-						}
-						onForwardButtonClick={() =>
-							dispatch({ type: 'DISPLAY_NEXT_MOVE_IN_HISTORY' })
-						}
+						onUndoButtonClick={() => dispatch({ type: 'REMOVE_LAST_MOVE' })}
+						onBackButtonClick={() => dispatch({ type: 'GOTO_PREV_MOVE' })}
+						onForwardButtonClick={() => dispatch({ type: 'GOTO_NEXT_MOVE' })}
 						onSaveButtonClick={onSaveButtonClick}
 						onCopyFenButtonClick={() => {
 							try {

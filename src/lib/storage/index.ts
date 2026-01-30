@@ -24,6 +24,8 @@ export interface ChessStudyMove extends Move {
 	variants: Variant[];
 	shapes: DrawShape[];
 	comment: JSONContent | null;
+	// TODO: Why do we have this function here?
+	// It does not belong
 	isCapture(): boolean;
 }
 
