@@ -7,7 +7,7 @@ import { ControlProps } from './ControlsProps';
 export interface PgnViewerProps extends ControlProps {
 	history: ChessStudyMove[];
 	currentMoveId: string | null;
-	firstPlayer: string;
+	initialPlayer: 'w' | 'b';
 	initialMoveNumber: number;
 	onMoveItemClick: (moveId: string) => void;
 	/*

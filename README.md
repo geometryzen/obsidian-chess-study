@@ -75,14 +75,17 @@ Thanks to [@latenitecoding](https://github.com/latenitecoding) for the contribut
 
 Here are the available settings for a `chessStudy` code block:
 
-| Setting             | Possible Values    | Description                                      |
-| ------------------- | ------------------ | ------------------------------------------------ |
-| `chessStudyId`      | Valid nanoid       | Valid ID for a file stored in the plugin storage |
-| `boardOrientation`  | `white` \| `black` | Orientation of the board                         |
-| `boardColor`        | `green` \| `brown` | Color of the board                               |
-| `viewComments`      | `true`  \| `false` | Whether to display the comments section          |
-| `disableNavigation` | `true`  \| `false` | Determines whether the study can be changed      |
-| `readOnly`          | `true`  \| `false` | Determines whether the study can be changed      |
+| Setting             | Possible Values                              | Description                                      |
+| ------------------- | -------------------------------------------- | ------------------------------------------------ |
+| `chessStudyId`      | Valid nanoid                                 | Valid ID for a file stored in the plugin storage |
+| `boardOrientation`  | `white` \| `black`                           | Orientation of the board                         |
+| `boardColor`        | `green` \| `brown`                           | Color of the board                               |
+| `disableCopy`       | `true`  \| `false`                           | Determines whether the study can be copied       |
+| `disableNavigation` | `true`  \| `false`                           | Determines whether the study can be navigated    |
+| `initialPosition`   | `begin` \| `end`                             | Determines the initial position                  |
+| `readOnly`          | `true`  \| `false`                           | Determines whether the study can be changed      |
+| `chessStudyKind`    | `game`  \| `position` \| `puzzle`\| `legacy` | Determines how the plugin works                  |
+| `viewComments`      | `true`  \| `false`                           | Whether to display the comments section          |
 
 You can permanently set some settings in the [Obsidian](https://obsidian.md/) plugin settings for Obsidian Chess Study.
 

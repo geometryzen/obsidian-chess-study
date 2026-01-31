@@ -1,9 +1,10 @@
 import { App, MarkdownRenderChild } from 'obsidian';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { ChessStudyDataAdapter, ChessStudyFileData } from 'src/lib/storage';
+import { ChessStudyDataAdapter, ChessStudyFileContent } from 'src/lib/storage';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettingsTab';
 import { ChessStudy } from '../react/ChessStudy';
+import { ChessStudyAppConfig, parseUserConfig } from 'src/lib/obsidian';
 
 /**
  * This is not the Obsidian Plugin.
@@ -14,7 +15,7 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	source: string;
 	app: App;
 	settings: ChessStudyPluginSettings;
-	data: ChessStudyFileData;
+	fileContent: ChessStudyFileContent;
 	dataAdapter: ChessStudyDataAdapter;
 
 	/**
@@ -24,7 +25,7 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	 * @param source
 	 * @param app
 	 * @param settings
-	 * @param data
+	 * @param fileContent
 	 * @param dataAdapter
 	 */
 	constructor(
@@ -32,14 +33,14 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 		source: string,
 		app: App,
 		settings: ChessStudyPluginSettings,
-		data: ChessStudyFileData,
+		fileContent: ChessStudyFileContent,
 		dataAdapter: ChessStudyDataAdapter,
 	) {
 		super(containerEL);
 		this.source = source;
 		this.app = app;
 		this.settings = settings;
-		this.data = data;
+		this.fileContent = fileContent;
 		this.dataAdapter = dataAdapter;
 	}
 
@@ -47,14 +48,23 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	 * @override
 	 */
 	onload(): void {
+		// This is where we bootstrap React.
 		this.root = ReactDOM.createRoot(this.containerEl);
+		// This demonstrates that we can pass parsed configuration to the top-level React component.
+		const config: ChessStudyAppConfig = parseUserConfig(
+			this.settings,
+			this.source,
+		);
+		// is there any reason why we have to pass in the source?
 		this.root.render(
 			<React.StrictMode>
 				<ChessStudy
 					source={this.source}
 					app={this.app}
 					pluginSettings={this.settings}
-					chessStudyData={this.data}
+					initialPos={config.initialPosition}
+					config={config}
+					fileContent={this.fileContent}
 					dataAdapter={this.dataAdapter}
 				/>
 			</React.StrictMode>,

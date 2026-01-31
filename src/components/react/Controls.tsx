@@ -31,12 +31,16 @@ export const Controls = (props: ControlProps) => {
 				)}
 			</div>
 			<div className="button-section">
-				<button title="Copy FEN" onClick={() => props.onCopyFenButtonClick()}>
-					<Copy strokeWidth={'1px'} />
-				</button>
-				<button title="Copy PGN" onClick={() => props.onCopyPgnButtonClick()}>
-					<Clipboard strokeWidth={'1px'} />
-				</button>
+				{props.disableCopy ? null : (
+					<React.Fragment>
+						<button title="Copy FEN" onClick={() => props.onCopyFenButtonClick()}>
+							<Copy strokeWidth={'1px'} />
+						</button>
+						<button title="Copy PGN" onClick={() => props.onCopyPgnButtonClick()}>
+							<Clipboard strokeWidth={'1px'} />
+						</button>
+					</React.Fragment>
+				)}
 				{props.readOnly ? null : (
 					<button title="Undo" onClick={() => props.onUndoButtonClick()}>
 						<Undo2 />

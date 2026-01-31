@@ -2,7 +2,7 @@ import { Editor, Notice, Plugin, normalizePath } from 'obsidian';
 import {
 	CURRENT_STORAGE_VERSION,
 	ChessStudyDataAdapter,
-	ChessStudyFileData,
+	ChessStudyFileContent,
 } from 'src/lib/storage';
 import { ChessStudyMarkdownRenderChild } from './components/obsidian/ChessStudyMarkdownRenderChild';
 import { ChessStudyInsertModal } from './components/obsidian/ChessStudyInsertModal';
@@ -26,6 +26,19 @@ import './main.css';
 type FEN = string;
 type PGN = string;
 export type ChessString = FEN | PGN;
+export type ChessStudyKind = 'game' | 'puzzle' | 'position' | 'legacy';
+export const CHESS_STUDY_KIND_YAML_NAME = 'chessStudyKind';
+export const CHESS_STUDY_KIND_GAME: ChessStudyKind = 'game';
+export const CHESS_STUDY_KIND_POSITION: ChessStudyKind = 'position';
+export const CHESS_STUDY_KIND_PUZZLE: ChessStudyKind = 'puzzle';
+export const CHESS_STUDY_KIND_LEGACY: ChessStudyKind = 'legacy';
+export type BoardOrientation = 'white' | 'black';
+export type BoardColor = 'green' | 'brown';
+export type InitialPosition = 'begin' | 'first' | 'end';
+export const INITIAL_POSITION_YAML_NAME = 'initialPosition';
+export const INITIAL_POSITION_BEGIN: InitialPosition = 'begin';
+export const INITIAL_POSITION_END: InitialPosition = 'end';
+export const INITIAL_POSITION_FIRST: InitialPosition = 'first';
 
 export const ROOT_FEN =
 	'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -68,9 +81,12 @@ export default class ChessStudyPlugin extends Plugin {
 
 				const onSubmit = async (
 					chessString: ChessString | undefined,
-					boardOrientation: 'white' | 'black',
+					boardOrientation: BoardOrientation,
+					disableCopy: boolean,
 					disableNavigation: boolean,
+					initialPosition: InitialPosition,
 					readOnly: boolean,
+					chessStudyKind: ChessStudyKind,
 					viewComments: boolean,
 				) => {
 					try {
@@ -103,7 +119,7 @@ export default class ChessStudyPlugin extends Plugin {
 							return null;
 						};
 
-						const chessStudyFileData: ChessStudyFileData = {
+						const fileContent: ChessStudyFileContent = {
 							version: CURRENT_STORAGE_VERSION,
 							headers: chess.getHeaders(),
 							comment: gameComment(), // seems to return the last comment
@@ -140,11 +156,11 @@ export default class ChessStudyPlugin extends Plugin {
 
 						this.dataAdapter.createStorageFolderIfNotExists();
 
-						const id = await this.dataAdapter.saveFile(chessStudyFileData);
+						const id = await this.dataAdapter.saveFile(fileContent);
 
 						// TODO: It would be nice for the boardOrientation and viewComments to be in the UI as configuration options.
 						editor.replaceRange(
-							`\`\`\`chessStudy\nchessStudyId: ${id}\nboardOrientation: ${boardOrientation === 'black' ? 'black' : 'white'}\ndisableNavigation: ${disableNavigation ? 'true' : 'false'}\nreadOnly: ${readOnly ? 'true' : 'false'}\nviewComments: ${viewComments ? 'true' : 'false'}\n\`\`\``,
+							`\`\`\`chessStudy\nchessStudyId: ${id}\n${INITIAL_POSITION_YAML_NAME}: ${initialPosition}\n${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}\nboardOrientation: ${boardOrientation}\ndisableCopy: ${disableCopy ? 'true' : 'false'}\ndisableNavigation: ${disableNavigation ? 'true' : 'false'}\nreadOnly: ${readOnly ? 'true' : 'false'}\nviewComments: ${viewComments ? 'true' : 'false'}\n\`\`\``,
 							cursorPosition,
 						);
 					} catch (e) {

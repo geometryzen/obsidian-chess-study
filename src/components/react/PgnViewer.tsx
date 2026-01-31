@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useMemo } from 'react';
-import { ChessStudyMove } from 'src/lib/storage';
 import { Controls } from './Controls';
 import { MoveItem, VariantMoveItem } from './MoveItem';
 import { PgnViewerProps } from './PgnViewerProps';
@@ -47,15 +46,15 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 	const {
 		history,
 		currentMoveId,
-		firstPlayer,
+		initialPlayer,
 		initialMoveNumber,
 		onMoveItemClick,
 		...controlActions
 	} = props;
 
 	const movePairs = useMemo(
-		() => chunkArray(history, 2, firstPlayer === 'b'),
-		[firstPlayer, history],
+		() => chunkArray(history, 2, initialPlayer === 'b'),
+		[initialPlayer, history],
 	);
 
 	return (
@@ -70,7 +69,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 								<p className="move-indicator center">
 									{currentMoveIndex + initialMoveNumber}
 								</p>
-								{firstPlayer === 'b' && !bMove && currentMoveIndex === 0 && (
+								{initialPlayer === 'b' && !bMove && currentMoveIndex === 0 && (
 									<MoveItem
 										san={'...'}
 										isCurrentMove={false}
@@ -109,11 +108,11 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 																			onMoveItemClick={() => onMoveItemClick(bMove.moveId)}
 																			moveIndicator={
 																				(wMoveVarianti === 0 &&
-																					(firstPlayer === 'w' || currentMoveIndex > 0) &&
+																					(initialPlayer === 'w' || currentMoveIndex > 0) &&
 																					`${
 																						currentMoveIndex + initialMoveNumber + wMoveVarianti
 																					}... `) ||
-																				(firstPlayer === 'b' &&
+																				(initialPlayer === 'b' &&
 																					currentMoveIndex === 0 &&
 																					`${
 																						currentMoveIndex + initialMoveNumber + wMoveVarianti
@@ -127,7 +126,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 																				san={wMove.san}
 																				onMoveItemClick={() => onMoveItemClick(wMove.moveId)}
 																				moveIndicator={
-																					((firstPlayer === 'w' || currentMoveIndex > 0) &&
+																					((initialPlayer === 'w' || currentMoveIndex > 0) &&
 																						`${
 																							currentMoveIndex + initialMoveNumber + 1 + wMoveVarianti
 																						}. `) ||

@@ -7,23 +7,43 @@ import {
 	TextAreaComponent,
 	ToggleComponent,
 } from 'obsidian';
-import { ChessString } from 'src/main';
+import {
+	BoardOrientation,
+	CHESS_STUDY_KIND_GAME,
+	CHESS_STUDY_KIND_LEGACY,
+	CHESS_STUDY_KIND_POSITION,
+	CHESS_STUDY_KIND_PUZZLE,
+	CHESS_STUDY_KIND_YAML_NAME,
+	ChessString,
+	ChessStudyKind,
+	INITIAL_POSITION_BEGIN,
+	INITIAL_POSITION_END,
+	INITIAL_POSITION_FIRST,
+	INITIAL_POSITION_YAML_NAME,
+	InitialPosition,
+} from 'src/main';
 
 /**
  * The Modal Dialog that pops up when creating a new Chess Study.
  */
 export class ChessStudyInsertModal extends Modal {
 	#chessString: ChessString;
-	#boardOrientation: 'white' | 'black' = 'white';
+	#boardOrientation: BoardOrientation = 'white';
+	#disableCopy = false;
 	#disableNavigation = false;
+	#initialPosition: InitialPosition = 'begin';
 	#readOnly = false;
+	#chessStudyKind: ChessStudyKind = CHESS_STUDY_KIND_GAME;
 	#viewComments = false;
 
 	onSubmit: (
 		pgn: string,
-		boardOrientation: 'white' | 'black',
+		boardOrientation: BoardOrientation,
+		disableCopy: boolean,
 		disableNavigation: boolean,
+		initialPosition: InitialPosition,
 		readOnly: boolean,
+		chessStudyKind: ChessStudyKind,
 		viewComments: boolean,
 	) => void;
 
@@ -31,9 +51,12 @@ export class ChessStudyInsertModal extends Modal {
 		app: App,
 		onSubmit: (
 			pgn: string,
-			boardOrientation: 'white' | 'black',
+			boardOrientation: BoardOrientation,
+			disableCopy: boolean,
 			disableNavigation: boolean,
+			initialPosition: InitialPosition,
 			readOnly: boolean,
+			chessStudyKind: ChessStudyKind,
 			viewComments: boolean,
 		) => void,
 	) {
@@ -68,7 +91,7 @@ export class ChessStudyInsertModal extends Modal {
 			.addDropdown((dropdown: DropdownComponent) => {
 				dropdown.addOption('white', 'White');
 				dropdown.addOption('black', 'Black');
-				dropdown.setValue('white');
+				dropdown.setValue(this.#boardOrientation);
 				dropdown.onChange((boardOrientation) => {
 					this.#boardOrientation =
 						boardOrientation === 'white' ? boardOrientation : 'black';
@@ -76,9 +99,19 @@ export class ChessStudyInsertModal extends Modal {
 			});
 
 		new Setting(contentEl)
+			.setName('disableCopy')
+			.addToggle((toggle: ToggleComponent) => {
+				toggle.setValue(this.#disableCopy);
+				toggle.setTooltip('Determines whether the study can be copied', {});
+				toggle.onChange((disableCopy) => {
+					this.#disableCopy = disableCopy;
+				});
+			});
+
+		new Setting(contentEl)
 			.setName('disableNavigation')
 			.addToggle((toggle: ToggleComponent) => {
-				toggle.setValue(false);
+				toggle.setValue(this.#disableNavigation);
 				toggle.setTooltip('Determines whether the study can be navigated', {});
 				toggle.onChange((disableNavigation) => {
 					this.#disableNavigation = disableNavigation;
@@ -86,12 +119,39 @@ export class ChessStudyInsertModal extends Modal {
 			});
 
 		new Setting(contentEl)
+			.setName(INITIAL_POSITION_YAML_NAME)
+			.addDropdown((dropdown: DropdownComponent) => {
+				dropdown.addOption(INITIAL_POSITION_BEGIN, 'Begin');
+				dropdown.addOption(INITIAL_POSITION_FIRST, 'First');
+				dropdown.addOption(INITIAL_POSITION_END, 'End');
+				dropdown.setValue(this.#initialPosition);
+				dropdown.onChange((initialPosition) => {
+					this.#initialPosition = initialPosition as InitialPosition;
+				});
+			});
+
+		new Setting(contentEl)
 			.setName('readOnly')
 			.addToggle((toggle: ToggleComponent) => {
-				toggle.setValue(false);
+				toggle.setValue(this.#readOnly);
 				toggle.setTooltip('Determines whether the study can be changed', {});
 				toggle.onChange((readOnly) => {
 					this.#readOnly = readOnly;
+				});
+			});
+
+		new Setting(contentEl)
+			// TODO: Humanize the YAML name.
+			.setName(CHESS_STUDY_KIND_YAML_NAME)
+			.addDropdown((dropdown: DropdownComponent) => {
+				// TODO: Humanize the option display string
+				dropdown.addOption(CHESS_STUDY_KIND_GAME, 'Game');
+				dropdown.addOption(CHESS_STUDY_KIND_POSITION, 'Position');
+				dropdown.addOption(CHESS_STUDY_KIND_PUZZLE, 'Puzzle');
+				dropdown.addOption(CHESS_STUDY_KIND_LEGACY, 'Legacy');
+				dropdown.setValue(this.#chessStudyKind);
+				dropdown.onChange((type) => {
+					this.#chessStudyKind = type as ChessStudyKind;
 				});
 			});
 
@@ -114,8 +174,11 @@ export class ChessStudyInsertModal extends Modal {
 					this.onSubmit(
 						this.#chessString,
 						this.#boardOrientation,
+						this.#disableCopy,
 						this.#disableNavigation,
+						this.#initialPosition,
 						this.#readOnly,
+						this.#chessStudyKind,
 						this.#viewComments,
 					);
 				}),

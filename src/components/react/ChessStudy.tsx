@@ -7,10 +7,10 @@ import { App, Notice } from 'obsidian';
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { ChessStudyPluginSettings } from 'src/components/obsidian/ChessStudyPluginSettingsTab';
-import { parseUserConfig } from 'src/lib/obsidian';
+import { ChessStudyAppConfig, parseUserConfig } from 'src/lib/obsidian';
 import {
 	ChessStudyDataAdapter,
-	ChessStudyFileData,
+	ChessStudyFileContent,
 	ChessStudyMove,
 	VariantMove,
 } from 'src/lib/storage';
@@ -25,14 +25,20 @@ import { useImmerReducer } from 'use-immer';
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { CommentSection } from './CommentSection';
 import { PgnViewer } from './PgnViewer';
+import { CHESS_STUDY_KIND_PUZZLE, InitialPosition } from 'src/main';
 
 export type ChessStudyConfig = ChessgroundProps;
 
 interface AppProps {
+	/**
+	 * The markdown source (unparsed).
+	 */
 	source: string;
 	app: App;
 	pluginSettings: ChessStudyPluginSettings;
-	chessStudyData: ChessStudyFileData;
+	initialPos: InitialPosition;
+	config: ChessStudyAppConfig;
+	fileContent: ChessStudyFileContent;
 	dataAdapter: ChessStudyDataAdapter;
 }
 
@@ -45,7 +51,7 @@ export interface GameState {
 	// What exactly do we need here
 	currentMove: GameCurrentMove;
 	isViewOnly: boolean;
-	study: ChessStudyFileData;
+	study: ChessStudyFileContent;
 }
 
 export type GameActions =
@@ -57,23 +63,45 @@ export type GameActions =
 	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
 
+const initialMove = (
+	moves: GameCurrentMove[],
+	initialPosition: InitialPosition,
+): GameCurrentMove => {
+	switch (initialPosition) {
+		case 'begin': {
+			return null;
+		}
+		case 'first': {
+			return moves[0] ?? null;
+		}
+		case 'end':
+		default: {
+			return moves[moves.length - 1] ?? null;
+		}
+	}
+};
 /**
  * This is the top-level React component in our Markdown renderer.
- * @param param0
- * @returns
  */
 export const ChessStudy = ({
 	source,
 	pluginSettings,
-	chessStudyData,
+	initialPos: initialPosition,
+	config,
+	// This is destructuring with a rename?
+	// The thing on the left is what's coming in, on the right is the destructured name.
+	fileContent: data,
 	dataAdapter,
 }: AppProps) => {
 	// Parse Obsidian / Code Block Settings
 	const {
 		boardColor,
 		boardOrientation,
+		disableCopy,
 		disableNavigation,
+		// initialPosition: ignoreMe,
 		readOnly,
+		chessStudyKind,
 		viewComments,
 		chessStudyId,
 	} = parseUserConfig(pluginSettings, source);
@@ -82,24 +110,53 @@ export const ChessStudy = ({
 	const [chessView, setChessView] = useState<ChessView | null>(null);
 
 	// Setup Chess.js API
-	const [initialChessLogic, firstPlayer, initialMoveNumber] = useMemo(() => {
-		const chess = new ChessModel(chessStudyData.rootFEN);
+	/**
+	 *
+	 */
+	const [initialChessModel, initialPlayer, initialMoveNumber] = useMemo(() => {
+		const chess = new ChessModel(data.rootFEN);
 
-		const firstPlayer = chess.turn();
+		const initialPlayer: 'w' | 'b' = chess.turn();
 		const initialMoveNumber = chess.moveNumber();
 
-		chessStudyData.moves.forEach((move) => {
-			chess.move({
-				from: move.from,
-				to: move.to,
-				promotion: move.promotion,
-			});
-		});
+		switch (config.initialPosition) {
+			case 'end': {
+				data.moves.forEach((move) => {
+					chess.move({
+						from: move.from,
+						to: move.to,
+						promotion: move.promotion,
+					});
+				});
+				break;
+			}
+			case 'first': {
+				const move = data.moves[0];
+				if (move) {
+					chess.move({
+						from: move.from,
+						to: move.to,
+						promotion: move.promotion,
+					});
+				}
+				break;
+			}
+			case 'begin':
+			default: {
+				// Do nothing
+			}
+		}
 
-		return [chess, firstPlayer, initialMoveNumber];
-	}, [chessStudyData.moves, chessStudyData.rootFEN]);
+		return [chess, initialPlayer, initialMoveNumber];
+	}, [data.moves, data.rootFEN, config.initialPosition]);
 
-	const [chessLogic, setChessLogic] = useState(initialChessLogic);
+	const [chessLogic, setChessLogic] = useState(initialChessModel);
+
+	const initialState: GameState = {
+		currentMove: initialMove(data.moves, initialPosition),
+		isViewOnly: false,
+		study: data,
+	};
 
 	// Why are we using use-immer instead of React's useReducer hook?
 	// The purpose is to have immutable state and the immer librray helps with the handling.
@@ -236,6 +293,7 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'PLAY_MOVE': {
+					if (!chessView) return state;
 					// There seems to be a bug whereby if you hit the Back button to get positioned
 					// just before the first move, then making the first move adds it to the move list as if it were a new move.
 					/**
@@ -292,6 +350,19 @@ export const ChessStudy = ({
 								});
 							}
 						} else {
+							// TODO: It would be nice for the different kinds to be handled by different instances of some interface.
+							/*
+							switch(config.chessStudyKind) {
+								case 'game':
+								case 'legacy':
+								case 'position': {
+									break;
+								}
+								case 'puzzle': {
+									break;
+								}
+							}
+							*/
 							// handle Main Line
 							const isLastMove = currentMoveIndex === moves.length - 1;
 
@@ -320,8 +391,46 @@ export const ChessStudy = ({
 								const nextMove = moves[moveIndex + 1];
 
 								if (nextMove.san === action.move.san) {
-									state.currentMove = nextMove;
-									return state;
+									switch (chessStudyKind) {
+										case CHESS_STUDY_KIND_PUZZLE: {
+											const replyMove = moves[moveIndex + 2];
+											if (replyMove) {
+												updateView(chessView, setChessLogic, replyMove.after);
+												state.currentMove = replyMove;
+											} else {
+												updateView(chessView, setChessLogic, nextMove.after);
+												state.currentMove = nextMove;
+											}
+											return state;
+										}
+										default: {
+											state.currentMove = nextMove;
+											return state;
+										}
+									}
+								} else {
+									const move: ChessStudyMove = {
+										...action.move,
+										moveId: nanoid(),
+										variants: [],
+										shapes: [],
+										comment: null,
+										isCapture: () => false,
+										isPromotion: () => false,
+										isEnPassant: () => false,
+										isKingsideCastle: () => false,
+										isQueensideCastle: () => false,
+										isBigPawn: () => false,
+										isNullMove: () => false,
+									};
+
+									currentMove.variants.push({
+										parentMoveId: currentMove.moveId,
+										variantId: nanoid(),
+										moves: [move],
+									});
+
+									state.currentMove = move;
 								}
 
 								const move: ChessStudyMove = {
@@ -394,12 +503,11 @@ export const ChessStudy = ({
 			}
 		},
 		// The second argument is the initial state.
-		{
-			currentMove: chessStudyData.moves[chessStudyData.moves.length - 1] ?? null,
-			isViewOnly: false,
-			study: chessStudyData,
-		},
+		initialState,
 	);
+
+	// I don't think this can be called since the DOM has not rendered.
+	// dispatch({ type: 'GOTO_NEXT_MOVE' });
 
 	const onSaveButtonClick = useCallback(async () => {
 		try {
@@ -430,50 +538,53 @@ export const ChessStudy = ({
 						shapes={gameState.currentMove?.shapes || []}
 					/>
 				</div>
-
-				<div className="pgn-container">
-					<PgnViewer
-						history={gameState.study.moves}
-						currentMoveId={gameState.currentMove?.moveId ?? null}
-						firstPlayer={firstPlayer}
-						initialMoveNumber={initialMoveNumber}
-						onMoveItemClick={(moveId: string) =>
-							dispatch({
-								type: 'GOTO_MOVE',
-								moveId: moveId,
-							})
-						}
-						disableNavigation={disableNavigation}
-						readOnly={readOnly}
-						onUndoButtonClick={() => dispatch({ type: 'REMOVE_LAST_MOVE' })}
-						onBackButtonClick={() => dispatch({ type: 'GOTO_PREV_MOVE' })}
-						onForwardButtonClick={() => dispatch({ type: 'GOTO_NEXT_MOVE' })}
-						onSaveButtonClick={onSaveButtonClick}
-						onCopyFenButtonClick={() => {
-							try {
-								navigator.clipboard.writeText(chessLogic.fen());
-								new Notice('Copied FEN to clipboard!');
-							} catch (e) {
-								new Notice('Could not copy FEN to clipboard:', e);
+				{(chessStudyKind as string) !== 'foo' && (
+					<div className="pgn-container">
+						<PgnViewer
+							history={gameState.study.moves}
+							currentMoveId={gameState.currentMove?.moveId ?? null}
+							initialPlayer={initialPlayer}
+							initialMoveNumber={initialMoveNumber}
+							onMoveItemClick={(moveId: string) =>
+								dispatch({
+									type: 'GOTO_MOVE',
+									moveId: moveId,
+								})
 							}
-						}}
-						onCopyPgnButtonClick={() => {
-							try {
-								navigator.clipboard.writeText(chessLogic.pgn());
-								new Notice('Copied PGN to clipboard!');
-							} catch (e) {
-								new Notice('Could not copy PGN to clipboard:', e);
-							}
-						}}
-						onSettingsButtonClick={() => {
-							try {
-								new Notice("I'm afraid I can't do that Dave??");
-							} catch (e) {
-								new Notice('Something is rotten in Denmark:', e);
-							}
-						}}
-					/>
-				</div>
+							disableCopy={disableCopy}
+							disableNavigation={disableNavigation}
+							readOnly={readOnly}
+							chessStudyKind={chessStudyKind}
+							onUndoButtonClick={() => dispatch({ type: 'REMOVE_LAST_MOVE' })}
+							onBackButtonClick={() => dispatch({ type: 'GOTO_PREV_MOVE' })}
+							onForwardButtonClick={() => dispatch({ type: 'GOTO_NEXT_MOVE' })}
+							onSaveButtonClick={onSaveButtonClick}
+							onCopyFenButtonClick={() => {
+								try {
+									navigator.clipboard.writeText(chessLogic.fen());
+									new Notice('Copied FEN to clipboard!');
+								} catch (e) {
+									new Notice('Could not copy FEN to clipboard:', e);
+								}
+							}}
+							onCopyPgnButtonClick={() => {
+								try {
+									navigator.clipboard.writeText(chessLogic.pgn());
+									new Notice('Copied PGN to clipboard!');
+								} catch (e) {
+									new Notice('Could not copy PGN to clipboard:', e);
+								}
+							}}
+							onSettingsButtonClick={() => {
+								try {
+									new Notice("I'm afraid I can't do that Dave??");
+								} catch (e) {
+									new Notice('Something is rotten in Denmark:', e);
+								}
+							}}
+						/>
+					</div>
+				)}
 			</div>
 			{viewComments && (
 				<div className="CommentSection">

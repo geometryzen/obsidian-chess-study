@@ -29,7 +29,7 @@ export interface ChessStudyMove extends Move {
 	isCapture(): boolean;
 }
 
-export interface ChessStudyFileData {
+export interface ChessStudyFileContent {
 	/**
 	 * The version is not being used at present.
 	 */
@@ -44,6 +44,9 @@ export interface ChessStudyFileData {
 }
 
 export class ChessStudyDataAdapter {
+	/**
+	 * The adapter is an Obsidian thing.
+	 */
 	adapter: DataAdapter;
 	storagePath: string;
 
@@ -52,7 +55,7 @@ export class ChessStudyDataAdapter {
 		this.storagePath = storagePath;
 	}
 
-	async saveFile(data: ChessStudyFileData, id?: string) {
+	async saveFile(fileContent: ChessStudyFileContent, id?: string) {
 		const chessStudyId = id || nanoid();
 
 		console.log(
@@ -63,14 +66,14 @@ export class ChessStudyDataAdapter {
 
 		await this.adapter.write(
 			normalizePath(`${this.storagePath}/${chessStudyId}.json`),
-			JSON.stringify(data, null, 2),
+			JSON.stringify(fileContent, null, 2),
 			{},
 		);
 
 		return chessStudyId;
 	}
 
-	async loadFile(id: string): Promise<ChessStudyFileData> {
+	async loadFile(id: string): Promise<ChessStudyFileContent> {
 		console.log(
 			`Reading file from ${normalizePath(`${this.storagePath}/${id}.json`)}`,
 		);
@@ -79,14 +82,14 @@ export class ChessStudyDataAdapter {
 			normalizePath(`${this.storagePath}/${id}.json`),
 		);
 
-		const jsonData = JSON.parse(data);
+		const fileContent = JSON.parse(data) as ChessStudyFileContent;
 
-		//Make sure data is compatible with storage version 0.0.1.
-		if (!jsonData.rootFEN) {
-			return { ...jsonData, rootFEN: ROOT_FEN };
+		// Make sure data is compatible with storage version 0.0.1.
+		if (!fileContent.rootFEN) {
+			return { ...fileContent, rootFEN: ROOT_FEN };
 		}
 
-		return jsonData;
+		return fileContent;
 	}
 
 	async createStorageFolderIfNotExists() {
