@@ -25,7 +25,11 @@ import { useImmerReducer } from 'use-immer';
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { CommentSection } from './CommentSection';
 import { PgnViewer } from './PgnViewer';
-import { CHESS_STUDY_KIND_PUZZLE, InitialPosition } from 'src/main';
+import {
+	CHESS_STUDY_KIND_PUZZLE,
+	ChessStudyKind,
+	InitialPosition,
+} from 'src/main';
 
 export type ChessStudyConfig = ChessgroundProps;
 
@@ -54,7 +58,7 @@ export interface GameState {
 	study: ChessStudyFileContent;
 }
 
-export type GameActions =
+export type GameEvent =
 	| { type: 'PLAY_MOVE'; move: Move }
 	| { type: 'REMOVE_LAST_MOVE' }
 	| { type: 'GOTO_NEXT_MOVE' }
@@ -80,6 +84,392 @@ const initialMove = (
 		}
 	}
 };
+
+interface ChessStudyEventHandler {
+	gotoNextMove(state: GameState): void;
+	gotoPrevMove(state: GameState): void;
+	gotoMove(state: GameState, moveId: string): void;
+	playMove(state: GameState, move: Move): void;
+}
+
+class GameEventHandler implements ChessStudyEventHandler {
+	readonly #chessView: ChessView;
+	readonly #setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>;
+	constructor(
+		chessView: ChessView,
+		setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>,
+	) {
+		this.#chessView = chessView;
+		this.#setChessLogic = setChessLogic;
+	}
+	/**
+	 * @override
+	 */
+	gotoNextMove(state: GameState): void {
+		state.currentMove = displayRelativeMoveInHistory(
+			state,
+			this.#chessView,
+			this.#setChessLogic,
+			{
+				offset: 1,
+				selectedMoveId: null,
+			},
+		);
+	}
+	/**
+	 * @override
+	 */
+	gotoPrevMove(state: GameState): void {
+		state.currentMove = displayRelativeMoveInHistory(
+			state,
+			this.#chessView,
+			this.#setChessLogic,
+			{
+				offset: -1,
+				selectedMoveId: null,
+			},
+		);
+	}
+	/**
+	 * @override
+	 */
+	gotoMove(state: GameState, moveId: string): void {
+		const move = getMoveById(state.study.moves, moveId);
+		updateView(this.#chessView, this.#setChessLogic, move.after);
+		state.currentMove = move;
+	}
+	/**
+	 * @override
+	 */
+	playMove(state: GameState, m: Move): void {
+		const moves = state.study.moves;
+
+		if (state.currentMove) {
+			const currentMoveId = state.currentMove.moveId;
+			const currentMoveIndex = moves.findIndex(
+				(move) => move.moveId === currentMoveId,
+			);
+
+			const { variant, moveIndex } = findMoveIndex(moves, currentMoveId);
+
+			if (variant) {
+				// handle Variation
+				const parent = moves[variant.parentMoveIndex];
+				const variantMoves = parent.variants[variant.variantIndex].moves;
+
+				const isLastMove = moveIndex === variantMoves.length - 1;
+
+				// Only push if its the last move in the variant because depth can only be 1
+				if (isLastMove) {
+					const variantMove: ChessStudyMove = {
+						...m,
+						moveId: nanoid(),
+						variants: [],
+						shapes: [],
+						comment: null,
+						isCapture: () => false,
+						isPromotion: () => false,
+						isEnPassant: () => false,
+						isKingsideCastle: () => false,
+						isQueensideCastle: () => false,
+						isBigPawn: () => false,
+						isNullMove: () => false,
+					};
+					variantMoves.push(variantMove);
+
+					const tempChess = new ChessModel(m.after);
+
+					state.currentMove = variantMove;
+
+					this.#chessView?.set({
+						fen: m.after,
+						check: tempChess.isCheck(),
+					});
+				}
+			} else {
+				// TODO: It would be nice for the different kinds to be handled by different instances of some interface.
+				/*
+							switch(config.chessStudyKind) {
+								case 'game':
+								case 'legacy':
+								case 'position': {
+									break;
+								}
+								case 'puzzle': {
+									break;
+								}
+							}
+							*/
+				// handle Main Line
+				const isLastMove = currentMoveIndex === moves.length - 1;
+
+				if (isLastMove) {
+					const move: ChessStudyMove = {
+						...m,
+						moveId: nanoid(),
+						variants: [],
+						shapes: [],
+						comment: null,
+						isCapture: () => false,
+						isPromotion: () => false,
+						isEnPassant: () => false,
+						isKingsideCastle: () => false,
+						isQueensideCastle: () => false,
+						isBigPawn: () => false,
+						isNullMove: () => false,
+					};
+					moves.push(move);
+
+					state.currentMove = move;
+				} else {
+					const currentMove = moves[moveIndex];
+
+					// check if the next move is the same move
+					const nextMove = moves[moveIndex + 1];
+
+					if (nextMove.san === m.san) {
+						state.currentMove = nextMove;
+						return;
+					} else {
+						const move: ChessStudyMove = {
+							...m,
+							moveId: nanoid(),
+							variants: [],
+							shapes: [],
+							comment: null,
+							isCapture: () => false,
+							isPromotion: () => false,
+							isEnPassant: () => false,
+							isKingsideCastle: () => false,
+							isQueensideCastle: () => false,
+							isBigPawn: () => false,
+							isNullMove: () => false,
+						};
+
+						currentMove.variants.push({
+							parentMoveId: currentMove.moveId,
+							variantId: nanoid(),
+							moves: [move],
+						});
+
+						state.currentMove = move;
+					}
+
+					const move: ChessStudyMove = {
+						...m,
+						moveId: nanoid(),
+						variants: [],
+						shapes: [],
+						comment: null,
+						isCapture: () => false,
+						isPromotion: () => false,
+						isEnPassant: () => false,
+						isKingsideCastle: () => false,
+						isQueensideCastle: () => false,
+						isBigPawn: () => false,
+						isNullMove: () => false,
+					};
+
+					currentMove.variants.push({
+						parentMoveId: currentMove.moveId,
+						variantId: nanoid(),
+						moves: [move],
+					});
+
+					state.currentMove = move;
+				}
+			}
+		} else {
+			// There is no current move.
+			// This means we are positioned at the beginning of the game.
+			// If there are no moves in the game then add it as the first move.
+			// If there are moves in the game then
+			// TODO: This is probably where we should check the moves and proceed accordingly.
+			if (moves.length === 0) {
+				const move: ChessStudyMove = {
+					...m,
+					moveId: nanoid(),
+					variants: [],
+					shapes: [],
+					comment: null,
+					isCapture: () => false,
+					isPromotion: () => false,
+					isEnPassant: () => false,
+					isKingsideCastle: () => false,
+					isQueensideCastle: () => false,
+					isBigPawn: () => false,
+					isNullMove: () => false,
+				};
+				moves.push(move);
+
+				state.currentMove = move;
+			} else {
+				// Do nothing for now.
+				// The problem with doing nothing is that the move will be displayed
+				const firstMove = moves[0];
+
+				if (firstMove.san === m.san) {
+					state.currentMove = firstMove;
+					return;
+				} else {
+					// What do we do if the moves do not match?
+					// I think it becomes a Variation.
+				}
+			}
+		}
+	}
+}
+
+class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
+	readonly #chessView: ChessView;
+	readonly #setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>;
+	constructor(
+		chessView: ChessView,
+		setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>,
+	) {
+		this.#chessView = chessView;
+		this.#setChessLogic = setChessLogic;
+	}
+	/**
+	 * @override
+	 */
+	gotoNextMove(state: GameState): void {
+		// Do nothing
+	}
+	/**
+	 * @override
+	 */
+	gotoPrevMove(state: GameState): void {
+		// Do nothing
+	}
+	/**
+	 * @override
+	 */
+	gotoMove(state: GameState, moveId: string): void {
+		// Do nothing
+	}
+	/**
+	 * @override
+	 */
+	playMove(state: GameState, m: Move): void {
+		const moves = state.study.moves;
+
+		if (state.currentMove) {
+			const currentMoveId = state.currentMove.moveId;
+			const currentMoveIndex = moves.findIndex(
+				(move) => move.moveId === currentMoveId,
+			);
+
+			const { variant, moveIndex } = findMoveIndex(moves, currentMoveId);
+
+			if (variant) {
+				// handle Variation
+			} else {
+				// handle Main Line
+				const isLastMove = currentMoveIndex === moves.length - 1;
+
+				if (isLastMove) {
+					// state.currentMove = move;
+				} else {
+					// check if the next move is the same move
+					const nextMove = moves[moveIndex + 1];
+
+					if (nextMove.san === m.san) {
+						const replyMove = moves[moveIndex + 2];
+						if (replyMove) {
+							updateView(this.#chessView, this.#setChessLogic, replyMove.after);
+							state.currentMove = replyMove;
+						} else {
+							updateView(this.#chessView, this.#setChessLogic, nextMove.after);
+							state.currentMove = nextMove;
+						}
+						return;
+					} else {
+						// state.currentMove = move;
+					}
+					// state.currentMove = move;
+				}
+			}
+		} else {
+			// There is no current move.
+			// This means we are positioned at the beginning of the game.
+			// If there are no moves in the game then add it as the first move.
+			// If there are moves in the game then
+			// TODO: This is probably where we should check the moves and proceed accordingly.
+			if (moves.length === 0) {
+				// state.currentMove = move;
+			} else {
+				// Do nothing for now.
+				// The problem with doing nothing is that the move will be displayed
+				const firstMove = moves[0];
+
+				if (firstMove.san === m.san) {
+					state.currentMove = firstMove;
+					return;
+				} else {
+					// What do we do if the moves do not match?
+					// I think it becomes a Variation.
+				}
+			}
+		}
+	}
+}
+
+class NoopChessStudyEventHandler implements ChessStudyEventHandler {
+	/**
+	 * @override
+	 */
+	gotoNextMove(state: GameState): void {
+		// Do nothing
+	}
+	/**
+	 * @override
+	 */
+	gotoPrevMove(state: GameState): void {
+		// Do nothing
+	}
+	/**
+	 * @override
+	 */
+	gotoMove(state: GameState, moveId: string): void {
+		// Do nothing
+	}
+	/**
+	 * @override
+	 */
+	playMove(state: GameState, move: Move): void {
+		// Do nothing
+	}
+}
+
+const createChessStudyEventHandler = (
+	chessStudyKind: ChessStudyKind,
+	chessView: ChessView | null,
+	setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>,
+) => {
+	if (chessView) {
+		switch (chessStudyKind) {
+			case 'game': {
+				return new GameEventHandler(chessView, setChessLogic);
+			}
+			case 'puzzle': {
+				return new PuzzleChessStudyEventHandler(chessView, setChessLogic);
+			}
+			case 'position': {
+				return new NoopChessStudyEventHandler();
+			}
+			case 'legacy': {
+				return new GameEventHandler(chessView, setChessLogic);
+			}
+			default: {
+				return new NoopChessStudyEventHandler();
+			}
+		}
+	} else {
+		return new NoopChessStudyEventHandler();
+	}
+};
+
 /**
  * This is the top-level React component in our Markdown renderer.
  */
@@ -158,42 +548,26 @@ export const ChessStudy = ({
 		study: data,
 	};
 
+	const handler: ChessStudyEventHandler = createChessStudyEventHandler(
+		chessStudyKind,
+		chessView,
+		setChessLogic,
+	);
+
 	// Why are we using use-immer instead of React's useReducer hook?
 	// The purpose is to have immutable state and the immer librray helps with the handling.
 	// This may be more efficient than using mutable state?
-	const [gameState, dispatch] = useImmerReducer<GameState, GameActions>(
+	const [gameState, dispatch] = useImmerReducer<GameState, GameEvent>(
 		// The first argument is the reducer function
-		(state, action) => {
+		(state: GameState, event: GameEvent) => {
 			const hasNoMoves = state.study.moves.length === 0;
-			switch (action.type) {
+			switch (event.type) {
 				case 'GOTO_NEXT_MOVE': {
-					if (!chessView || hasNoMoves) return state;
-
-					state.currentMove = displayRelativeMoveInHistory(
-						state,
-						chessView,
-						setChessLogic,
-						{
-							offset: 1,
-							selectedMoveId: null,
-						},
-					);
-
+					handler.gotoNextMove(state);
 					return state;
 				}
 				case 'GOTO_PREV_MOVE': {
-					if (!chessView || hasNoMoves) return state;
-
-					state.currentMove = displayRelativeMoveInHistory(
-						state,
-						chessView,
-						setChessLogic,
-						{
-							offset: -1,
-							selectedMoveId: null,
-						},
-					);
-
+					handler.gotoPrevMove(state);
 					return state;
 				}
 				case 'REMOVE_LAST_MOVE': {
@@ -261,11 +635,7 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'GOTO_MOVE': {
-					if (!chessView || hasNoMoves) return state;
-
-					const move = getMoveById(state.study.moves, action.moveId);
-					updateView(chessView, setChessLogic, move.after);
-					state.currentMove = move;
+					handler.gotoMove(state, event.moveId);
 					return state;
 				}
 				case 'SYNC_SHAPES': {
@@ -274,7 +644,7 @@ export const ChessStudy = ({
 					const move = getCurrentMove(state);
 
 					if (move) {
-						move.shapes = action.shapes;
+						move.shapes = event.shapes;
 						state.currentMove = move;
 					}
 
@@ -286,216 +656,14 @@ export const ChessStudy = ({
 					const move = getCurrentMove(state);
 
 					if (move) {
-						move.comment = action.comment;
+						move.comment = event.comment;
 						state.currentMove = move;
 					}
 
 					return state;
 				}
 				case 'PLAY_MOVE': {
-					if (!chessView) return state;
-					// There seems to be a bug whereby if you hit the Back button to get positioned
-					// just before the first move, then making the first move adds it to the move list as if it were a new move.
-					/**
-					 * The move that was played in the current position.
-					 */
-					// const theMove = action.move;
-
-					const moves = state.study.moves;
-
-					// TODO: No need to allocate an id here because we may not need it.
-					// const moveId = nanoid();
-
-					if (state.currentMove) {
-						const currentMoveId = state.currentMove.moveId;
-						console.log('currentMoveId', currentMoveId);
-						const currentMoveIndex = moves.findIndex(
-							(move) => move.moveId === currentMoveId,
-						);
-
-						const { variant, moveIndex } = findMoveIndex(moves, currentMoveId);
-
-						if (variant) {
-							// handle Variation
-							const parent = moves[variant.parentMoveIndex];
-							const variantMoves = parent.variants[variant.variantIndex].moves;
-
-							const isLastMove = moveIndex === variantMoves.length - 1;
-
-							// Only push if its the last move in the variant because depth can only be 1
-							if (isLastMove) {
-								const variantMove: ChessStudyMove = {
-									...action.move,
-									moveId: nanoid(),
-									variants: [],
-									shapes: [],
-									comment: null,
-									isCapture: () => false,
-									isPromotion: () => false,
-									isEnPassant: () => false,
-									isKingsideCastle: () => false,
-									isQueensideCastle: () => false,
-									isBigPawn: () => false,
-									isNullMove: () => false,
-								};
-								variantMoves.push(variantMove);
-
-								const tempChess = new ChessModel(action.move.after);
-
-								state.currentMove = variantMove;
-
-								chessView?.set({
-									fen: action.move.after,
-									check: tempChess.isCheck(),
-								});
-							}
-						} else {
-							// TODO: It would be nice for the different kinds to be handled by different instances of some interface.
-							/*
-							switch(config.chessStudyKind) {
-								case 'game':
-								case 'legacy':
-								case 'position': {
-									break;
-								}
-								case 'puzzle': {
-									break;
-								}
-							}
-							*/
-							// handle Main Line
-							const isLastMove = currentMoveIndex === moves.length - 1;
-
-							if (isLastMove) {
-								const move: ChessStudyMove = {
-									...action.move,
-									moveId: nanoid(),
-									variants: [],
-									shapes: [],
-									comment: null,
-									isCapture: () => false,
-									isPromotion: () => false,
-									isEnPassant: () => false,
-									isKingsideCastle: () => false,
-									isQueensideCastle: () => false,
-									isBigPawn: () => false,
-									isNullMove: () => false,
-								};
-								moves.push(move);
-
-								state.currentMove = move;
-							} else {
-								const currentMove = moves[moveIndex];
-
-								// check if the next move is the same move
-								const nextMove = moves[moveIndex + 1];
-
-								if (nextMove.san === action.move.san) {
-									switch (chessStudyKind) {
-										case CHESS_STUDY_KIND_PUZZLE: {
-											const replyMove = moves[moveIndex + 2];
-											if (replyMove) {
-												updateView(chessView, setChessLogic, replyMove.after);
-												state.currentMove = replyMove;
-											} else {
-												updateView(chessView, setChessLogic, nextMove.after);
-												state.currentMove = nextMove;
-											}
-											return state;
-										}
-										default: {
-											state.currentMove = nextMove;
-											return state;
-										}
-									}
-								} else {
-									const move: ChessStudyMove = {
-										...action.move,
-										moveId: nanoid(),
-										variants: [],
-										shapes: [],
-										comment: null,
-										isCapture: () => false,
-										isPromotion: () => false,
-										isEnPassant: () => false,
-										isKingsideCastle: () => false,
-										isQueensideCastle: () => false,
-										isBigPawn: () => false,
-										isNullMove: () => false,
-									};
-
-									currentMove.variants.push({
-										parentMoveId: currentMove.moveId,
-										variantId: nanoid(),
-										moves: [move],
-									});
-
-									state.currentMove = move;
-								}
-
-								const move: ChessStudyMove = {
-									...action.move,
-									moveId: nanoid(),
-									variants: [],
-									shapes: [],
-									comment: null,
-									isCapture: () => false,
-									isPromotion: () => false,
-									isEnPassant: () => false,
-									isKingsideCastle: () => false,
-									isQueensideCastle: () => false,
-									isBigPawn: () => false,
-									isNullMove: () => false,
-								};
-
-								currentMove.variants.push({
-									parentMoveId: currentMove.moveId,
-									variantId: nanoid(),
-									moves: [move],
-								});
-
-								state.currentMove = move;
-							}
-						}
-					} else {
-						// There is no current move.
-						// This means we are positioned at the beginning of the game.
-						// If there are no moves in the game then add it as the first move.
-						// If there are moves in the game then
-						// TODO: This is probably where we should check the moves and proceed accordingly.
-						if (moves.length === 0) {
-							const move: ChessStudyMove = {
-								...action.move,
-								moveId: nanoid(),
-								variants: [],
-								shapes: [],
-								comment: null,
-								isCapture: () => false,
-								isPromotion: () => false,
-								isEnPassant: () => false,
-								isKingsideCastle: () => false,
-								isQueensideCastle: () => false,
-								isBigPawn: () => false,
-								isNullMove: () => false,
-							};
-							moves.push(move);
-
-							state.currentMove = move;
-						} else {
-							// Do nothing for now.
-							// The problem with doing nothing is that the move will be displayed
-							const firstMove = moves[0];
-
-							if (firstMove.san === action.move.san) {
-								state.currentMove = firstMove;
-								return state;
-							} else {
-								// What do we do if the moves do not match?
-								// I think it becomes a Variation.
-							}
-						}
-					}
-
+					handler.playMove(state, event.move);
 					return state;
 				}
 				default:

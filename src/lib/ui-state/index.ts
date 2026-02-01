@@ -97,24 +97,18 @@ export const displayRelativeMoveInHistory = (
 	> | null = null;
 
 	const { offset, selectedMoveId } = options;
-	console.log('displayMoveInHistory');
-	console.log('offset', offset);
-	console.log('selectedMoveId', selectedMoveId);
 
 	// Figure out where we are
 	const currentMove = state.currentMove;
 
 	if (currentMove) {
 		const currentMoveId = currentMove.moveId;
-		console.log('currMoveId', currentMoveId);
 
 		// If we pass a moveId, find out where that is and offset from there, otherwise take current moveId
 		const baseMoveId = selectedMoveId || currentMoveId;
-		console.log('baseMoveId', baseMoveId);
 
 		moveToDisplay = getMoveToDisplay(state.study.moves, baseMoveId, offset);
 	} else {
-		console.log('currentMove', currentMove);
 		if (offset < 0) {
 			moveToDisplay = state.study.moves[state.study.moves.length - 1];
 		} else {
