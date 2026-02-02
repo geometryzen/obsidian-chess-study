@@ -89,6 +89,11 @@ Here are the available settings for a `chessStudy` code block:
 
 You can permanently set some settings in the [Obsidian](https://obsidian.md/) plugin settings for Obsidian Chess Study.
 
+## chess.js and PGN parsing
+
+The chess.js parser cannot handle multiple comments per move (as found in ChessDojo and Lichess).
+I have been experimenting with a fork. Hence the "chess.js": "file:../chess.js" dependency in package.json.
+
 ## Roadmap
 
 - [ ] Add view to manage stored games

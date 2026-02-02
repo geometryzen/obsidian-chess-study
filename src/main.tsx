@@ -94,6 +94,11 @@ export default class ChessStudyPlugin extends Plugin {
 						const chessStringOrStartPos =
 							chessStringTrimmed.length > 0 ? chessStringTrimmed : ROOT_FEN;
 
+						// We are using chess.js as a parser of both FEN and PGN.
+						// Once parsed, the data is mapped onto our own data structure and the chess instance is discarded.
+						// As can be seen below, variants are not handled.
+						// It should also be noted that the chess.js PGN parser does not handle multiple comments per move
+						// which occur in ChessDojo and Lichess. See note in README.md for workaround.
 						const { chess, format } = parseChessString(chessStringOrStartPos);
 
 						const findComment = (
