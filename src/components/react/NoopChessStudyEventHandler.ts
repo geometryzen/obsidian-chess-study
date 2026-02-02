@@ -6,6 +6,12 @@ export class NoopChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
+	setInitialState(state: Pick<GameState, 'isNotationHidden'>): void {
+		// Do nothing
+	}
+	/**
+	 * @override
+	 */
 	gotoNextMove(state: GameState): void {
 		// Do nothing
 	}

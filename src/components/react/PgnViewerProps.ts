@@ -9,6 +9,7 @@ export interface PgnViewerProps extends ControlProps {
 	currentMoveId: string | null;
 	initialPlayer: 'w' | 'b';
 	initialMoveNumber: number;
+	isVisible: boolean;
 	onMoveItemClick: (moveId: string) => void;
 	/*
 	onUndoButtonClick: () => void;

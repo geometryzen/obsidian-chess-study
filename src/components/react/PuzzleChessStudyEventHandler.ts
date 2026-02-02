@@ -3,17 +3,22 @@ import { Api as ChessView } from 'chessground/api';
 import { findMoveIndex, updateView } from 'src/lib/ui-state';
 import { GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
-import { Notice } from 'obsidian';
 
 export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
-	readonly #chessView: ChessView;
+	readonly #chessView: ChessView | null;
 	readonly #setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>;
 	constructor(
-		chessView: ChessView,
+		chessView: ChessView | null,
 		setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>,
 	) {
 		this.#chessView = chessView;
 		this.#setChessLogic = setChessLogic;
+	}
+	/**
+	 * @override
+	 */
+	setInitialState(state: Pick<GameState, 'isNotationHidden'>): void {
+		state.isNotationHidden = true;
 	}
 	/**
 	 * @override
@@ -37,6 +42,8 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	 * @override
 	 */
 	playMove(state: GameState, m: Move): void {
+		if (!this.#chessView) return;
+
 		const moves = state.study.moves;
 
 		if (state.currentMove) {
@@ -73,8 +80,7 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 						} else {
 							updateView(this.#chessView, this.#setChessLogic, nextMove.after);
 							state.currentMove = nextMove;
-							// Unfortunately, this renders twice. Is that strict rendering?
-							new Notice('Congratulations! You have solved the Puzzle.', 5000);
+							state.isNotationHidden = false;
 						}
 					} else {
 						// There is a current move.

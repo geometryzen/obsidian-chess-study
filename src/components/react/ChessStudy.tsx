@@ -53,7 +53,11 @@ export interface GameState {
 	 */
 	currentMove: GameCurrentMove;
 	/**
-	 * How is this used?
+	 * Determines whether the game notation is visible or not.
+	 */
+	isNotationHidden: boolean;
+	/**
+	 * Determines whether the Board View has mouse or pointer interaction.
 	 */
 	isViewOnly: boolean;
 	/**
@@ -162,17 +166,29 @@ export const ChessStudy = ({
 
 	const [chessLogic, setChessLogic] = useState(initialChessModel);
 
-	const initialState: GameState = {
-		currentMove: initialMove(data.moves, initialPosition),
-		isViewOnly: false,
-		study: data,
-	};
-
 	const handler: ChessStudyEventHandler = createChessStudyEventHandler(
 		chessStudyKind,
 		chessView,
 		setChessLogic,
 	);
+
+	// Because of strict rendering, the initialState is created when the chessView
+	const initialState: GameState = {
+		currentMove: initialMove(data.moves, initialPosition),
+		/**
+		 * In most use cases the notation is visible.
+		 * However, in the case of a puzzle, the notation is the solution, and may be hidden.
+		 */
+		isNotationHidden: false,
+		/**
+		 * This property is synchronized with the Board View (currently Chessground).
+		 */
+		isViewOnly: false,
+
+		study: data,
+	};
+
+	handler.setInitialState(initialState);
 
 	// Why are we using use-immer instead of React's useReducer hook?
 	// The purpose is to have immutable state and the immer librray helps with the handling.
@@ -333,6 +349,7 @@ export const ChessStudy = ({
 							currentMoveId={gameState.currentMove?.moveId ?? null}
 							initialPlayer={initialPlayer}
 							initialMoveNumber={initialMoveNumber}
+							isVisible={!gameState.isNotationHidden}
 							onMoveItemClick={(moveId: string) =>
 								dispatch({
 									type: 'GOTO_MOVE',

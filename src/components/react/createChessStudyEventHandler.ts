@@ -10,25 +10,21 @@ export const createChessStudyEventHandler = (
 	chessView: ChessView | null,
 	setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>,
 ) => {
-	if (chessView) {
-		switch (chessStudyKind) {
-			case 'game': {
-				return new GameChessStudyEventHandler(chessView, setChessLogic);
-			}
-			case 'puzzle': {
-				return new PuzzleChessStudyEventHandler(chessView, setChessLogic);
-			}
-			case 'position': {
-				return new NoopChessStudyEventHandler();
-			}
-			case 'legacy': {
-				return new GameChessStudyEventHandler(chessView, setChessLogic);
-			}
-			default: {
-				return new NoopChessStudyEventHandler();
-			}
+	switch (chessStudyKind) {
+		case 'game': {
+			return new GameChessStudyEventHandler(chessView, setChessLogic);
 		}
-	} else {
-		return new NoopChessStudyEventHandler();
+		case 'puzzle': {
+			return new PuzzleChessStudyEventHandler(chessView, setChessLogic);
+		}
+		case 'position': {
+			return new NoopChessStudyEventHandler();
+		}
+		case 'legacy': {
+			return new GameChessStudyEventHandler(chessView, setChessLogic);
+		}
+		default: {
+			return new NoopChessStudyEventHandler();
+		}
 	}
 };

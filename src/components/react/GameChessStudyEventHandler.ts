@@ -1,6 +1,7 @@
-import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { Chess as ChessModel, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
+import { nanoid } from 'nanoid';
+import { ChessStudyMove } from 'src/lib/storage';
 import {
 	displayRelativeMoveInHistory,
 	findMoveIndex,
@@ -8,14 +9,13 @@ import {
 	updateView,
 } from 'src/lib/ui-state';
 import { GameState } from './ChessStudy';
-import { ChessStudyMove } from 'src/lib/storage';
-import { nanoid } from 'nanoid';
+import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
-	readonly #chessView: ChessView;
+	readonly #chessView: ChessView | null;
 	readonly #setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>;
 	constructor(
-		chessView: ChessView,
+		chessView: ChessView | null,
 		setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>,
 	) {
 		this.#chessView = chessView;
@@ -24,7 +24,15 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
+	setInitialState(state: Pick<GameState, 'isNotationHidden'>): void {
+		state.isNotationHidden = false;
+	}
+	/**
+	 * @override
+	 */
 	gotoNextMove(state: GameState): void {
+		if (!this.#chessView) return;
+
 		state.currentMove = displayRelativeMoveInHistory(
 			state,
 			this.#chessView,
@@ -39,6 +47,8 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 * @override
 	 */
 	gotoPrevMove(state: GameState): void {
+		if (!this.#chessView) return;
+
 		state.currentMove = displayRelativeMoveInHistory(
 			state,
 			this.#chessView,
@@ -53,6 +63,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 * @override
 	 */
 	gotoMove(state: GameState, moveId: string): void {
+		if (!this.#chessView) return;
 		const move = getMoveById(state.study.moves, moveId);
 		updateView(this.#chessView, this.#setChessLogic, move.after);
 		state.currentMove = move;

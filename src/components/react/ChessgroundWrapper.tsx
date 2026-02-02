@@ -9,6 +9,9 @@ import { useEffect, useRef } from 'react';
 import { playOtherSide, legalMoves } from 'src/lib/chess-logic';
 import { turnColor } from 'src/lib/chess-logic/turnColor';
 
+/**
+ * Strictly speaking, these are the React properties of our Chessground wrapper.
+ */
 export interface ChessgroundProps {
 	api: Api | null;
 	setApi: React.Dispatch<React.SetStateAction<Api>>;
@@ -35,7 +38,7 @@ export const ChessgroundWrapper = React.memo(
 	}: ChessgroundProps) => {
 		const ref = useRef<HTMLDivElement>(null);
 
-		//Chessground Init
+		// Chessground Inititialization
 		useEffect(() => {
 			if (ref.current && !api) {
 				const board = Chessground(ref.current, {
