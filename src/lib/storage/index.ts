@@ -7,28 +7,39 @@ import { ROOT_FEN } from 'src/main';
 
 export const CURRENT_STORAGE_VERSION = '0.0.2';
 
+/**
+ * This interface is part of the serialization structure and should not be changed.
+ */
 export interface Variant {
 	variantId: string;
 	parentMoveId: string;
 	moves: VariantMove[];
 }
 
+/**
+ * The design of extending Move seems questionable to me.
+ */
 export interface VariantMove extends Move {
 	moveId: string;
 	shapes: DrawShape[];
 	comment: JSONContent | null;
 }
 
+/**
+ * The design of extending Move seems questionable to me.
+ * This interface is part of the serialization structure and should not be changed.
+ */
 export interface ChessStudyMove extends Move {
 	moveId: string;
 	variants: Variant[];
 	shapes: DrawShape[];
 	comment: JSONContent | null;
-	// TODO: Why do we have this function here?
-	// It does not belong
-	isCapture(): boolean;
 }
 
+/**
+ * A version, headers, comment (top level), moves, and a rootFEN.
+ * This interface defines the serialization structure and should not be changed.
+ */
 export interface ChessStudyFileContent {
 	/**
 	 * The version is not being used at present.
@@ -38,8 +49,17 @@ export interface ChessStudyFileContent {
 	 * The headers are obtained from chess.js, which does the parsing of PGN data.
 	 */
 	headers: Record<string, string>;
+	/**
+	 * The top-level comment.
+	 */
 	comment: JSONContent | null;
+	/**
+	 * The moves that follow from the root FEN.
+	 */
 	moves: ChessStudyMove[];
+	/**
+	 * The starting position.
+	 */
 	rootFEN: string;
 }
 
@@ -47,25 +67,26 @@ export class ChessStudyDataAdapter {
 	/**
 	 * The adapter is an Obsidian thing.
 	 */
-	adapter: DataAdapter;
-	storagePath: string;
+	readonly #adapter: DataAdapter;
+	readonly #storagePath: string;
 
 	constructor(adapter: DataAdapter, storagePath: string) {
-		this.adapter = adapter;
-		this.storagePath = storagePath;
+		this.#adapter = adapter;
+		this.#storagePath = storagePath;
 	}
 
 	async saveFile(fileContent: ChessStudyFileContent, id?: string) {
 		const chessStudyId = id || nanoid();
-
-		console.log(
+		/*
+		console.lg(
 			`Writing file to ${normalizePath(
-				`${this.storagePath}/${chessStudyId}.json`,
+				`${this.#storagePath}/${chessStudyId}.json`,
 			)}`,
 		);
+		*/
 
-		await this.adapter.write(
-			normalizePath(`${this.storagePath}/${chessStudyId}.json`),
+		await this.#adapter.write(
+			normalizePath(`${this.#storagePath}/${chessStudyId}.json`),
 			JSON.stringify(fileContent, null, 2),
 			{},
 		);
@@ -74,12 +95,14 @@ export class ChessStudyDataAdapter {
 	}
 
 	async loadFile(id: string): Promise<ChessStudyFileContent> {
-		console.log(
-			`Reading file from ${normalizePath(`${this.storagePath}/${id}.json`)}`,
+		/*
+		console.lg(
+			`Reading file from ${normalizePath(`${this.#storagePath}/${id}.json`)}`,
 		);
+		*/
 
-		const data = await this.adapter.read(
-			normalizePath(`${this.storagePath}/${id}.json`),
+		const data = await this.#adapter.read(
+			normalizePath(`${this.#storagePath}/${id}.json`),
 		);
 
 		const fileContent = JSON.parse(data) as ChessStudyFileContent;
@@ -93,11 +116,11 @@ export class ChessStudyDataAdapter {
 	}
 
 	async createStorageFolderIfNotExists() {
-		const folderExists = await this.adapter.exists(this.storagePath);
+		const folderExists = await this.#adapter.exists(this.#storagePath);
 
 		if (!folderExists) {
-			console.log(`Creating storage folder at: ${this.storagePath}`);
-			this.adapter.mkdir(this.storagePath);
+			// console.lg(`Creating storage folder at: ${this.#storagePath}`);
+			this.#adapter.mkdir(this.#storagePath);
 		}
 	}
 }

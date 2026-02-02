@@ -164,7 +164,6 @@ export default class ChessStudyPlugin extends Plugin {
 							cursorPosition,
 						);
 					} catch (e) {
-						console.log(e);
 						new Notice(
 							`Oops?? There was an error during PGN parsing. Cause: ${e}`,
 							0,
@@ -210,14 +209,14 @@ export default class ChessStudyPlugin extends Plugin {
 			},
 		);
 
-		console.log('Chess Study Plugin successfully loaded');
+		// console.lg('Chess Study Plugin successfully loaded');
 	}
 
 	/**
 	 * @override
 	 */
 	async onunload(): Promise<void> {
-		console.log('Chess Study Plugin successfully unloaded');
+		// console.lg('Chess Study Plugin successfully unloaded');
 	}
 
 	async loadSettings(): Promise<void> {

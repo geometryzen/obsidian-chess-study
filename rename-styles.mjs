@@ -8,7 +8,7 @@ export const renameStyles = {
 			const outcss = outfile.replace(/\.js$/, '.css');
 			const fixcss = outfile.replace(/main\.js$/, 'styles.css');
 			if (existsSync(outcss)) {
-				console.log('Renaming', outcss, 'to', fixcss);
+				// console.lg('Renaming', outcss, 'to', fixcss);
 				renameSync(outcss, fixcss);
 			}
 		});
