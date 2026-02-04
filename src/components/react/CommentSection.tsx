@@ -11,7 +11,12 @@ interface CommentSectionProps {
 export const CommentSection = React.memo(
 	({ currentComment, setComments }: CommentSectionProps) => {
 		const editor = useEditor({
-			extensions: [StarterKit],
+			extensions: [
+				StarterKit.configure({
+					// Disable the ordered list extension because of conflicts with move numbers.
+					orderedList: false,
+				}),
+			],
 			onUpdate: (state) => {
 				const comment = state.editor.getJSON();
 				if (comment) setComments(comment);

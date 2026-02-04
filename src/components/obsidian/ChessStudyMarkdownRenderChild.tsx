@@ -1,10 +1,11 @@
 import { App, MarkdownRenderChild } from 'obsidian';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { ChessStudyDataAdapter, ChessStudyFileContent } from 'src/lib/storage';
+import { ChessStudyFileContent } from 'src/lib/storage';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettingsTab';
 import { ChessStudy } from '../react/ChessStudy';
 import { ChessStudyAppConfig, parseUserConfig } from 'src/lib/obsidian';
+import { ChessStudyDataAdapter } from 'src/lib/storage/ChessStudyDataAdapter';
 
 /**
  * This is not the Obsidian Plugin.

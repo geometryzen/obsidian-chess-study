@@ -1,9 +1,6 @@
 import { JSONContent } from '@tiptap/react';
-import { Move } from 'chess.js';
+import { PieceSymbol } from 'chess.js';
 import { DrawShape } from 'chessground/draw';
-import { nanoid } from 'nanoid';
-import { DataAdapter, normalizePath } from 'obsidian';
-import { ROOT_FEN } from 'src/main';
 
 export const CURRENT_STORAGE_VERSION = '0.0.2';
 
@@ -18,22 +15,33 @@ export interface Variant {
 
 /**
  * The design of extending Move seems questionable to me.
+ * FIXME: Extending Move is a coupling to chess.js
  */
-export interface VariantMove extends Move {
+export interface VariantMove /* extends Move*/ {
 	moveId: string;
 	shapes: DrawShape[];
 	comment: JSONContent | null;
+	san: string;
+	after: string;
 }
 
 /**
  * The design of extending Move seems questionable to me.
  * This interface is part of the serialization structure and should not be changed.
+ * FIXME: Extending Move couples to chess.js
  */
-export interface ChessStudyMove extends Move {
+export interface ChessStudyMove /* extends Move*/ {
 	moveId: string;
+	// We really would like an array of arrays here in order to support multiple variations.
 	variants: Variant[];
 	shapes: DrawShape[];
 	comment: JSONContent | null;
+	color: 'w' | 'b';
+	san: string;
+	after: string;
+	from: string;
+	to: string;
+	promotion: 'b' | 'p' | 'n' | 'r' | 'q' | 'k' | PieceSymbol | undefined; // temporary borrow from chess.js
 }
 
 /**
@@ -61,66 +69,4 @@ export interface ChessStudyFileContent {
 	 * The starting position.
 	 */
 	rootFEN: string;
-}
-
-export class ChessStudyDataAdapter {
-	/**
-	 * The adapter is an Obsidian thing.
-	 */
-	readonly #adapter: DataAdapter;
-	readonly #storagePath: string;
-
-	constructor(adapter: DataAdapter, storagePath: string) {
-		this.#adapter = adapter;
-		this.#storagePath = storagePath;
-	}
-
-	async saveFile(fileContent: ChessStudyFileContent, id?: string) {
-		const chessStudyId = id || nanoid();
-		/*
-		console.lg(
-			`Writing file to ${normalizePath(
-				`${this.#storagePath}/${chessStudyId}.json`,
-			)}`,
-		);
-		*/
-
-		await this.#adapter.write(
-			normalizePath(`${this.#storagePath}/${chessStudyId}.json`),
-			JSON.stringify(fileContent, null, 2),
-			{},
-		);
-
-		return chessStudyId;
-	}
-
-	async loadFile(id: string): Promise<ChessStudyFileContent> {
-		/*
-		console.lg(
-			`Reading file from ${normalizePath(`${this.#storagePath}/${id}.json`)}`,
-		);
-		*/
-
-		const data = await this.#adapter.read(
-			normalizePath(`${this.#storagePath}/${id}.json`),
-		);
-
-		const fileContent = JSON.parse(data) as ChessStudyFileContent;
-
-		// Make sure data is compatible with storage version 0.0.1.
-		if (!fileContent.rootFEN) {
-			return { ...fileContent, rootFEN: ROOT_FEN };
-		}
-
-		return fileContent;
-	}
-
-	async createStorageFolderIfNotExists() {
-		const folderExists = await this.#adapter.exists(this.#storagePath);
-
-		if (!folderExists) {
-			// console.lg(`Creating storage folder at: ${this.#storagePath}`);
-			this.#adapter.mkdir(this.#storagePath);
-		}
-	}
 }

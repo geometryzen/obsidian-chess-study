@@ -1,8 +1,13 @@
 import { Move } from 'chess.js';
-import { GameState } from './ChessStudy';
+import { GameCurrentMove, GameState } from './ChessStudy';
+import { ChessStudyFileContent } from 'src/lib/storage';
 
 export interface ChessStudyEventHandler {
-	setInitialState(state: Pick<GameState, 'isNotationHidden'>): void;
+	setInitialState(
+		state: Pick<GameState, 'isNotationHidden'>,
+		currentMove: GameCurrentMove,
+		study: ChessStudyFileContent,
+	): void;
 	gotoNextMove(state: GameState): void;
 	gotoPrevMove(state: GameState): void;
 	gotoMove(state: GameState, moveId: string): void;

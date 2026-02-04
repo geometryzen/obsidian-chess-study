@@ -1,14 +1,14 @@
 import { Chess as ChessModel, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { nanoid } from 'nanoid';
-import { ChessStudyMove } from 'src/lib/storage';
+import { ChessStudyFileContent, ChessStudyMove } from 'src/lib/storage';
 import {
 	displayRelativeMoveInHistory,
 	findMoveIndex,
 	getMoveById,
 	updateView,
 } from 'src/lib/ui-state';
-import { GameState } from './ChessStudy';
+import { GameCurrentMove, GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
@@ -24,8 +24,18 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	setInitialState(state: Pick<GameState, 'isNotationHidden'>): void {
+	setInitialState(
+		state: Pick<GameState, 'isNotationHidden'>,
+		currentMove: GameCurrentMove,
+		study: ChessStudyFileContent,
+	): void {
 		state.isNotationHidden = false;
+		if (!this.#chessView) return;
+		if (currentMove) {
+			// This seems to cause rendering problems (too may re-renders)
+			// const move = getMoveById(study.moves, currentMove.moveId);
+			// updateView(this.#chessView, this.#setChessLogic, move.after);
+		}
 	}
 	/**
 	 * @override
@@ -97,13 +107,19 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						variants: [],
 						shapes: [],
 						comment: null,
-						isCapture: () => false,
-						isPromotion: () => false,
-						isEnPassant: () => false,
-						isKingsideCastle: () => false,
-						isQueensideCastle: () => false,
-						isBigPawn: () => false,
-						isNullMove: () => false,
+						color: m.color,
+						san: m.san,
+						after: m.after,
+						from: m.from,
+						to: m.to,
+						promotion: m.promotion,
+						// isCapture: () => false,
+						// isPromotion: () => false,
+						// isEnPassant: () => false,
+						// isKingsideCastle: () => false,
+						// isQueensideCastle: () => false,
+						// isBigPawn: () => false,
+						// isNullMove: () => false,
 					};
 					variantMoves.push(variantMove);
 
@@ -140,13 +156,19 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						variants: [],
 						shapes: [],
 						comment: null,
-						isCapture: () => false,
-						isPromotion: () => false,
-						isEnPassant: () => false,
-						isKingsideCastle: () => false,
-						isQueensideCastle: () => false,
-						isBigPawn: () => false,
-						isNullMove: () => false,
+						color: m.color,
+						san: m.san,
+						after: m.after,
+						from: m.from,
+						to: m.to,
+						promotion: m.promotion,
+						// isCapture: () => false,
+						// isPromotion: () => false,
+						// isEnPassant: () => false,
+						// isKingsideCastle: () => false,
+						// isQueensideCastle: () => false,
+						// isBigPawn: () => false,
+						// isNullMove: () => false,
 					};
 					moves.push(move);
 
@@ -167,13 +189,19 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 							variants: [],
 							shapes: [],
 							comment: null,
-							isCapture: () => false,
-							isPromotion: () => false,
-							isEnPassant: () => false,
-							isKingsideCastle: () => false,
-							isQueensideCastle: () => false,
-							isBigPawn: () => false,
-							isNullMove: () => false,
+							color: m.color,
+							san: m.san,
+							after: m.after,
+							from: m.from,
+							to: m.to,
+							promotion: m.promotion,
+							// isCapture: () => false,
+							// isPromotion: () => false,
+							// isEnPassant: () => false,
+							// isKingsideCastle: () => false,
+							// isQueensideCastle: () => false,
+							// isBigPawn: () => false,
+							// isNullMove: () => false,
 						};
 
 						currentMove.variants.push({
@@ -186,18 +214,24 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					}
 
 					const move: ChessStudyMove = {
-						...m,
+						//...m,
 						moveId: nanoid(),
 						variants: [],
 						shapes: [],
 						comment: null,
-						isCapture: () => false,
-						isPromotion: () => false,
-						isEnPassant: () => false,
-						isKingsideCastle: () => false,
-						isQueensideCastle: () => false,
-						isBigPawn: () => false,
-						isNullMove: () => false,
+						color: m.color,
+						san: m.san,
+						after: m.after,
+						from: m.from,
+						to: m.to,
+						promotion: m.promotion,
+						// isCapture: () => false,
+						// isPromotion: () => false,
+						// isEnPassant: () => false,
+						// isKingsideCastle: () => false,
+						// isQueensideCastle: () => false,
+						// isBigPawn: () => false,
+						// isNullMove: () => false,
 					};
 
 					currentMove.variants.push({
@@ -222,13 +256,14 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					variants: [],
 					shapes: [],
 					comment: null,
-					isCapture: () => false,
-					isPromotion: () => false,
-					isEnPassant: () => false,
-					isKingsideCastle: () => false,
-					isQueensideCastle: () => false,
-					isBigPawn: () => false,
-					isNullMove: () => false,
+					promotion: m.promotion,
+					// isCapture: () => false,
+					// isPromotion: () => false,
+					// isEnPassant: () => false,
+					// isKingsideCastle: () => false,
+					// isQueensideCastle: () => false,
+					// isBigPawn: () => false,
+					// isNullMove: () => false,
 				};
 				moves.push(move);
 

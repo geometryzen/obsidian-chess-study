@@ -1,3 +1,4 @@
+import { parse, ParseTree } from '@mliebelt/pgn-parser';
 import { JSONContent } from '@tiptap/react';
 import { Chess as ChessModel, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
@@ -8,11 +9,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { ChessStudyPluginSettings } from 'src/components/obsidian/ChessStudyPluginSettingsTab';
 import { ChessStudyAppConfig, parseUserConfig } from 'src/lib/obsidian';
 import {
-	ChessStudyDataAdapter,
 	ChessStudyFileContent,
 	ChessStudyMove,
 	VariantMove,
 } from 'src/lib/storage';
+import { ChessStudyDataAdapter } from 'src/lib/storage/ChessStudyDataAdapter';
+import { chess_study_to_pgn_string } from 'src/lib/storage/study_to_pgn';
 import {
 	displayRelativeMoveInHistory,
 	findMoveIndex,
@@ -25,7 +27,6 @@ import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { CommentSection } from './CommentSection';
 import { createChessStudyEventHandler } from './createChessStudyEventHandler';
 import { PgnViewer } from './PgnViewer';
-
 export type ChessStudyConfig = ChessgroundProps;
 
 interface AppProps {
@@ -87,8 +88,26 @@ const initialMove = (
 		case 'first': {
 			return moves[0] ?? null;
 		}
-		case 'end':
+		case 'end': {
+			return moves[moves.length - 1] ?? null;
+		}
 		default: {
+			// We are currently defaulting to the last move (legacy behavior)
+			const game = parse(initialPosition, { startRule: 'game' }) as ParseTree;
+			if (Array.isArray(game.moves)) {
+				const ipmoves = game.moves;
+				if (ipmoves.length === 1) {
+					const ipmove = ipmoves[0];
+					const moveNumber = ipmove.moveNumber;
+					// The PGN parsing library seems to get the color wrong.
+					const turn = initialPosition.contains('...') ? 'b' : 'w';
+					// The following needs refinement for when the first move does not start at 1.
+					const index =
+						turn === 'w' ? 2 * (moveNumber - 1) : 2 * (moveNumber - 1) + 1;
+					const move = moves[index];
+					return move;
+				}
+			}
 			return moves[moves.length - 1] ?? null;
 		}
 	}
@@ -155,15 +174,35 @@ export const ChessStudy = ({
 				}
 				break;
 			}
-			case 'begin':
+			case 'begin': {
+				// Do nothing.
+				break;
+			}
 			default: {
-				// Do nothing
+				const desiredMove = initialMove(data.moves, config.initialPosition);
+				if (desiredMove) {
+					for (let i = 0; i < data.moves.length; i++) {
+						const move = data.moves[i];
+						chess.move({
+							from: move.from,
+							to: move.to,
+							promotion: move.promotion,
+						});
+						if (desiredMove.moveId === move.moveId) {
+							break;
+						}
+					}
+				}
 			}
 		}
 
 		return [chess, initialPlayer, initialMoveNumber];
 	}, [data.moves, data.rootFEN, config.initialPosition]);
 
+	/**
+	 * These names are quite good since we would like to use chess.js
+	 * in its role as a position analyzer and not for game management (which it does no do so well)
+	 */
 	const [chessLogic, setChessLogic] = useState(initialChessModel);
 
 	const handler: ChessStudyEventHandler = createChessStudyEventHandler(
@@ -188,7 +227,11 @@ export const ChessStudy = ({
 		study: data,
 	};
 
-	handler.setInitialState(initialState);
+	handler.setInitialState(
+		initialState,
+		initialState.currentMove,
+		initialState.study,
+	);
 
 	// Why are we using use-immer instead of React's useReducer hook?
 	// The purpose is to have immutable state and the immer librray helps with the handling.
@@ -289,11 +332,13 @@ export const ChessStudy = ({
 				case 'SYNC_COMMENT': {
 					if (!chessView || hasNoMoves) return state;
 
-					const move = getCurrentMove(state);
+					const currentMove = getCurrentMove(state);
 
-					if (move) {
-						move.comment = event.comment;
-						state.currentMove = move;
+					if (currentMove) {
+						currentMove.comment = event.comment;
+						state.currentMove = currentMove;
+					} else {
+						state.study.comment = event.comment;
 					}
 
 					return state;
@@ -374,9 +419,13 @@ export const ChessStudy = ({
 							}}
 							onCopyPgnButtonClick={() => {
 								try {
-									navigator.clipboard.writeText(chessLogic.pgn());
+									const pgn_string = chess_study_to_pgn_string(gameState.study);
+									// console.lg('pgn', pgn_string);
+									navigator.clipboard.writeText(pgn_string);
 									new Notice('Copied PGN to clipboard!');
 								} catch (e) {
+									console.warn(e);
+									console.warn(JSON.stringify(gameState.study, null, 2));
 									new Notice('Could not copy PGN to clipboard:', e);
 								}
 							}}
