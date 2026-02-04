@@ -42,6 +42,10 @@ export interface ChessStudyMove /* extends Move*/ {
 	from: string;
 	to: string;
 	promotion: 'b' | 'p' | 'n' | 'r' | 'q' | 'k' | PieceSymbol | undefined; // temporary borrow from chess.js
+	/**
+	 * Numeric Annotation Glyphs
+	 */
+	nags: number[];
 }
 
 /**

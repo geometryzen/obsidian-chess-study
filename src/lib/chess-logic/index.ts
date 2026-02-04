@@ -128,6 +128,7 @@ function chess_to_study(
 			from: move.from,
 			to: move.to,
 			promotion: move.promotion,
+			nags: [], // chess.js does not support Numeric Annotation Glyphs, but it does not matter here because we are only working with FENs now.
 		})),
 		rootFEN: format === 'FEN' ? chessStringOrStartPos : ROOT_FEN,
 	};
@@ -157,40 +158,43 @@ function tags_to_headers(tags: Tags | undefined): Record<string, string> {
 		// A difficulty with the tags design is that some fields
 		// are not simply strings. As a result we must be careful when
 		// mapping them over.
-		headers['Event'] = tags.Event;
-		headers['Site'] = tags.Site;
+		if (tags.Event) {
+			headers['Event'] = tags.Event;
+		} else {
+			headers['Event'] = '?';
+		}
+		if (tags.Site) {
+			headers['Site'] = tags.Site;
+		} else {
+			headers['Site'] = '?';
+		}
 		if (tags.Date && tags.Date.value) {
 			headers['Date'] = tags.Date.value;
 		} else {
 			headers['Date'] = '????.??.??';
 		}
-		headers['Round'] = tags.Round;
-		headers['White'] = tags.White;
-		headers['Black'] = tags.Black;
-		headers['Result'] = tags.Result;
-		if (tags.ECO) {
-			headers['ECO'] = tags.ECO;
+		if (tags.Round) {
+			headers['Round'] = tags.Round;
+		} else {
+			headers['Round'] = '?';
 		}
-		if (tags.WhiteElo) {
-			headers['WhiteElo'] = tags.WhiteElo;
+		if (tags.White) {
+			headers['White'] = tags.White;
+		} else {
+			headers['White'] = '?';
 		}
-		if (tags.BlackElo) {
-			headers['BlackElo'] = tags.BlackElo;
+		if (tags.Black) {
+			headers['Black'] = tags.Black;
+		} else {
+			headers['Black'] = '?';
 		}
-		if (tags.PlyCount) {
-			headers['PlyCount'] = tags.PlyCount;
-		}
-		if (tags.EventDate && tags.EventDate.value) {
-			headers['EventDate'] = tags.EventDate.value;
+		if (tags.Result) {
+			headers['Result'] = tags.Result;
+		} else {
+			headers['Result'] = '*';
 		}
 		// The following are used by Lichess
 		// GameId
-		if (tags.UTCDate && tags.UTCDate.value) {
-			headers['UTCDate'] = tags.UTCDate.value;
-		}
-		if (tags.UTCTime && tags.UTCTime.value) {
-			headers['UTCTime'] = tags.UTCTime.value;
-		}
 		if (tags.WhiteRatingDiff) {
 			headers['WhiteRatingDiff'] = tags.WhiteRatingDiff;
 		}
@@ -200,18 +204,110 @@ function tags_to_headers(tags: Tags | undefined): Record<string, string> {
 		if (tags.Variant) {
 			headers['Variant'] = tags.Variant;
 		}
-		if (tags.TimeControl && tags.TimeControl.value) {
-			headers['TimeControl'] = tags.TimeControl.value;
+		// Player related information
+		if (tags.WhiteTitle) {
+			headers['WhiteTitle'] = tags.WhiteTitle;
 		}
+		if (tags.BlackTitle) {
+			headers['BlackTitle'] = tags.BlackTitle;
+		}
+		if (tags.WhiteElo) {
+			headers['WhiteElo'] = tags.WhiteElo;
+		}
+		if (tags.BlackElo) {
+			headers['BlackElo'] = tags.BlackElo;
+		}
+		if (tags.WhiteUSCF) {
+			headers['WhiteUSCF'] = tags.WhiteUSCF;
+		}
+		if (tags.BlackUSCF) {
+			headers['BlackUSCF'] = tags.BlackUSCF;
+		}
+		if (tags.WhiteNA) {
+			headers['WhiteNA'] = tags.WhiteNA;
+		}
+		if (tags.BlackNA) {
+			headers['BlackNA'] = tags.BlackNA;
+		}
+		if (tags.WhiteType) {
+			headers['WhiteType'] = tags.WhiteType;
+		}
+		if (tags.BlackType) {
+			headers['BlackType'] = tags.BlackType;
+		}
+		// Event related information
+		if (tags.EventDate && tags.EventDate.value) {
+			headers['EventDate'] = tags.EventDate.value;
+		}
+		if (tags.EventSponsor) {
+			headers['EventSponsor'] = tags.EventSponsor;
+		}
+		if (tags.Section) {
+			headers['Section'] = tags.Section;
+		}
+		if (tags.Stage) {
+			headers['Stage'] = tags.Stage;
+		}
+		if (tags.Board) {
+			headers['Board'] = tags.Board;
+		}
+		// Opening information (locale specific)
 		if (tags.Opening) {
 			headers['Opening'] = tags.Opening;
 		}
+		if (tags.Variation) {
+			headers['Variation'] = tags.Variation;
+		}
+		if (tags.SubVariation) {
+			headers['SubVariation'] = tags.SubVariation;
+		}
+		// Opening information (third parts vendors)
+		if (tags.ECO) {
+			headers['ECO'] = tags.ECO;
+		}
+		if (tags.NIC) {
+			headers['NIC'] = tags.NIC;
+		}
+		// Time and date related information
+		if (tags.Time && tags.Time.value) {
+			headers['Time'] = tags.Time.value;
+		}
+		if (tags.UTCTime && tags.UTCTime.value) {
+			headers['UTCTime'] = tags.UTCTime.value;
+		}
+		if (tags.UTCDate && tags.UTCDate.value) {
+			headers['UTCDate'] = tags.UTCDate.value;
+		}
+		// Time Control
+		if (tags.TimeControl && tags.TimeControl.value) {
+			headers['TimeControl'] = tags.TimeControl.value;
+		}
+		// Alternative starting positions
+		// The following are important.
+		if (tags.SetUp) {
+			headers['SetUp'] = tags.SetUp;
+		}
+		if (tags.FEN) {
+			headers['FEN'] = tags.FEN;
+		}
+		// Game conclusion
 		if (tags.Termination) {
 			headers['Termination'] = tags.Termination;
 		}
+		// Miscellaneous
 		if (tags.Annotator) {
 			headers['Annotator'] = tags.Annotator;
 		}
+		if (tags.Mode) {
+			headers['Mode'] = tags.Mode;
+		}
+		if (tags.PlyCount) {
+			headers['PlyCount'] = tags.PlyCount;
+		}
+		// What did we miss?
+		// We could detect anything missing and copy it across being careful to make sure we have a string
+		Object.keys(tags);
+		Object.keys(headers);
 	}
 	return headers;
 }
@@ -246,6 +342,17 @@ function game_comment_to_json_comment(
 	}
 }
 
+function nag_to_nags(ns: string[]): number[] {
+	return ns.map((n) => {
+		if (n.startsWith('$')) {
+			return parseInt(n.substring(1));
+		} else {
+			// Null annotation or should we throw it away?
+			return 0;
+		}
+	});
+}
+
 function pgn_moves_to_chess_study_moves(gms: PgnMove[]): ChessStudyMove[] {
 	// We use chess.js to compute the after, from, and to properties.
 	const chess = new Chess(ROOT_FEN);
@@ -256,7 +363,6 @@ function pgn_moves_to_chess_study_moves(gms: PgnMove[]): ChessStudyMove[] {
 		chess.move(m.notation.notation);
 		const history = chess.history({ verbose: true });
 		const chessMove = history[history.length - 1];
-		m.nag;
 		m.variations;
 		m.commentDiag;
 		m.drawOffer;
@@ -272,6 +378,7 @@ function pgn_moves_to_chess_study_moves(gms: PgnMove[]): ChessStudyMove[] {
 			from: chessMove.from,
 			to: chessMove.to,
 			promotion: m.notation.promotion as PieceSymbol, // There may be an issue here.
+			nags: nag_to_nags(m.nag),
 		};
 		moves.push(move);
 	}

@@ -102,7 +102,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				// Only push if its the last move in the variant because depth can only be 1
 				if (isLastMove) {
 					const variantMove: ChessStudyMove = {
-						...m,
 						moveId: nanoid(),
 						variants: [],
 						shapes: [],
@@ -113,13 +112,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						from: m.from,
 						to: m.to,
 						promotion: m.promotion,
-						// isCapture: () => false,
-						// isPromotion: () => false,
-						// isEnPassant: () => false,
-						// isKingsideCastle: () => false,
-						// isQueensideCastle: () => false,
-						// isBigPawn: () => false,
-						// isNullMove: () => false,
+						nags: [],
 					};
 					variantMoves.push(variantMove);
 
@@ -151,7 +144,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 
 				if (isLastMove) {
 					const move: ChessStudyMove = {
-						...m,
 						moveId: nanoid(),
 						variants: [],
 						shapes: [],
@@ -162,13 +154,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						from: m.from,
 						to: m.to,
 						promotion: m.promotion,
-						// isCapture: () => false,
-						// isPromotion: () => false,
-						// isEnPassant: () => false,
-						// isKingsideCastle: () => false,
-						// isQueensideCastle: () => false,
-						// isBigPawn: () => false,
-						// isNullMove: () => false,
+						nags: [],
 					};
 					moves.push(move);
 
@@ -184,7 +170,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						return;
 					} else {
 						const move: ChessStudyMove = {
-							...m,
 							moveId: nanoid(),
 							variants: [],
 							shapes: [],
@@ -195,13 +180,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 							from: m.from,
 							to: m.to,
 							promotion: m.promotion,
-							// isCapture: () => false,
-							// isPromotion: () => false,
-							// isEnPassant: () => false,
-							// isKingsideCastle: () => false,
-							// isQueensideCastle: () => false,
-							// isBigPawn: () => false,
-							// isNullMove: () => false,
+							nags: [],
 						};
 
 						currentMove.variants.push({
@@ -214,7 +193,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					}
 
 					const move: ChessStudyMove = {
-						//...m,
 						moveId: nanoid(),
 						variants: [],
 						shapes: [],
@@ -225,13 +203,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						from: m.from,
 						to: m.to,
 						promotion: m.promotion,
-						// isCapture: () => false,
-						// isPromotion: () => false,
-						// isEnPassant: () => false,
-						// isKingsideCastle: () => false,
-						// isQueensideCastle: () => false,
-						// isBigPawn: () => false,
-						// isNullMove: () => false,
+						nags: [],
 					};
 
 					currentMove.variants.push({
@@ -251,19 +223,17 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 			// TODO: This is probably where we should check the moves and proceed accordingly.
 			if (moves.length === 0) {
 				const move: ChessStudyMove = {
-					...m,
 					moveId: nanoid(),
 					variants: [],
 					shapes: [],
 					comment: null,
 					promotion: m.promotion,
-					// isCapture: () => false,
-					// isPromotion: () => false,
-					// isEnPassant: () => false,
-					// isKingsideCastle: () => false,
-					// isQueensideCastle: () => false,
-					// isBigPawn: () => false,
-					// isNullMove: () => false,
+					nags: [],
+					color: m.color,
+					san: m.san,
+					after: m.after,
+					from: m.from,
+					to: m.to,
 				};
 				moves.push(move);
 
