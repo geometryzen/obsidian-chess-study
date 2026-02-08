@@ -1,6 +1,7 @@
 import { Chess as ChessModel, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
-import { findMoveIndex, updateView } from 'src/lib/ui-state';
+import { updateView } from 'src/lib/ui-state';
+import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
 import { GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 
@@ -54,7 +55,10 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 
 			// How does moveIndex differ from currentMoveIndex?
 			// I believe it is the same, assuming we don't have variants.
-			const { variant, moveIndex } = findMoveIndex(moves, currentMoveId);
+			const { indexLocation: variant, moveIndex } = find_move_index_from_move_id(
+				moves,
+				currentMoveId,
+			);
 			// console.lg('currentMoveIndex', currentMoveIndex);
 			// console.lg('moveIndex', moveIndex);
 

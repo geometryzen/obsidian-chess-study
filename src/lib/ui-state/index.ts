@@ -3,54 +3,39 @@ import { Api as ChessgroundApi } from 'chessground/api';
 import { Draft } from 'immer';
 import { GameCurrentMove, GameState } from 'src/components/react/ChessStudy';
 import { legalMoves } from '../chess-logic';
-import { ChessStudyMove, VariantMove } from '../storage';
 import { turnColor } from '../chess-logic/turnColor';
-
-interface MovePosition {
-	variant: { parentMoveIndex: number; variantIndex: number } | null;
-	moveIndex: number;
-}
-
-export const findMoveIndex = (
-	moves: ChessStudyMove[],
-	moveId: string,
-): MovePosition => {
-	for (const [iMainLine, move] of moves.entries()) {
-		if (move.moveId === moveId) return { variant: null, moveIndex: iMainLine };
-
-		for (const [iVariant, variant] of move.variants.entries()) {
-			const moveIndex = variant.moves.findIndex((move) => move.moveId === moveId);
-
-			if (moveIndex >= 0)
-				return {
-					variant: { parentMoveIndex: iMainLine, variantIndex: iVariant },
-					moveIndex: moveIndex,
-				};
-		}
-	}
-
-	return { variant: null, moveIndex: -1 };
-};
+import { ChessStudyMove } from '../storage';
+import { find_move_index_from_move_id } from './find_move_index_from_move_id';
 
 const getMoveToDisplay = (
 	moves: ChessStudyMove[],
 	moveId: string,
-	offset: number,
+	offset: 1 | -1 | 0,
 ) => {
-	let moveToDisplay: ChessStudyMove | VariantMove | null = null;
-	const { variant, moveIndex } = findMoveIndex(moves, moveId);
+	let moveToDisplay: ChessStudyMove | null = null;
+	const { indexLocation, moveIndex } = find_move_index_from_move_id(
+		moves,
+		moveId,
+	);
 	// Are we in a variant? Are we not? Decide which move to display
 
-	if (variant) {
-		const variantMoves =
-			moves[variant.parentMoveIndex].variants[variant.variantIndex].moves;
+	if (indexLocation) {
+		const mainLineMove = moves[indexLocation.mainLineMoveIndex];
+		const variations = mainLineMove.variants;
+		const variation = variations[indexLocation.variationIndex];
 
-		if (typeof variantMoves[moveIndex + offset] !== 'undefined') {
-			return variantMoves[moveIndex + offset];
+		if (moveIndex === 0 && offset === -1) {
+			// TODO: I thought this would work but it does not.
+			// return getMoveToDisplay(moves, mainLineMove.moveId, -1);
+			return getMoveToDisplay(moves, variation.parentMoveId, 0);
+		}
+
+		if (typeof variation.moves[moveIndex + offset] !== 'undefined') {
+			return variation.moves[moveIndex + offset];
 		}
 
 		if (typeof moveToDisplay === 'undefined') {
-			moveToDisplay = moves[variant.parentMoveIndex + offset];
+			moveToDisplay = moves[indexLocation.mainLineMoveIndex + offset];
 		}
 	} else {
 		if (typeof moves[moveIndex + offset] !== 'undefined') {
@@ -61,18 +46,21 @@ const getMoveToDisplay = (
 };
 
 export const getMoveById = (moves: ChessStudyMove[], moveId: string) => {
-	const { variant, moveIndex } = findMoveIndex(moves, moveId);
+	const { indexLocation: variant, moveIndex } = find_move_index_from_move_id(
+		moves,
+		moveId,
+	);
 	// Are we in a variant? Are we not? Decide which move to display
 
 	if (variant) {
 		const variantMoves =
-			moves[variant.parentMoveIndex].variants[variant.variantIndex].moves;
+			moves[variant.mainLineMoveIndex].variants[variant.variationIndex].moves;
 
 		if (typeof variantMoves[moveIndex] !== 'undefined') {
 			return variantMoves[moveIndex];
 		}
 
-		return moves[variant.parentMoveIndex];
+		return moves[variant.mainLineMoveIndex];
 	}
 	return moves[moveIndex];
 };
@@ -92,7 +80,7 @@ export const displayRelativeMoveInHistory = (
 	options: { offset: 1 | -1; selectedMoveId: string | null },
 ): GameCurrentMove => {
 	let moveToDisplay: Pick<
-		VariantMove,
+		ChessStudyMove,
 		'moveId' | 'comment' | 'shapes' | 'after'
 	> | null = null;
 
@@ -159,17 +147,19 @@ export const updateView = (
 
 export const getCurrentMove = (
 	draft: Draft<GameState>,
-): Draft<ChessStudyMove> | Draft<VariantMove> | null => {
+): Draft<ChessStudyMove> | null => {
 	const currentMoveId = draft.currentMove?.moveId;
 	const moves = draft.study.moves;
 
 	if (currentMoveId) {
-		const { variant, moveIndex } = findMoveIndex(moves, currentMoveId);
+		const { indexLocation: variant, moveIndex } = find_move_index_from_move_id(
+			moves,
+			currentMoveId,
+		);
 
 		if (variant) {
-			return moves[variant.parentMoveIndex].variants[variant.variantIndex].moves[
-				moveIndex
-			];
+			return moves[variant.mainLineMoveIndex].variants[variant.variationIndex]
+				.moves[moveIndex];
 		} else {
 			return moves[moveIndex];
 		}

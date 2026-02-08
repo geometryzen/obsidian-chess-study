@@ -1,5 +1,4 @@
 import { JSONContent } from '@tiptap/react';
-import { PieceSymbol } from 'chess.js';
 import { DrawShape } from 'chessground/draw';
 
 export const CURRENT_STORAGE_VERSION = '0.0.2';
@@ -7,22 +6,10 @@ export const CURRENT_STORAGE_VERSION = '0.0.2';
 /**
  * This interface is part of the serialization structure and should not be changed.
  */
-export interface Variant {
+export interface Variation {
 	variantId: string;
 	parentMoveId: string;
-	moves: VariantMove[];
-}
-
-/**
- * The design of extending Move seems questionable to me.
- * FIXME: Extending Move is a coupling to chess.js
- */
-export interface VariantMove /* extends Move*/ {
-	moveId: string;
-	shapes: DrawShape[];
-	comment: JSONContent | null;
-	san: string;
-	after: string;
+	moves: ChessStudyMove[];
 }
 
 /**
@@ -32,8 +19,7 @@ export interface VariantMove /* extends Move*/ {
  */
 export interface ChessStudyMove /* extends Move*/ {
 	moveId: string;
-	// We really would like an array of arrays here in order to support multiple variations.
-	variants: Variant[];
+	variants: Variation[];
 	shapes: DrawShape[];
 	comment: JSONContent | null;
 	color: 'w' | 'b';
@@ -41,7 +27,7 @@ export interface ChessStudyMove /* extends Move*/ {
 	after: string;
 	from: string;
 	to: string;
-	promotion: 'b' | 'p' | 'n' | 'r' | 'q' | 'k' | PieceSymbol | undefined; // temporary borrow from chess.js
+	promotion: 'b' | 'p' | 'n' | 'r' | 'q' | 'k' | undefined;
 	/**
 	 * Numeric Annotation Glyphs
 	 */

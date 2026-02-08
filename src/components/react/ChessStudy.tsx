@@ -6,22 +6,18 @@ import { DrawShape } from 'chessground/draw';
 import { App, Notice } from 'obsidian';
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
-import { ChessStudyPluginSettings } from 'src/components/obsidian/ChessStudyPluginSettingsTab';
-import { ChessStudyAppConfig, parseUserConfig } from 'src/lib/obsidian';
-import {
-	ChessStudyFileContent,
-	ChessStudyMove,
-	VariantMove,
-} from 'src/lib/storage';
-import { ChessStudyDataAdapter } from 'src/lib/storage/ChessStudyDataAdapter';
-import { chess_study_to_pgn_string } from 'src/lib/storage/study_to_pgn';
-import {
-	displayRelativeMoveInHistory,
-	findMoveIndex,
-	getCurrentMove,
-} from 'src/lib/ui-state';
 import { InitialPosition } from 'src/main';
 import { useImmerReducer } from 'use-immer';
+import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPluginSettingsTab';
+import { ChessStudyAppConfig, parseUserConfig } from '../../lib/obsidian';
+import { ChessStudyFileContent, ChessStudyMove } from '../../lib/storage';
+import { ChessStudyDataAdapter } from '../../lib/storage/ChessStudyDataAdapter';
+import { chess_study_to_pgn_string } from '../../lib/storage/study_to_pgn';
+import {
+	displayRelativeMoveInHistory,
+	getCurrentMove,
+} from '../../lib/ui-state';
+import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { CommentSection } from './CommentSection';
@@ -42,10 +38,10 @@ interface AppProps {
 	dataAdapter: ChessStudyDataAdapter;
 }
 
-export type GameCurrentMove =
-	| Pick<ChessStudyMove, 'moveId' | 'comment' | 'shapes'>
-	| Pick<VariantMove, 'moveId' | 'comment' | 'shapes'>
-	| null;
+export type GameCurrentMove = Pick<
+	ChessStudyMove,
+	'moveId' | 'comment' | 'shapes'
+> | null;
 
 export interface GameState {
 	/**
@@ -257,11 +253,15 @@ export const ChessStudy = ({
 					const currentMoveId = state.currentMove?.moveId;
 
 					if (currentMoveId) {
-						const { variant, moveIndex } = findMoveIndex(moves, currentMoveId);
+						const { indexLocation, moveIndex } = find_move_index_from_move_id(
+							moves,
+							currentMoveId,
+						);
 
-						if (variant) {
-							const parent = moves[variant.parentMoveIndex];
-							const variantMoves = parent.variants[variant.variantIndex].moves;
+						if (indexLocation) {
+							// The current move belongs to a variation, not the Main Line.
+							const parent = moves[indexLocation.mainLineMoveIndex];
+							const variantMoves = parent.variants[indexLocation.variationIndex].moves;
 
 							const isLastMove = moveIndex === variantMoves.length - 1;
 
@@ -279,14 +279,14 @@ export const ChessStudy = ({
 
 							variantMoves.pop();
 							if (variantMoves.length === 0) {
-								parent.variants.splice(variant.variantIndex, 1);
+								parent.variants.splice(indexLocation.variationIndex, 1);
 							}
 
 							if (isLastMove) {
 								state.currentMove =
 									variantMoves.length > 0
 										? variantMoves[variantMoves.length - 1]
-										: moves[variant.parentMoveIndex];
+										: moves[indexLocation.mainLineMoveIndex];
 							}
 						} else {
 							const isLastMove = moveIndex === moves.length - 1;

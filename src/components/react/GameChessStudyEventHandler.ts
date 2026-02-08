@@ -4,10 +4,11 @@ import { nanoid } from 'nanoid';
 import { ChessStudyFileContent, ChessStudyMove } from 'src/lib/storage';
 import {
 	displayRelativeMoveInHistory,
-	findMoveIndex,
 	getMoveById,
 	updateView,
 } from 'src/lib/ui-state';
+import { find_variation_index_with_first_move } from 'src/lib/ui-state/find_variation_index_with_first_move';
+import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
 import { GameCurrentMove, GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 
@@ -80,22 +81,26 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	}
 	/**
 	 * @override
+	 *
+	 * @param state
+	 * @param m This move comes from the
+	 * @returns
 	 */
 	playMove(state: GameState, m: Move): void {
 		const moves = state.study.moves;
 
 		if (state.currentMove) {
 			const currentMoveId = state.currentMove.moveId;
-			const currentMoveIndex = moves.findIndex(
-				(move) => move.moveId === currentMoveId,
+
+			const { indexLocation, moveIndex } = find_move_index_from_move_id(
+				moves,
+				currentMoveId,
 			);
 
-			const { variant, moveIndex } = findMoveIndex(moves, currentMoveId);
-
-			if (variant) {
-				// handle Variation
-				const parent = moves[variant.parentMoveIndex];
-				const variantMoves = parent.variants[variant.variantIndex].moves;
+			if (indexLocation) {
+				// The current move belongs to a variation (not the Main Line).
+				const parent: ChessStudyMove = moves[indexLocation.mainLineMoveIndex];
+				const variantMoves = parent.variants[indexLocation.variationIndex].moves;
 
 				const isLastMove = moveIndex === variantMoves.length - 1;
 
@@ -124,25 +129,20 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						fen: m.after,
 						check: tempChess.isCheck(),
 					});
+				} else {
+					// We should provide some notice?
+					// We also must revert the board.
+					// Easier may be simply to allow variations of variaton.
 				}
 			} else {
-				// TODO: It would be nice for the different kinds to be handled by different instances of some interface.
-				/*
-							switch(config.chessStudyKind) {
-								case 'game':
-								case 'legacy':
-								case 'position': {
-									break;
-								}
-								case 'puzzle': {
-									break;
-								}
-							}
-							*/
-				// handle Main Line
-				const isLastMove = currentMoveIndex === moves.length - 1;
-
-				if (isLastMove) {
+				// The current move belongs to the Main Line.
+				const currentMoveIndex = moves.findIndex(
+					(move: ChessStudyMove) => move.moveId === currentMoveId,
+				);
+				const isCurrentMoveLast = currentMoveIndex === moves.length - 1;
+				if (isCurrentMoveLast) {
+					// If the current move is the last move then the played move
+					// should be added as a new Main Line move.
 					const move: ChessStudyMove = {
 						moveId: nanoid(),
 						variants: [],
@@ -160,6 +160,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 
 					state.currentMove = move;
 				} else {
+					// The current move is not the last in the Main Line.
 					const currentMove = moves[moveIndex];
 
 					// check if the next move is the same move
@@ -169,50 +170,41 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						state.currentMove = nextMove;
 						return;
 					} else {
-						const move: ChessStudyMove = {
-							moveId: nanoid(),
-							variants: [],
-							shapes: [],
-							comment: null,
-							color: m.color,
-							san: m.san,
-							after: m.after,
-							from: m.from,
-							to: m.to,
-							promotion: m.promotion,
-							nags: [],
-						};
+						// The played move is not the same as the next Main Line move.
+						// If a variation exists that starts with the playedMove, then go into that variation.
+						// Otherwise, create a new variation with the played move as the first move
+						const variationIndex = find_variation_index_with_first_move(
+							currentMove.variants,
+							m.san,
+						);
+						if (variationIndex !== -1) {
+							// We must set the state.currentMove to that move
+							state.currentMove = currentMove.variants[variationIndex].moves[0];
+						} else {
+							// The move does not exist in any existing variation so we create a new variation
+							const move: ChessStudyMove = {
+								moveId: nanoid(),
+								variants: [],
+								shapes: [],
+								comment: null,
+								color: m.color,
+								san: m.san,
+								after: m.after,
+								from: m.from,
+								to: m.to,
+								promotion: m.promotion,
+								nags: [],
+							};
 
-						currentMove.variants.push({
-							parentMoveId: currentMove.moveId,
-							variantId: nanoid(),
-							moves: [move],
-						});
+							currentMove.variants.push({
+								parentMoveId: currentMove.moveId,
+								variantId: nanoid(),
+								moves: [move],
+							});
 
-						state.currentMove = move;
+							state.currentMove = move;
+						}
 					}
-
-					const move: ChessStudyMove = {
-						moveId: nanoid(),
-						variants: [],
-						shapes: [],
-						comment: null,
-						color: m.color,
-						san: m.san,
-						after: m.after,
-						from: m.from,
-						to: m.to,
-						promotion: m.promotion,
-						nags: [],
-					};
-
-					currentMove.variants.push({
-						parentMoveId: currentMove.moveId,
-						variantId: nanoid(),
-						moves: [move],
-					});
-
-					state.currentMove = move;
 				}
 			}
 		} else {
@@ -245,7 +237,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 
 				if (firstMove.san === m.san) {
 					state.currentMove = firstMove;
-					return;
 				} else {
 					// What do we do if the moves do not match?
 					// I think it becomes a Variation.

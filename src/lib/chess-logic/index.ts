@@ -343,14 +343,18 @@ function game_comment_to_json_comment(
 }
 
 function nag_to_nags(ns: string[]): number[] {
-	return ns.map((n) => {
-		if (n.startsWith('$')) {
-			return parseInt(n.substring(1));
-		} else {
-			// Null annotation or should we throw it away?
-			return 0;
-		}
-	});
+	if (Array.isArray(ns)) {
+		return ns.map((n) => {
+			if (n.startsWith('$')) {
+				return parseInt(n.substring(1));
+			} else {
+				// Null annotation or should we throw it away?
+				return 0;
+			}
+		});
+	} else {
+		return [];
+	}
 }
 
 function pgn_moves_to_chess_study_moves(gms: PgnMove[]): ChessStudyMove[] {
