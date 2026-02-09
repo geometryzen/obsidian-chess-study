@@ -8,6 +8,9 @@ export const CURRENT_STORAGE_VERSION = '0.0.2';
  */
 export interface Variation {
 	variantId: string;
+	/**
+	 * The identifier of the Main Line move corresponding to this variation.
+	 */
 	parentMoveId: string;
 	moves: ChessStudyMove[];
 }

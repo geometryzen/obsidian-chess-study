@@ -99,8 +99,9 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 
 			if (indexLocation) {
 				// The current move belongs to a variation (not the Main Line).
-				const parent: ChessStudyMove = moves[indexLocation.mainLineMoveIndex];
-				const variantMoves = parent.variants[indexLocation.variationIndex].moves;
+				const mainLineMove: ChessStudyMove = moves[indexLocation.mainLineMoveIndex];
+				const variantMoves =
+					mainLineMove.variants[indexLocation.variationIndex].moves;
 
 				const isLastMove = moveIndex === variantMoves.length - 1;
 
@@ -142,7 +143,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				const isCurrentMoveLast = currentMoveIndex === moves.length - 1;
 				if (isCurrentMoveLast) {
 					// If the current move is the last move then the played move
-					// should be added as a new Main Line move.
+					// should be added as a Main Line move.
 					const move: ChessStudyMove = {
 						moveId: nanoid(),
 						variants: [],
@@ -196,8 +197,9 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 								nags: [],
 							};
 
-							currentMove.variants.push({
-								parentMoveId: currentMove.moveId,
+							// Notice how the variations belong to the next move, not the current move.
+							nextMove.variants.push({
+								parentMoveId: nextMove.moveId,
 								variantId: nanoid(),
 								moves: [move],
 							});

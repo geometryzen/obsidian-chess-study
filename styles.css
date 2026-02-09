@@ -442,7 +442,7 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 	color: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) - 10%));
 }
 .chess-study .variant-move-indicator {
-	font-weight: bold;
+	font-weight: normal;
 }
 .chess-study .editor-input {
 	min-height: 150px;

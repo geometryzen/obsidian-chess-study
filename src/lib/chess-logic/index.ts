@@ -17,6 +17,7 @@ import {
 	ChessStudyFileContent,
 	ChessStudyMove,
 	CURRENT_STORAGE_VERSION,
+	Variation,
 } from '../storage';
 import { turnColor } from './turnColor';
 
@@ -357,32 +358,63 @@ function nag_to_nags(ns: string[]): number[] {
 	}
 }
 
-function pgn_moves_to_chess_study_moves(gms: PgnMove[]): ChessStudyMove[] {
+function from_pgn_variation(
+	moves: PgnMove[],
+	parentMoveId: string,
+	fen: string,
+): Variation {
+	const variation: Variation = {
+		parentMoveId,
+		moves: pgn_moves_to_chess_study_moves(moves, fen),
+		variantId: nanoid(),
+	};
+	return variation;
+}
+
+function from_pgn_variations(
+	movess: PgnMove[][],
+	parentMoveId: string,
+	fen: string,
+): Variation[] {
+	const variations: Variation[] = [];
+	for (let i = 0; i < movess.length; i++) {
+		const variation = from_pgn_variation(movess[i], parentMoveId, fen);
+		variations.push(variation);
+	}
+	return variations;
+}
+
+function pgn_moves_to_chess_study_moves(
+	gms: PgnMove[],
+	fen: string,
+): ChessStudyMove[] {
 	// We use chess.js to compute the after, from, and to properties.
-	const chess = new Chess(ROOT_FEN);
+	const chess = new Chess(fen);
 	const moves: ChessStudyMove[] = [];
 	for (let i = 0; i < gms.length; i++) {
-		const m = gms[i];
+		const pgnMove = gms[i];
+		// console.lg(JSON.stringify(pgnMove, null, 2))
 		// This may need some work for promotions?
-		chess.move(m.notation.notation);
+		chess.move(pgnMove.notation.notation);
 		const history = chess.history({ verbose: true });
 		const chessMove = history[history.length - 1];
-		m.variations;
-		m.commentDiag;
-		m.drawOffer;
-		m.commentMove;
+		pgnMove.variations;
+		pgnMove.commentDiag;
+		pgnMove.drawOffer;
+		pgnMove.commentMove;
+		const moveId = nanoid();
 		const move: ChessStudyMove = {
-			moveId: nanoid(),
-			variants: [],
+			moveId,
+			variants: from_pgn_variations(pgnMove.variations, moveId, chessMove.before),
 			shapes: [],
-			comment: string_to_json_comment(m.commentAfter),
-			color: m.turn,
-			san: m.notation.notation,
+			comment: string_to_json_comment(pgnMove.commentAfter),
+			color: pgnMove.turn,
+			san: pgnMove.notation.notation,
 			after: chessMove.after,
 			from: chessMove.from,
 			to: chessMove.to,
-			promotion: m.notation.promotion as PieceSymbol, // There may be an issue here.
-			nags: nag_to_nags(m.nag),
+			promotion: pgnMove.notation.promotion as PieceSymbol, // There may be an issue here.
+			nags: nag_to_nags(pgnMove.nag),
 		};
 		moves.push(move);
 	}
@@ -398,7 +430,7 @@ function modern_compile_pgn(chessStringTrimmed: string): ChessStudyFileContent {
 		version: CURRENT_STORAGE_VERSION,
 		headers: tags_to_headers(game.tags),
 		comment: game_comment_to_json_comment(game.gameComment),
-		moves: pgn_moves_to_chess_study_moves(game.moves),
+		moves: pgn_moves_to_chess_study_moves(game.moves, ROOT_FEN),
 		// TODO: This does not long correct for the case of starting from a non-root position.
 		rootFEN: ROOT_FEN,
 	};

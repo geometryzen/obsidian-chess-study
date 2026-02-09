@@ -38,6 +38,7 @@
 .chess-study *::after {
 	box-sizing: border-box;
 }
+
 .chess-study * {
 	margin: 0;
 }
@@ -168,7 +169,8 @@
 }
 
 .chess-study .variant-move-indicator {
-	font-weight: bold;
+	/* DGH Why would the move indicator for the variation need to be bold. Changing to normal. */
+	font-weight: normal;
 }
 
 /* Comment Section */

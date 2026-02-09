@@ -1,22 +1,9 @@
 import * as React from 'react';
 import { useMemo } from 'react';
+import { chunkArray } from '../../lib/lang/chunkArray';
 import { Controls } from './Controls';
 import { MoveItem, VariantMoveItem } from './MoveItem';
 import { PgnViewerProps } from './PgnViewerProps';
-
-const chunkArray = <T,>(array: T[], chunkSize: number, offsetByOne = false) => {
-	return array.reduce((resultArray, item, index) => {
-		const chunkIndex = Math.floor((index + (offsetByOne ? 1 : 0)) / chunkSize);
-
-		if (!resultArray[chunkIndex]) {
-			resultArray[chunkIndex] = [];
-		}
-
-		resultArray[chunkIndex].push(item);
-
-		return resultArray;
-	}, [] as T[][]);
-};
 
 export const VariantMoveItemContainer = ({
 	children,
@@ -53,7 +40,11 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 		...controlActions
 	} = props;
 
-	const movePairs = useMemo(
+	// Split the moves into [White, Black] pairs.
+	// Notice that chunkArray does not give quite the result you might expect for the first pair when the initial player is Black.
+	// The first element in such a case contains a single move which is really Black's, but it is in the first position.
+	// This requires us
+	const main_move_pairs = useMemo(
 		() => chunkArray(history, 2, initialPlayer === 'b'),
 		[initialPlayer, history],
 	);
@@ -63,79 +54,92 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 			{isVisible && (
 				<div className="move-item-section">
 					<div className="move-item-container">
-						{movePairs.map((pair, currentMoveIndex) => {
-							const [wMove, bMove] = pair;
+						{main_move_pairs.map((pair, main_move_pairs_index) => {
+							// In general this pair correctly contains White and Black moves.
+							// However, for the first move when Black is the initial player,
+							// bMove will be empty and wMove will contain the move by the Black player
+							const [white_main_move, black_main_move] = pair;
+							// console.lg("wMove", JSON.stringify(wMove,null,2))
+							// console.lg("bMove", JSON.stringify(bMove,null,2))
 
 							return (
-								<React.Fragment key={wMove.san + bMove?.san + currentMoveIndex}>
+								<React.Fragment
+									key={
+										white_main_move.san + black_main_move?.san + main_move_pairs_index
+									}
+								>
 									<p className="move-indicator center">
-										{currentMoveIndex + initialMoveNumber}
+										{main_move_pairs_index + initialMoveNumber}
 									</p>
-									{initialPlayer === 'b' && !bMove && currentMoveIndex === 0 && (
-										<MoveItem
-											san={'...'}
-											isCurrentMove={false}
-											onMoveItemClick={() => {}}
-										/>
-									)}
+									{
+										// Special logic here because of the chunking into pairs.
+										initialPlayer === 'b' &&
+											!black_main_move &&
+											main_move_pairs_index === 0 && (
+												<MoveItem
+													san={'...'}
+													isCurrentMove={false}
+													onMoveItemClick={() => {}}
+												/>
+											)
+									}
 									<MoveItem
-										san={wMove.san}
-										isCurrentMove={wMove.moveId === currentMoveId}
-										onMoveItemClick={() => onMoveItemClick(wMove.moveId)}
+										san={white_main_move.san}
+										isCurrentMove={white_main_move.moveId === currentMoveId}
+										onMoveItemClick={() => onMoveItemClick(white_main_move.moveId)}
 									/>
-									{bMove && (
-										<MoveItem
-											san={bMove.san}
-											isCurrentMove={bMove.moveId === currentMoveId}
-											onMoveItemClick={() => onMoveItemClick(bMove.moveId)}
-										/>
-									)}
-									{!!wMove.variants.concat(bMove?.variants || []).length && (
-										<VariantsContainer>
-											{!!wMove.variants.length && (
+									{!!white_main_move?.variants.length && (
+										<React.Fragment>
+											<MoveItem
+												san={'...'}
+												isCurrentMove={false}
+												onMoveItemClick={() => {}}
+											/>
+											<VariantsContainer>
 												<VariantContainer>
-													{wMove.variants.map((variant) => {
+													{white_main_move.variants.map((variant) => {
 														return (
 															<VariantMoveItemContainer key={variant.variantId}>
 																{chunkArray(variant.moves, 2).map((pair, wMoveVarianti) => {
-																	const [bMove, wMove] = pair;
+																	const [white_variation_move, black_variation_move] = pair;
 
 																	return (
 																		<React.Fragment
-																			key={bMove.san + wMove?.san + currentMoveIndex}
+																			key={
+																				white_variation_move.san +
+																				black_variation_move?.san +
+																				main_move_pairs_index
+																			}
 																		>
 																			<VariantMoveItem
-																				isCurrentMove={bMove.moveId === currentMoveId}
-																				san={bMove.san}
-																				onMoveItemClick={() => onMoveItemClick(bMove.moveId)}
-																				moveIndicator={
-																					(wMoveVarianti === 0 &&
-																						(initialPlayer === 'w' || currentMoveIndex > 0) &&
-																						`${
-																							currentMoveIndex + initialMoveNumber + wMoveVarianti
-																						}... `) ||
-																					(initialPlayer === 'b' &&
-																						currentMoveIndex === 0 &&
-																						`${
-																							currentMoveIndex + initialMoveNumber + wMoveVarianti
-																						}. `) ||
-																					null
+																				isCurrentMove={
+																					white_variation_move.moveId === currentMoveId
 																				}
+																				san={white_variation_move.san}
+																				onMoveItemClick={() =>
+																					onMoveItemClick(white_variation_move.moveId)
+																				}
+																				moveIndicator={`${
+																					main_move_pairs_index +
+																					initialMoveNumber +
+																					0 +
+																					wMoveVarianti
+																				}. `}
 																			/>
-																			{wMove && (
-																				<VariantMoveItem
-																					isCurrentMove={wMove.moveId === currentMoveId}
-																					san={wMove.san}
-																					onMoveItemClick={() => onMoveItemClick(wMove.moveId)}
-																					moveIndicator={
-																						((initialPlayer === 'w' || currentMoveIndex > 0) &&
-																							`${
-																								currentMoveIndex + initialMoveNumber + 1 + wMoveVarianti
-																							}. `) ||
-																						null
-																					}
-																				/>
-																			)}
+																			{
+																				// Black's move in a white variation never needs a move indicator.
+																				black_variation_move && (
+																					<VariantMoveItem
+																						isCurrentMove={
+																							black_variation_move.moveId === currentMoveId
+																						}
+																						san={black_variation_move.san}
+																						onMoveItemClick={() =>
+																							onMoveItemClick(black_variation_move.moveId)
+																						}
+																					/>
+																				)
+																			}
 																		</React.Fragment>
 																	);
 																})}
@@ -143,33 +147,84 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 														);
 													})}
 												</VariantContainer>
-											)}
-											{!!bMove?.variants.length && (
+											</VariantsContainer>
+										</React.Fragment>
+									)}
+									{black_main_move && !!white_main_move?.variants.length && (
+										<React.Fragment>
+											<p className="move-indicator center">
+												{main_move_pairs_index + initialMoveNumber}
+											</p>
+											<MoveItem
+												san={'...'}
+												isCurrentMove={false}
+												onMoveItemClick={() => {}}
+											/>
+										</React.Fragment>
+									)}
+									{black_main_move && (
+										<MoveItem
+											san={black_main_move.san}
+											isCurrentMove={black_main_move.moveId === currentMoveId}
+											onMoveItemClick={() => onMoveItemClick(black_main_move.moveId)}
+										/>
+									)}
+									{!!black_main_move?.variants.length && (
+										<VariantsContainer>
+											{!!black_main_move?.variants.length && (
 												<VariantContainer>
-													{bMove.variants.map((variant) => {
+													{black_main_move.variants.map((variant) => {
 														return (
 															<VariantMoveItemContainer key={variant.variantId}>
 																{chunkArray(variant.moves, 2).map((pair, bMoveVarianti) => {
-																	const [wMove, bMove] = pair;
+																	const [black_variation_move, white_variation_move] = pair;
 																	return (
 																		<React.Fragment
-																			key={wMove.san + bMove?.san + currentMoveIndex}
+																			key={
+																				black_variation_move.san +
+																				white_variation_move?.san +
+																				main_move_pairs_index
+																			}
 																		>
 																			<VariantMoveItem
-																				isCurrentMove={wMove.moveId === currentMoveId}
-																				san={wMove.san}
-																				onMoveItemClick={() => onMoveItemClick(wMove.moveId)}
-																				moveIndicator={`${
-																					currentMoveIndex + initialMoveNumber + 1 + bMoveVarianti
-																				}. `}
+																				isCurrentMove={
+																					black_variation_move.moveId === currentMoveId
+																				}
+																				san={black_variation_move.san}
+																				onMoveItemClick={() =>
+																					onMoveItemClick(black_variation_move.moveId)
+																				}
+																				moveIndicator={
+																					bMoveVarianti === 0
+																						? `${
+																								main_move_pairs_index +
+																								initialMoveNumber +
+																								0 /* was 1 */ +
+																								bMoveVarianti
+																							}... `
+																						: null
+																				}
 																			/>
-																			{bMove && (
-																				<VariantMoveItem
-																					isCurrentMove={bMove.moveId === currentMoveId}
-																					san={bMove.san}
-																					onMoveItemClick={() => onMoveItemClick(bMove.moveId)}
-																				/>
-																			)}
+																			{
+																				// White's moves in a Black variation
+																				white_variation_move && (
+																					<VariantMoveItem
+																						isCurrentMove={
+																							white_variation_move.moveId === currentMoveId
+																						}
+																						san={white_variation_move.san}
+																						onMoveItemClick={() =>
+																							onMoveItemClick(white_variation_move.moveId)
+																						}
+																						moveIndicator={`${
+																							main_move_pairs_index +
+																							initialMoveNumber +
+																							1 +
+																							bMoveVarianti
+																						}. `}
+																					/>
+																				)
+																			}
 																		</React.Fragment>
 																	);
 																})}
