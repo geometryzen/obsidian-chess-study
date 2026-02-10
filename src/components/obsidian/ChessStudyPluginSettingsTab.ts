@@ -14,24 +14,14 @@ import ChessStudyPlugin, {
 	INITIAL_POSITION_YAML_NAME,
 	InitialPosition,
 } from 'src/main';
-
-export interface ChessStudyPluginSettings {
-	boardOrientation: BoardOrientation;
-	boardColor: BoardColor;
-	disableCopy: true | false;
-	disableNavigation: true | false;
-	initialPosition: InitialPosition;
-	readOnly: true | false;
-	chessStudyKind: ChessStudyKind;
-	viewComments: true | false;
-}
+import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
 
 export const DEFAULT_SETTINGS: ChessStudyPluginSettings = {
 	boardOrientation: 'white',
 	boardColor: 'brown',
 	disableCopy: false,
 	disableNavigation: false,
-	initialPosition: 'begin',
+	initialPosition: INITIAL_POSITION_BEGIN,
 	readOnly: false,
 	chessStudyKind: CHESS_STUDY_KIND_GAME,
 	viewComments: true,

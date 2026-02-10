@@ -6,44 +6,7 @@ import { legalMoves } from '../chess-logic';
 import { turnColor } from '../chess-logic/turnColor';
 import { ChessStudyMove } from '../storage';
 import { find_move_index_from_move_id } from './find_move_index_from_move_id';
-
-const getMoveToDisplay = (
-	moves: ChessStudyMove[],
-	moveId: string,
-	offset: 1 | -1 | 0,
-) => {
-	let moveToDisplay: ChessStudyMove | null = null;
-	const { indexLocation, moveIndex } = find_move_index_from_move_id(
-		moves,
-		moveId,
-	);
-	// Are we in a variant? Are we not? Decide which move to display
-
-	if (indexLocation) {
-		const mainLineMove = moves[indexLocation.mainLineMoveIndex];
-		const variations = mainLineMove.variants;
-		const variation = variations[indexLocation.variationIndex];
-
-		if (moveIndex === 0 && offset === -1) {
-			// TODO: I thought this would work but it does not.
-			// return getMoveToDisplay(moves, mainLineMove.moveId, -1);
-			return getMoveToDisplay(moves, variation.parentMoveId, 0);
-		}
-
-		if (typeof variation.moves[moveIndex + offset] !== 'undefined') {
-			return variation.moves[moveIndex + offset];
-		}
-
-		if (typeof moveToDisplay === 'undefined') {
-			moveToDisplay = moves[indexLocation.mainLineMoveIndex + offset];
-		}
-	} else {
-		if (typeof moves[moveIndex + offset] !== 'undefined') {
-			moveToDisplay = moves[moveIndex + offset];
-		}
-	}
-	return moveToDisplay;
-};
+import { get_move_from_offset } from './get_move_from_offset';
 
 export const getMoveById = (moves: ChessStudyMove[], moveId: string) => {
 	const { indexLocation: variant, moveIndex } = find_move_index_from_move_id(
@@ -95,7 +58,7 @@ export const displayRelativeMoveInHistory = (
 		// If we pass a moveId, find out where that is and offset from there, otherwise take current moveId
 		const baseMoveId = selectedMoveId || currentMoveId;
 
-		moveToDisplay = getMoveToDisplay(state.study.moves, baseMoveId, offset);
+		moveToDisplay = get_move_from_offset(state.study.moves, baseMoveId, offset);
 	} else {
 		if (offset < 0) {
 			moveToDisplay = state.study.moves[state.study.moves.length - 1];

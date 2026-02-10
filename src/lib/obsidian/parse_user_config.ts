@@ -1,11 +1,11 @@
 import { parseYaml } from 'obsidian';
-import { ChessStudyPluginSettings } from 'src/components/obsidian/ChessStudyPluginSettingsTab';
+import { ChessStudyPluginSettings } from 'src/components/obsidian/ChessStudyPluginSettings';
 
 export type ChessStudyAppConfig = ChessStudyPluginSettings & {
 	chessStudyId: string;
 };
 
-export const parseUserConfig = (
+export const parse_user_config = (
 	settings: ChessStudyPluginSettings,
 	content: string,
 ): ChessStudyAppConfig => {

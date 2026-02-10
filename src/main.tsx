@@ -2,7 +2,6 @@ import { Editor, Notice, Plugin, normalizePath } from 'obsidian';
 import { ChessStudyInsertModal } from './components/obsidian/ChessStudyInsertModal';
 import { ChessStudyMarkdownRenderChild } from './components/obsidian/ChessStudyMarkdownRenderChild';
 import {
-	ChessStudyPluginSettings,
 	ChessStudyPluginSettingsTab,
 	DEFAULT_SETTINGS,
 } from './components/obsidian/ChessStudyPluginSettingsTab';
@@ -13,10 +12,11 @@ import 'chessground/assets/chessground.base.css';
 import 'chessground/assets/chessground.brown.css';
 import 'chessground/assets/chessground.cburnett.css';
 import { compile_pgn_or_fen } from './lib/chess-logic';
-import { parseUserConfig } from './lib/obsidian';
+import { parse_user_config } from './lib/obsidian/parse_user_config';
 import { ChessStudyFileContent } from './lib/storage';
 import { ChessStudyDataAdapter } from './lib/storage/ChessStudyDataAdapter';
 import './main.css';
+import { ChessStudyPluginSettings } from './components/obsidian/ChessStudyPluginSettings';
 
 type FEN = string;
 type PGN = string;
@@ -30,7 +30,7 @@ export const CHESS_STUDY_KIND_LEGACY: ChessStudyKind = 'legacy';
 export type BoardOrientation = 'white' | 'black';
 export type BoardColor = 'green' | 'brown';
 /**
- * The initial position can be a move e.g. "1. e4" or "1... e5" or a specially recognized value.
+ * The initial position can be a move e.g. "1. e4" or "1... e5" or a specially recognized value such as 'begin', 'first', or 'end'.
  */
 export type InitialPosition = 'begin' | 'first' | 'end' | string;
 export const INITIAL_POSITION_YAML_NAME = 'initialPosition';
@@ -121,7 +121,7 @@ export default class ChessStudyPlugin extends Plugin {
 		this.registerMarkdownCodeBlockProcessor(
 			'chessStudy',
 			async (source, el, ctx) => {
-				const { chessStudyId } = parseUserConfig(this.settings, source);
+				const { chessStudyId } = parse_user_config(this.settings, source);
 
 				if (!chessStudyId.trim().length)
 					return new Notice(

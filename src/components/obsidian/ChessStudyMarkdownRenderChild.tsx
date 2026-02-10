@@ -1,11 +1,14 @@
 import { App, MarkdownRenderChild } from 'obsidian';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
+import {
+	ChessStudyAppConfig,
+	parse_user_config,
+} from 'src/lib/obsidian/parse_user_config';
 import { ChessStudyFileContent } from 'src/lib/storage';
-import { ChessStudyPluginSettings } from './ChessStudyPluginSettingsTab';
-import { ChessStudy } from '../react/ChessStudy';
-import { ChessStudyAppConfig, parseUserConfig } from 'src/lib/obsidian';
 import { ChessStudyDataAdapter } from 'src/lib/storage/ChessStudyDataAdapter';
+import { ChessStudy } from '../react/ChessStudy';
+import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
 
 /**
  * This is not the Obsidian Plugin.
@@ -52,7 +55,7 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 		// This is where we bootstrap React.
 		this.root = ReactDOM.createRoot(this.containerEl);
 		// This demonstrates that we can pass parsed configuration to the top-level React component.
-		const config: ChessStudyAppConfig = parseUserConfig(
+		const config: ChessStudyAppConfig = parse_user_config(
 			this.settings,
 			this.source,
 		);

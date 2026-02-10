@@ -8,8 +8,11 @@ import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { InitialPosition } from 'src/main';
 import { useImmerReducer } from 'use-immer';
-import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPluginSettingsTab';
-import { ChessStudyAppConfig, parseUserConfig } from '../../lib/obsidian';
+import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPluginSettings';
+import {
+	ChessStudyAppConfig,
+	parse_user_config,
+} from '../../lib/obsidian/parse_user_config';
 import { ChessStudyFileContent, ChessStudyMove } from '../../lib/storage';
 import { ChessStudyDataAdapter } from '../../lib/storage/ChessStudyDataAdapter';
 import { chess_study_to_pgn_string } from '../../lib/storage/study_to_pgn';
@@ -133,7 +136,7 @@ export const ChessStudy = ({
 		chessStudyKind,
 		viewComments,
 		chessStudyId,
-	} = parseUserConfig(pluginSettings, source);
+	} = parse_user_config(pluginSettings, source);
 
 	// Setup Chessground API
 	const [chessView, setChessView] = useState<ChessView | null>(null);
