@@ -1,4 +1,4 @@
-import { ChessStudyMove } from '../storage';
+import { ChessStudyMove, Variation } from '../storage';
 import { find_move_index_from_move_id } from './find_move_index_from_move_id';
 
 export function get_move_from_offset(
@@ -14,9 +14,9 @@ export function get_move_from_offset(
 
 	if (indexLocation) {
 		// The move that is our origin is in a variation.
-		const mainLineMove = moves[indexLocation.mainLineMoveIndex];
-		const variations = mainLineMove.variants;
-		const variation = variations[indexLocation.variationIndex];
+		const mainLineMove: ChessStudyMove = moves[indexLocation.mainLineMoveIndex];
+		const variations: Variation[] = mainLineMove.variants;
+		const variation: Variation = variations[indexLocation.variationIndex];
 
 		if (moveIndex === 0 && offset === -1) {
 			// If we are the first move in the variation and we are going backwards,
@@ -30,6 +30,7 @@ export function get_move_from_offset(
 
 		return moves[indexLocation.mainLineMoveIndex + offset];
 	} else {
+		// The move that is our origin is in the Main Line.
 		if (typeof moves[moveIndex + offset] !== 'undefined') {
 			return moves[moveIndex + offset];
 		} else {
