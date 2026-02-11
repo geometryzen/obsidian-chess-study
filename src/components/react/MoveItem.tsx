@@ -1,12 +1,16 @@
 import * as React from 'react';
+import { NumericAnnotationGlyph } from '../../lib/NumericAnnotationGlyphs';
+import { move_text } from './move_text';
 
 export const MoveItem = ({
 	isCurrentMove,
 	san,
+	nags,
 	onMoveItemClick,
 }: {
 	isCurrentMove: boolean;
 	san: string;
+	nags: NumericAnnotationGlyph[];
 	onMoveItemClick: () => void;
 }) => {
 	const ref = React.useRef<HTMLParagraphElement>(null);
@@ -30,7 +34,7 @@ export const MoveItem = ({
 				onMoveItemClick();
 			}}
 		>
-			{san}
+			{move_text(san, nags)}
 		</p>
 	);
 };
@@ -38,11 +42,13 @@ export const MoveItem = ({
 export const VariantMoveItem = ({
 	isCurrentMove,
 	san,
+	nags,
 	onMoveItemClick,
 	moveIndicator = null,
 }: {
 	isCurrentMove: boolean;
 	san: string;
+	nags: NumericAnnotationGlyph[];
 	onMoveItemClick: () => void;
 	moveIndicator?: string | null;
 }) => {
@@ -68,7 +74,7 @@ export const VariantMoveItem = ({
 			ref={ref}
 		>
 			<span className={'variant-move-indicator'}>{moveIndicator}</span>
-			{san}
+			{move_text(san, nags)}
 		</div>
 	);
 };

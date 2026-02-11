@@ -1,5 +1,6 @@
 import { JSONContent } from '@tiptap/react';
 import { DrawShape } from 'chessground/draw';
+import { NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
 
 export const CURRENT_STORAGE_VERSION = '0.0.2';
 
@@ -34,7 +35,7 @@ export interface ChessStudyMove /* extends Move*/ {
 	/**
 	 * Numeric Annotation Glyphs
 	 */
-	nags: number[];
+	nags: NumericAnnotationGlyph[];
 }
 
 /**

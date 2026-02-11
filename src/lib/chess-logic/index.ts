@@ -20,6 +20,7 @@ import {
 	Variation,
 } from '../storage';
 import { turnColor } from './turnColor';
+import { NAG_null, NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
 
 /**
  * Gets the set of legal moves for the current position.
@@ -343,14 +344,15 @@ function game_comment_to_json_comment(
 	}
 }
 
-function nag_to_nags(ns: string[]): number[] {
+function nag_to_nags(ns: string[]): NumericAnnotationGlyph[] {
 	if (Array.isArray(ns)) {
 		return ns.map((n) => {
 			if (n.startsWith('$')) {
-				return parseInt(n.substring(1));
+				// TODO: Some verification of the casting here?
+				return parseInt(n.substring(1)) as NumericAnnotationGlyph;
 			} else {
 				// Null annotation or should we throw it away?
-				return 0;
+				return NAG_null;
 			}
 		});
 	} else {

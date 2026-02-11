@@ -326,7 +326,7 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 }
 .chess-study {
 	height: 100%;
-	max-width: 750px;
+	max-width: 800px;
 	line-height: 1.5;
 	-webkit-font-smoothing: antialiased;
 	background-color: var(--background-secondary);
@@ -358,10 +358,10 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 }
 .chess-study .chessground-pgn-container {
 	display: flex;
-	height: 450px;
+	height: 480px;
 }
 .chess-study .chessground-pgn-container .chessground-container {
-	flex: 0 0 450px;
+	flex: 0 0 480px;
 	height: 100%;
 }
 .chess-study .chessground-pgn-container .pgn-container {
@@ -456,7 +456,7 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 	caret-color: #444;
 }
 .chess-study .CommentSection {
-	height: 250px;
+	height: 400px;
 	padding-top: 5px;
 	overflow: scroll;
 	border-top: 1px solid var(--background-secondary-alt);

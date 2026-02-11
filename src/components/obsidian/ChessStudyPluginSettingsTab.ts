@@ -8,24 +8,11 @@ import ChessStudyPlugin, {
 	CHESS_STUDY_KIND_PUZZLE,
 	CHESS_STUDY_KIND_YAML_NAME,
 	ChessStudyKind,
-	INITIAL_POSITION_BEGIN,
 	INITIAL_POSITION_END,
 	INITIAL_POSITION_FIRST,
 	INITIAL_POSITION_YAML_NAME,
 	InitialPosition,
 } from 'src/main';
-import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
-
-export const DEFAULT_SETTINGS: ChessStudyPluginSettings = {
-	boardOrientation: 'white',
-	boardColor: 'brown',
-	disableCopy: false,
-	disableNavigation: false,
-	initialPosition: INITIAL_POSITION_BEGIN,
-	readOnly: false,
-	chessStudyKind: CHESS_STUDY_KIND_GAME,
-	viewComments: true,
-};
 
 export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 	#plugin: ChessStudyPlugin;

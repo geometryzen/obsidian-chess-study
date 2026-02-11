@@ -78,6 +78,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 											main_move_pairs_index === 0 && (
 												<MoveItem
 													san={'...'}
+													nags={[]}
 													isCurrentMove={false}
 													onMoveItemClick={() => {}}
 												/>
@@ -85,6 +86,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 									}
 									<MoveItem
 										san={white_main_move.san}
+										nags={white_main_move.nags}
 										isCurrentMove={white_main_move.moveId === currentMoveId}
 										onMoveItemClick={() => onMoveItemClick(white_main_move.moveId)}
 									/>
@@ -92,6 +94,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 										<React.Fragment>
 											<MoveItem
 												san={'...'}
+												nags={[]}
 												isCurrentMove={false}
 												onMoveItemClick={() => {}}
 											/>
@@ -116,6 +119,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 																					white_variation_move.moveId === currentMoveId
 																				}
 																				san={white_variation_move.san}
+																				nags={white_variation_move.nags}
 																				onMoveItemClick={() =>
 																					onMoveItemClick(white_variation_move.moveId)
 																				}
@@ -134,6 +138,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 																							black_variation_move.moveId === currentMoveId
 																						}
 																						san={black_variation_move.san}
+																						nags={black_variation_move.nags}
 																						onMoveItemClick={() =>
 																							onMoveItemClick(black_variation_move.moveId)
 																						}
@@ -157,6 +162,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 											</p>
 											<MoveItem
 												san={'...'}
+												nags={[]}
 												isCurrentMove={false}
 												onMoveItemClick={() => {}}
 											/>
@@ -165,6 +171,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 									{black_main_move && (
 										<MoveItem
 											san={black_main_move.san}
+											nags={black_main_move.nags}
 											isCurrentMove={black_main_move.moveId === currentMoveId}
 											onMoveItemClick={() => onMoveItemClick(black_main_move.moveId)}
 										/>
@@ -191,6 +198,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 																					black_variation_move.moveId === currentMoveId
 																				}
 																				san={black_variation_move.san}
+																				nags={black_variation_move.nags}
 																				onMoveItemClick={() =>
 																					onMoveItemClick(black_variation_move.moveId)
 																				}
@@ -213,6 +221,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 																							white_variation_move.moveId === currentMoveId
 																						}
 																						san={white_variation_move.san}
+																						nags={white_variation_move.nags}
 																						onMoveItemClick={() =>
 																							onMoveItemClick(white_variation_move.moveId)
 																						}

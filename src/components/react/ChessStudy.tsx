@@ -70,9 +70,12 @@ export interface GameState {
 export type GameEvent =
 	| { type: 'PLAY_MOVE'; move: Move }
 	| { type: 'REMOVE_LAST_MOVE' }
+	| { type: 'GOTO_BEGIN_POSITION' }
 	| { type: 'GOTO_NEXT_MOVE' }
 	| { type: 'GOTO_PREV_MOVE' }
+	| { type: 'GOTO_END_POSITION' }
 	| { type: 'GOTO_MOVE'; moveId: string }
+	| { type: 'ANNOTATE_MOVE'; glyph: '' | '?!' | '?' | '??' }
 	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
 
@@ -350,8 +353,21 @@ export const ChessStudy = ({
 					handler.playMove(state, event.move);
 					return state;
 				}
-				default:
+				case 'ANNOTATE_MOVE': {
+					const currentMove = getCurrentMove(state);
+
+					if (currentMove) {
+						new Notice(`${currentMove.san} ${event.glyph}`);
+						currentMove.nags;
+						state.currentMove = currentMove;
+					} else {
+						// Do nothing
+					}
+					return state;
+				}
+				default: {
 					break;
+				}
 			}
 		},
 		// The second argument is the initial state.
@@ -408,10 +424,10 @@ export const ChessStudy = ({
 							disableNavigation={disableNavigation}
 							readOnly={readOnly}
 							chessStudyKind={chessStudyKind}
-							onUndoButtonClick={() => dispatch({ type: 'REMOVE_LAST_MOVE' })}
+							onBeginButtonClick={() => dispatch({ type: 'GOTO_BEGIN_POSITION' })}
 							onBackButtonClick={() => dispatch({ type: 'GOTO_PREV_MOVE' })}
 							onForwardButtonClick={() => dispatch({ type: 'GOTO_NEXT_MOVE' })}
-							onSaveButtonClick={onSaveButtonClick}
+							onEndButtonClick={() => dispatch({ type: 'GOTO_END_POSITION' })}
 							onCopyFenButtonClick={() => {
 								try {
 									navigator.clipboard.writeText(chessLogic.fen());
@@ -432,6 +448,20 @@ export const ChessStudy = ({
 									new Notice('Could not copy PGN to clipboard:', e);
 								}
 							}}
+							onSaveButtonClick={onSaveButtonClick}
+							onUndoButtonClick={() => dispatch({ type: 'REMOVE_LAST_MOVE' })}
+							onAnnotateMoveCorrect={() =>
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: '' })
+							}
+							onAnnotateMoveInaccurate={() =>
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: '?!' })
+							}
+							onAnnotateMoveMistake={() =>
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: '?' })
+							}
+							onAnnotateMoveBlunder={() =>
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: '??' })
+							}
 							onSettingsButtonClick={() => {
 								try {
 									new Notice("I'm afraid I can't do that Dave??");

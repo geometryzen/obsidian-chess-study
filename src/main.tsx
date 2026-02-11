@@ -1,10 +1,7 @@
 import { Editor, Notice, Plugin, normalizePath } from 'obsidian';
 import { ChessStudyInsertModal } from './components/obsidian/ChessStudyInsertModal';
 import { ChessStudyMarkdownRenderChild } from './components/obsidian/ChessStudyMarkdownRenderChild';
-import {
-	ChessStudyPluginSettingsTab,
-	DEFAULT_SETTINGS,
-} from './components/obsidian/ChessStudyPluginSettingsTab';
+import { ChessStudyPluginSettingsTab } from './components/obsidian/ChessStudyPluginSettingsTab';
 
 // these styles must be imported somewhere
 import 'assets/board/green.css';
@@ -17,6 +14,7 @@ import { ChessStudyFileContent } from './lib/storage';
 import { ChessStudyDataAdapter } from './lib/storage/ChessStudyDataAdapter';
 import './main.css';
 import { ChessStudyPluginSettings } from './components/obsidian/ChessStudyPluginSettings';
+import { DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS } from './components/obsidian/DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS';
 
 type FEN = string;
 type PGN = string;
@@ -162,7 +160,11 @@ export default class ChessStudyPlugin extends Plugin {
 	}
 
 	async loadSettings(): Promise<void> {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign(
+			{},
+			DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS,
+			await this.loadData(),
+		);
 	}
 
 	async saveSettings(): Promise<void> {
