@@ -11,6 +11,8 @@ export interface Variation {
 	variantId: string;
 	/**
 	 * The identifier of the Main Line move corresponding to this variation.
+	 * This is not the prior move.
+	 * It is the move containing this Variation in its variations list.
 	 */
 	parentMoveId: string;
 	moves: ChessStudyMove[];

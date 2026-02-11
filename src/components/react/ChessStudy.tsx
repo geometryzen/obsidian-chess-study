@@ -10,6 +10,17 @@ import { InitialPosition } from 'src/main';
 import { useImmerReducer } from 'use-immer';
 import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPluginSettings';
 import {
+	annotate_move_blunder,
+	annotate_move_correct,
+	annotate_move_inaccurate,
+	annotate_move_mistake,
+	NAG_null,
+	NAG_poor_move,
+	NAG_questionable_move,
+	NAG_very_poor_move,
+	NumericAnnotationGlyph,
+} from '../../lib/NumericAnnotationGlyphs';
+import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
@@ -75,7 +86,7 @@ export type GameEvent =
 	| { type: 'GOTO_PREV_MOVE' }
 	| { type: 'GOTO_END_POSITION' }
 	| { type: 'GOTO_MOVE'; moveId: string }
-	| { type: 'ANNOTATE_MOVE'; glyph: '' | '?!' | '?' | '??' }
+	| { type: 'ANNOTATE_MOVE'; glyph: NumericAnnotationGlyph }
 	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
 
@@ -357,9 +368,27 @@ export const ChessStudy = ({
 					const currentMove = getCurrentMove(state);
 
 					if (currentMove) {
-						new Notice(`${currentMove.san} ${event.glyph}`);
-						currentMove.nags;
-						state.currentMove = currentMove;
+						switch (event.glyph) {
+							case NAG_null: {
+								currentMove.nags = annotate_move_correct(currentMove.nags);
+								break;
+							}
+							case NAG_questionable_move: {
+								currentMove.nags = annotate_move_inaccurate(currentMove.nags);
+								break;
+							}
+							case NAG_poor_move: {
+								currentMove.nags = annotate_move_mistake(currentMove.nags);
+								break;
+							}
+							case NAG_very_poor_move: {
+								currentMove.nags = annotate_move_blunder(currentMove.nags);
+								break;
+							}
+							default: {
+								new Notice(`${currentMove.san} ${event.glyph}`);
+							}
+						}
 					} else {
 						// Do nothing
 					}
@@ -451,16 +480,16 @@ export const ChessStudy = ({
 							onSaveButtonClick={onSaveButtonClick}
 							onUndoButtonClick={() => dispatch({ type: 'REMOVE_LAST_MOVE' })}
 							onAnnotateMoveCorrect={() =>
-								dispatch({ type: 'ANNOTATE_MOVE', glyph: '' })
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_null })
 							}
 							onAnnotateMoveInaccurate={() =>
-								dispatch({ type: 'ANNOTATE_MOVE', glyph: '?!' })
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_questionable_move })
 							}
 							onAnnotateMoveMistake={() =>
-								dispatch({ type: 'ANNOTATE_MOVE', glyph: '?' })
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_poor_move })
 							}
 							onAnnotateMoveBlunder={() =>
-								dispatch({ type: 'ANNOTATE_MOVE', glyph: '??' })
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_very_poor_move })
 							}
 							onSettingsButtonClick={() => {
 								try {

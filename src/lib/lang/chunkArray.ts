@@ -1,3 +1,5 @@
+import { is_shallow_arrays_equal } from './is_shallow_arrays_equal';
+
 /**
  * Creates a new array whose elements are arrays of maximum length chunkSize each containing the original elements in order.
  * If the offsetByOne parameter is true then all elements are shifted to the next chunk (and empty chunks are removed).
@@ -31,7 +33,7 @@ export function chunkArray<T>(
 		return resultArray;
 	}, [] as T[][]);
 }
-
+/*
 export function chunkArrayRedux<T>(
 	items: T[],
 	chunkSize: number,
@@ -56,24 +58,7 @@ export function chunkArrayRedux<T>(
 		[] as (T | null)[][],
 	);
 }
-
-function simpleArraysEqual<T>(a: T[], b: T[]) {
-	if (a === b) return true;
-	if (a == null || b == null) return false;
-	if (a.length !== b.length) return false;
-
-	for (let i = 0; i < a.length; ++i) {
-		// Check if elements are arrays and recurse
-		if (Array.isArray(a[i]) && Array.isArray(b[i])) {
-			throw new Error();
-		} else if (a[i] !== b[i]) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
+*/
 function chunkArraysEqual<T>(a: T[][], b: T[][]) {
 	if (a === b) return true;
 	if (a == null || b == null) return false;
@@ -82,7 +67,7 @@ function chunkArraysEqual<T>(a: T[][], b: T[][]) {
 	for (let i = 0; i < a.length; ++i) {
 		// Check if elements are arrays and recurse
 		if (Array.isArray(a[i]) && Array.isArray(b[i])) {
-			if (!simpleArraysEqual(a[i], b[i])) return false;
+			if (!is_shallow_arrays_equal(a[i], b[i])) return false;
 		} else if (a[i] !== b[i]) {
 			return false;
 		}
@@ -90,6 +75,7 @@ function chunkArraysEqual<T>(a: T[][], b: T[][]) {
 
 	return true;
 }
+
 function assertChunkArraysEqual<T>(actual: T[][], expect: T[][]) {
 	console.assert(
 		chunkArraysEqual(actual, expect),
@@ -218,6 +204,7 @@ function assertChunkArraysEqual<T>(actual: T[][], expect: T[][]) {
 	] as string[][];
 	assertChunkArraysEqual(actual, expect);
 }
+/*
 {
 	const actual = chunkArrayRedux([], 2, true);
 	const expect = [] as string[][];
@@ -253,3 +240,4 @@ function assertChunkArraysEqual<T>(actual: T[][], expect: T[][]) {
 	const expect = [['a'], ['b', 'c'], ['d', 'e'], ['f']] as string[][];
 	assertChunkArraysEqual(actual, expect);
 }
+*/

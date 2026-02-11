@@ -41,21 +41,21 @@ export const Controls = (props: ControlProps) => {
 				{props.disableCopy ? null : (
 					<React.Fragment>
 						<button title="Copy FEN" onClick={() => props.onCopyFenButtonClick()}>
-							<Copy color="green" strokeWidth={'2px'} />
+							<Copy strokeWidth={'2px'} />
 						</button>
 						<button title="Copy PGN" onClick={() => props.onCopyPgnButtonClick()}>
-							<Clipboard color="green" strokeWidth={'2px'} />
+							<Clipboard strokeWidth={'2px'} />
 						</button>
 					</React.Fragment>
 				)}
 				{props.readOnly ? null : (
 					<button title="Save" onClick={() => props.onSaveButtonClick()}>
-						<Save color="purple" strokeWidth={'2px'} />
+						<Save strokeWidth={'2px'} />
 					</button>
 				)}
 				{props.readOnly ? null : (
 					<button title="Undo" onClick={() => props.onUndoButtonClick()}>
-						<Undo2 color="purple" strokeWidth={'2px'} />
+						<Undo2 strokeWidth={'2px'} />
 					</button>
 				)}
 			</div>
@@ -63,22 +63,22 @@ export const Controls = (props: ControlProps) => {
 				{props.readOnly ? null : (
 					<React.Fragment>
 						<button title="Correct" onClick={() => props.onAnnotateMoveCorrect()}>
-							<BookmarkCheck color="blue" fill="white" strokeWidth={'2px'} />
+							<BookmarkCheck strokeWidth={'2px'} />
 						</button>
 						<button
 							title="Inaccurate - ?!"
 							onClick={() => props.onAnnotateMoveInaccurate()}
 						>
-							<Bookmark color="blue" strokeWidth={'2px'} />
+							<Bookmark strokeWidth={'2px'} />
 						</button>
 						<button title="Mistake - ?" onClick={() => props.onAnnotateMoveMistake()}>
-							<BookmarkMinus color="blue" strokeWidth={'2px'} />
+							<BookmarkMinus strokeWidth={'2px'} />
 						</button>
 						<button
 							title="Blunder - ??"
 							onClick={() => props.onAnnotateMoveBlunder()}
 						>
-							<BookmarkX color="blue" strokeWidth={'2px'} />
+							<BookmarkX strokeWidth={'2px'} />
 						</button>
 					</React.Fragment>
 				)}
