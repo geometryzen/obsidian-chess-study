@@ -17,13 +17,4 @@ export interface PgnViewerProps extends ControlProps {
 	initialMoveNumber: number;
 	isVisible: boolean;
 	onMoveItemClick: (moveId: string) => void;
-	/*
-	onUndoButtonClick: () => void;
-	onBackButtonClick: () => void;
-	onForwardButtonClick: () => void;
-	onSaveButtonClick: () => void;
-	onCopyFenButtonClick: () => void;
-	onCopyPgnButtonClick: () => void;
-	onSettingsButtonClick: () => void;
-	*/
 }

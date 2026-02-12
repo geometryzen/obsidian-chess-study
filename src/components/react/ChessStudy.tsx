@@ -14,6 +14,8 @@ import {
 	annotate_move_correct,
 	annotate_move_inaccurate,
 	annotate_move_mistake,
+	decrease_position_evaluation,
+	increase_position_evaluation,
 	NAG_null,
 	NAG_poor_move,
 	NAG_questionable_move,
@@ -87,6 +89,7 @@ export type GameEvent =
 	| { type: 'GOTO_END_POSITION' }
 	| { type: 'GOTO_MOVE'; moveId: string }
 	| { type: 'ANNOTATE_MOVE'; glyph: NumericAnnotationGlyph }
+	| { type: 'EVALUATE_POSITION'; direction: 1 | -1 }
 	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
 
@@ -394,6 +397,28 @@ export const ChessStudy = ({
 					}
 					return state;
 				}
+				case 'EVALUATE_POSITION': {
+					const currentMove = getCurrentMove(state);
+
+					if (currentMove) {
+						switch (event.direction) {
+							case 1: {
+								currentMove.nags = increase_position_evaluation(currentMove.nags);
+								break;
+							}
+							case -1: {
+								currentMove.nags = decrease_position_evaluation(currentMove.nags);
+								break;
+							}
+							default: {
+								new Notice(`${currentMove.san} ${event.direction}`);
+							}
+						}
+					} else {
+						// Do nothing
+					}
+					return state;
+				}
 				default: {
 					break;
 				}
@@ -478,7 +503,7 @@ export const ChessStudy = ({
 								}
 							}}
 							onSaveButtonClick={onSaveButtonClick}
-							onUndoButtonClick={() => dispatch({ type: 'REMOVE_LAST_MOVE' })}
+							onDeleteButtonClick={() => dispatch({ type: 'REMOVE_LAST_MOVE' })}
 							onAnnotateMoveCorrect={() =>
 								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_null })
 							}
@@ -490,6 +515,12 @@ export const ChessStudy = ({
 							}
 							onAnnotateMoveBlunder={() =>
 								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_very_poor_move })
+							}
+							onIncreasePositionEvaluation={() =>
+								dispatch({ type: 'EVALUATE_POSITION', direction: +1 })
+							}
+							onDecreasePositionEvaluation={() =>
+								dispatch({ type: 'EVALUATE_POSITION', direction: -1 })
 							}
 							onSettingsButtonClick={() => {
 								try {

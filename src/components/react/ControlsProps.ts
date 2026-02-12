@@ -12,10 +12,12 @@ export interface ControlProps {
 	onCopyFenButtonClick: () => void;
 	onCopyPgnButtonClick: () => void;
 	onSaveButtonClick: () => void;
-	onUndoButtonClick: () => void;
+	onDeleteButtonClick: () => void;
 	onAnnotateMoveCorrect: () => void;
 	onAnnotateMoveInaccurate: () => void;
 	onAnnotateMoveMistake: () => void;
 	onAnnotateMoveBlunder: () => void;
+	onIncreasePositionEvaluation: () => void;
+	onDecreasePositionEvaluation: () => void;
 	onSettingsButtonClick: () => void;
 }
