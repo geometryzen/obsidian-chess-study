@@ -35,7 +35,19 @@ export type NumericAnnotationGlyph =
 	| typeof NAG_speculative_move
 	| typeof NAG_questionable_move;
 
-export function nag_to_string(nag: NumericAnnotationGlyph): string {
+export function nags_to_dollars(nags: NumericAnnotationGlyph[]): string {
+	if (Array.isArray(nags)) {
+		return nags
+			.map((nag) => {
+				return `$${nag}`;
+			})
+			.join(' ');
+	} else {
+		return '';
+	}
+}
+
+export function nag_to_human(nag: NumericAnnotationGlyph): string {
 	switch (nag) {
 		case NAG_null:
 			return '';
@@ -57,9 +69,9 @@ export function nag_to_string(nag: NumericAnnotationGlyph): string {
 	}
 }
 
-export function nags_to_string(nags: NumericAnnotationGlyph[]): string {
+export function nags_to_human(nags: NumericAnnotationGlyph[]): string {
 	if (Array.isArray(nags)) {
-		return nags.map(nag_to_string).join(' ');
+		return nags.map(nag_to_human).join(' ');
 	} else {
 		return '';
 	}

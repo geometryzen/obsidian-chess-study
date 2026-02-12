@@ -2,6 +2,10 @@ import { generateText } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Chess } from 'chess.js';
 import { ChessStudyFileContent } from '.';
+import {
+	nags_to_dollars,
+	NumericAnnotationGlyph,
+} from '../NumericAnnotationGlyphs';
 
 /**
  * The keys of the Seven Tags Roster in the export ordering.
@@ -15,6 +19,21 @@ const seven_tag_keys = [
 	'Black',
 	'Result',
 ];
+
+export function move_san_and_nags_to_pgn_string(
+	san: string,
+	nags: NumericAnnotationGlyph[],
+): string {
+	if (Array.isArray(nags)) {
+		if (nags.length > 0) {
+			return `${san} ${nags_to_dollars(nags)}`;
+		} else {
+			return san;
+		}
+	} else {
+		return san;
+	}
+}
 
 const seven_tag_defaults = ['?', '?', '????.??.??', '?', '?', '?', '*'];
 
@@ -62,7 +81,7 @@ export function chess_study_to_pgn_string(
 		.map((move, index) => {
 			switch (move.color) {
 				case 'w': {
-					const move_string = `${(index + indexOffset) / 2 + rootMoveNumber}. ${move.san}`;
+					const move_string = `${(index + indexOffset) / 2 + rootMoveNumber}. ${move_san_and_nags_to_pgn_string(move.san, move.nags)}`;
 					if (move.comment) {
 						try {
 							const text = generateText(move.comment, [StarterKit]);
@@ -78,7 +97,7 @@ export function chess_study_to_pgn_string(
 				}
 				default: {
 					// TODO: If there are no comments then we can omit the preamble before the san.
-					const move_string = `${(index + indexOffset - 1) / 2 + rootMoveNumber}... ${move.san}`;
+					const move_string = `${(index + indexOffset - 1) / 2 + rootMoveNumber}... ${move_san_and_nags_to_pgn_string(move.san, move.nags)}`;
 					if (move.comment) {
 						try {
 							const text = generateText(move.comment, [StarterKit]);
