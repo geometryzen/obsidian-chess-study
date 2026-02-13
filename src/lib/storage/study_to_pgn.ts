@@ -1,7 +1,7 @@
 import { generateText } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Chess } from 'chess.js';
-import { ChessStudyFileContent } from '.';
+import { ChessStudyFileContent, ChessStudyMove } from '.';
 import {
 	nags_to_dollars,
 	NumericAnnotationGlyph,
@@ -36,6 +36,50 @@ export function move_san_and_nags_to_pgn_string(
 }
 
 const seven_tag_defaults = ['?', '?', '????.??.??', '?', '?', '?', '*'];
+
+function commands_from_move(move: ChessStudyMove): [string, string][] {
+	const commands: [string, string][] = [];
+	if (typeof move.evaluation === 'number') {
+		commands.push(['eval', move.evaluation.toString()]);
+	}
+	if (typeof move.clock === 'string') {
+		commands.push(['clk', move.clock]);
+	}
+	return commands;
+}
+
+function comment_from_commands(commands: [string, string][]): string {
+	const blocks = commands
+		.map(([key, value]) => {
+			return `[%${key} ${value}]`;
+		})
+		.join(' ');
+	return `{ ${blocks} }`;
+}
+
+function append_comments(base: string, move: ChessStudyMove): string {
+	if (move.comment) {
+		try {
+			const text = generateText(move.comment, [StarterKit]);
+			return `${base} { ${text} }`;
+		} catch (e) {
+			console.warn(e);
+			console.warn(JSON.stringify(move.comment, null, 2));
+			return base;
+		}
+	} else {
+		return base;
+	}
+}
+
+function append_commands(base: string, move: ChessStudyMove): string {
+	const commands = commands_from_move(move);
+	if (commands.length > 0) {
+		return `${base} ${comment_from_commands(commands)}`;
+	} else {
+		return base;
+	}
+}
 
 /**
  * Converts the proprietary chess-study data to a PGN string in export format.
@@ -82,38 +126,13 @@ export function chess_study_to_pgn_string(
 			switch (move.color) {
 				case 'w': {
 					const move_string = `${(index + indexOffset) / 2 + rootMoveNumber}. ${move_san_and_nags_to_pgn_string(move.san, move.nags)}`;
-					if (move.comment) {
-						try {
-							const text = generateText(move.comment, [StarterKit]);
-							return `${move_string} { ${text} }`;
-						} catch (e) {
-							console.warn(e);
-							console.warn(JSON.stringify(move.comment, null, 2));
-							return move_string;
-						}
-					} else {
-						return move_string;
-					}
+					return append_commands(append_comments(move_string, move), move);
 				}
+				case 'b':
 				default: {
-					// TODO: If there are no comments then we can omit the preamble before the san.
+					// This tends to be verbose when White's move has no comments or commands.
 					const move_string = `${(index + indexOffset - 1) / 2 + rootMoveNumber}... ${move_san_and_nags_to_pgn_string(move.san, move.nags)}`;
-					if (move.comment) {
-						try {
-							const text = generateText(move.comment, [StarterKit]);
-							return `${move_string} { ${text} }`;
-						} catch (e) {
-							console.warn(e);
-							console.warn(JSON.stringify(move.comment, null, 2));
-							return move_string;
-						}
-					} else {
-						if (index === 0) {
-							return move_string;
-						} else {
-							return move.san;
-						}
-					}
+					return append_commands(append_comments(move_string, move), move);
 				}
 			}
 		})

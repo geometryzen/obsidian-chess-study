@@ -13,6 +13,7 @@ import { Config } from 'chessground/config';
 import { nanoid } from 'nanoid';
 import { ROOT_FEN } from 'src/main';
 import { getChessDataFormat } from '../fen-or-pgn';
+import { NAG_null, NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
 import {
 	ChessStudyFileContent,
 	ChessStudyMove,
@@ -20,7 +21,6 @@ import {
 	Variation,
 } from '../storage';
 import { turnColor } from './turnColor';
-import { NAG_null, NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
 
 /**
  * Gets the set of legal moves for the current position.
@@ -386,6 +386,28 @@ function from_pgn_variations(
 	return variations;
 }
 
+function clock_from_comment_diag(gameComment: GameComment): string | undefined {
+	if (gameComment) {
+		return gameComment.clk;
+	} else {
+		return void 0;
+	}
+}
+
+function evaluation_from_comment_diag(
+	gameComment: GameComment,
+): number | undefined {
+	if (gameComment) {
+		if (gameComment.eval) {
+			return parseFloat(gameComment.eval);
+		} else {
+			return void 0;
+		}
+	} else {
+		return void 0;
+	}
+}
+
 function pgn_moves_to_chess_study_moves(
 	gms: PgnMove[],
 	fen: string,
@@ -415,8 +437,10 @@ function pgn_moves_to_chess_study_moves(
 			after: chessMove.after,
 			from: chessMove.from,
 			to: chessMove.to,
-			promotion: pgnMove.notation.promotion as PieceSymbol, // There may be an issue here.
+			promotion: pgnMove.notation.promotion as PieceSymbol, // There may be an issue here?
 			nags: nag_to_nags(pgnMove.nag),
+			clock: clock_from_comment_diag(pgnMove.commentDiag),
+			evaluation: evaluation_from_comment_diag(pgnMove.commentDiag),
 		};
 		moves.push(move);
 	}

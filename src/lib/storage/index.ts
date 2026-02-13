@@ -38,6 +38,14 @@ export interface ChessStudyMove /* extends Move*/ {
 	 * Numeric Annotation Glyphs
 	 */
 	nags: NumericAnnotationGlyph[];
+	/**
+	 *
+	 */
+	clock?: string;
+	/**
+	 *
+	 */
+	evaluation?: number;
 }
 
 /**
