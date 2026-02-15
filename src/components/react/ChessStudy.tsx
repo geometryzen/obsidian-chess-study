@@ -28,7 +28,7 @@ import {
 } from '../../lib/obsidian/parse_user_config';
 import { ChessStudyFileContent, ChessStudyMove } from '../../lib/storage';
 import { ChessStudyDataAdapter } from '../../lib/storage/ChessStudyDataAdapter';
-import { chess_study_to_pgn_string } from '../../lib/storage/study_to_pgn';
+import { chess_study_to_pgn } from '../../lib/storage/chess_study_to_pgn';
 import {
 	displayRelativeMoveInHistory,
 	getCurrentMove,
@@ -116,7 +116,7 @@ const initialMove = (
 					const ipmove = ipmoves[0];
 					const moveNumber = ipmove.moveNumber;
 					// The PGN parsing library seems to get the color wrong.
-					const turn = initialPosition.contains('...') ? 'b' : 'w';
+					const turn = initialPosition.includes('...') ? 'b' : 'w';
 					// The following needs refinement for when the first move does not start at 1.
 					const index =
 						turn === 'w' ? 2 * (moveNumber - 1) : 2 * (moveNumber - 1) + 1;
@@ -492,7 +492,7 @@ export const ChessStudy = ({
 							}}
 							onCopyPgnButtonClick={() => {
 								try {
-									const pgn_string = chess_study_to_pgn_string(gameState.study);
+									const pgn_string = chess_study_to_pgn(gameState.study);
 									// console.lg('pgn', pgn_string);
 									navigator.clipboard.writeText(pgn_string);
 									new Notice('Copied PGN to clipboard!');

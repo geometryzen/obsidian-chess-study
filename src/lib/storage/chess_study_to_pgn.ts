@@ -8,7 +8,7 @@ import {
 } from '../NumericAnnotationGlyphs';
 
 /**
- * The keys of the Seven Tags Roster in the export ordering.
+ * The keys of the Seven Tags Roster in the canonical ordering.
  */
 const seven_tag_keys = [
 	'Event',
@@ -20,7 +20,7 @@ const seven_tag_keys = [
 	'Result',
 ];
 
-export function move_san_and_nags_to_pgn_string(
+function move_san_and_nags_to_pgn_string(
 	san: string,
 	nags: NumericAnnotationGlyph[],
 ): string {
@@ -82,11 +82,9 @@ function append_commands(base: string, move: ChessStudyMove): string {
 }
 
 /**
- * Converts the proprietary chess-study data to a PGN string in export format.
+ * Converts the proprietary chess-study data to a PGN string in canonical format.
  */
-export function chess_study_to_pgn_string(
-	study: ChessStudyFileContent,
-): string {
+export function chess_study_to_pgn(study: ChessStudyFileContent): string {
 	// console.lg(JSON.stringify(study, null, 2));
 	const root = new Chess(study.rootFEN);
 	const result = study.headers ? study.headers['Result'] : '*';
@@ -105,7 +103,7 @@ export function chess_study_to_pgn_string(
 	const other_tags_string = study.headers
 		? Object.entries(study.headers)
 				.filter((header) => {
-					return !seven_tag_keys.contains(header[0]);
+					return !seven_tag_keys.includes(header[0]);
 				})
 				.map((header) => {
 					// TODO: Some string escaping may be needed here for double quotes?

@@ -19,8 +19,8 @@ import {
 	CURRENT_STORAGE_VERSION,
 	Variation,
 } from '../storage';
-import { turnColor } from './turnColor';
 import { ROOT_FEN } from './ROOT_FEN';
+import { turnColor } from './turnColor';
 
 /**
  * Gets the set of legal moves for the current position.
@@ -178,7 +178,7 @@ function tags_to_headers(tags: Tags | undefined): Record<string, string> {
 		if (tags.Round) {
 			headers['Round'] = tags.Round;
 		} else {
-			headers['Round'] = '?';
+			headers['Round'] = '-';
 		}
 		if (tags.White) {
 			headers['White'] = tags.White;
@@ -447,10 +447,16 @@ function pgn_moves_to_chess_study_moves(
 	return moves;
 }
 
-function modern_compile_pgn(chessStringTrimmed: string): ChessStudyFileContent {
-	const game = parse(chessStringTrimmed, { startRule: 'game' }) as ParseTree;
+export function compile_fen(fen: string): ChessStudyFileContent {
+	const chess = new Chess(fen);
+	return chess_to_study(chess, 'FEN', fen);
+}
+
+export function compile_pgn(pgn: string): ChessStudyFileContent {
+	const game = parse(pgn, { startRule: 'game' }) as ParseTree;
 	// console.lg(JSON.stringify(game, null, 2));
 	// The messages contain statements about the parsing.
+	// These could be returned in a different data structure.
 	game.messages;
 	const fileContent: ChessStudyFileContent = {
 		version: CURRENT_STORAGE_VERSION,
@@ -460,22 +466,17 @@ function modern_compile_pgn(chessStringTrimmed: string): ChessStudyFileContent {
 		// TODO: This does not long correct for the case of starting from a non-root position.
 		rootFEN: ROOT_FEN,
 	};
-	// console.lg(JSON.stringify(fileContent, null, 2));
 	return fileContent;
 }
 
-export function compile_pgn_or_fen(
-	chessStringTrimmed: string,
-): ChessStudyFileContent {
-	const format = getChessDataFormat(chessStringTrimmed);
+export function compile_pgn_or_fen(pgn_or_fen: string): ChessStudyFileContent {
+	const format = getChessDataFormat(pgn_or_fen);
 	switch (format) {
 		case 'FEN': {
-			const chess = new Chess(chessStringTrimmed);
-			return chess_to_study(chess, 'FEN', chessStringTrimmed);
+			return compile_fen(pgn_or_fen);
 		}
 		case 'PGN': {
-			return modern_compile_pgn(chessStringTrimmed);
-			// return legacy_compile_pgn(chessStringTrimmed);
+			return compile_pgn(pgn_or_fen);
 		}
 		default: {
 			throw new Error('Chess string must be FEN or PGN.');
