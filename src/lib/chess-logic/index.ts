@@ -178,7 +178,7 @@ function tags_to_headers(tags: Tags | undefined): Record<string, string> {
 		if (tags.Round) {
 			headers['Round'] = tags.Round;
 		} else {
-			headers['Round'] = '-';
+			headers['Round'] = '?';
 		}
 		if (tags.White) {
 			headers['White'] = tags.White;

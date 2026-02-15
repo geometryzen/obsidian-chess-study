@@ -117,6 +117,11 @@ export function chess_study_to_pgn(study: ChessStudyFileContent): string {
 			? `${seven_tags_string}\n${other_tags_string}`
 			: seven_tags_string;
 
+	let gameComment: string | null = null;
+	if (study.comment) {
+		gameComment = generateText(study.comment, [StarterKit]);
+	}
+
 	const indexOffset = root.turn() === 'w' ? 0 : 1;
 	const rootMoveNumber = root.moveNumber();
 	const moves_string = study.moves
@@ -136,5 +141,5 @@ export function chess_study_to_pgn(study: ChessStudyFileContent): string {
 		})
 		.join(' ');
 
-	return `${tags_string}\n\n${moves_string} ${result}`;
+	return `${tags_string}\n\n${gameComment ? `{${gameComment}}\n` : ''}${moves_string} ${result}`;
 }

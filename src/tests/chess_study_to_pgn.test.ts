@@ -3,7 +3,7 @@ import { ChessStudyFileContent } from '../lib/storage';
 import { chess_study_to_pgn } from '../lib/storage/chess_study_to_pgn';
 
 function simple(moves: string): string {
-	return `[Event "?"]\n[Site "?"]\n[Date "????.??.??"]\n[Round "-"]\n[White "?"]\n[Black "?"]\n[Result "*"]\n\n${moves}`;
+	return `[Event "?"]\n[Site "?"]\n[Date "????.??.??"]\n[Round "?"]\n[White "?"]\n[Black "?"]\n[Result "*"]\n\n${moves}`;
 }
 
 describe('fen-or-pgn module', () => {
@@ -18,7 +18,7 @@ describe('fen-or-pgn module', () => {
 		chessStudy.headers['Event'] = '?';
 		chessStudy.headers['Site'] = '?';
 		chessStudy.headers['Date'] = '????.??.??';
-		chessStudy.headers['Round'] = '-';
+		chessStudy.headers['Round'] = '?';
 		chessStudy.headers['White'] = '?';
 		chessStudy.headers['Black'] = '?';
 		chessStudy.headers['Result'] = '*';
