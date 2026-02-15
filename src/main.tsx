@@ -15,6 +15,7 @@ import { ChessStudyDataAdapter } from './lib/storage/ChessStudyDataAdapter';
 import './main.css';
 import { ChessStudyPluginSettings } from './components/obsidian/ChessStudyPluginSettings';
 import { DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS } from './components/obsidian/DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS';
+import { ROOT_FEN } from './lib/chess-logic/ROOT_FEN';
 
 type FEN = string;
 type PGN = string;
@@ -35,9 +36,6 @@ export const INITIAL_POSITION_YAML_NAME = 'initialPosition';
 export const INITIAL_POSITION_BEGIN: InitialPosition = 'begin';
 export const INITIAL_POSITION_END: InitialPosition = 'end';
 export const INITIAL_POSITION_FIRST: InitialPosition = 'first';
-
-export const ROOT_FEN =
-	'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
 // TODO:
 // 1) Allow to show the root position

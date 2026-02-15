@@ -181,7 +181,7 @@ export function contains_nag(
 	target: NumericAnnotationGlyph,
 ): boolean {
 	if (Array.isArray(nags)) {
-		return nags.contains(target);
+		return nags.indexOf(target) !== -1;
 	} else {
 		return false;
 	}

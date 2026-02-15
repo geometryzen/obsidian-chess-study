@@ -11,7 +11,6 @@ import { Chess, PieceSymbol, QUEEN, Square, SQUARES } from 'chess.js';
 import { Api } from 'chessground/api';
 import { Config } from 'chessground/config';
 import { nanoid } from 'nanoid';
-import { ROOT_FEN } from '../../main';
 import { getChessDataFormat } from '../fen-or-pgn';
 import { NAG_null, NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
 import {
@@ -21,6 +20,7 @@ import {
 	Variation,
 } from '../storage';
 import { turnColor } from './turnColor';
+import { ROOT_FEN } from './ROOT_FEN';
 
 /**
  * Gets the set of legal moves for the current position.
