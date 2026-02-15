@@ -190,15 +190,10 @@ export function contains_nag(
 export function increase_position_evaluation(
 	nags: NumericAnnotationGlyph[],
 ): NumericAnnotationGlyph[] {
-	if (contains_nag(nags, NAG_white_has_a_crushing_advantage)) {
+	if (contains_nag(nags, NAG_white_has_a_decisive_advantage)) {
 		// We make the position evaluation cyclic by removing the annotation.
 		// This allows us to reach a state where there is no position evaluation.
-		return remove_nag(nags, NAG_white_has_a_crushing_advantage);
-	} else if (contains_nag(nags, NAG_white_has_a_decisive_advantage)) {
-		return ensure_nag(
-			remove_nag(nags, NAG_white_has_a_decisive_advantage),
-			NAG_white_has_a_crushing_advantage,
-		);
+		return remove_nag(nags, NAG_white_has_a_decisive_advantage);
 	} else if (contains_nag(nags, NAG_white_has_a_moderate_advantage)) {
 		return ensure_nag(
 			remove_nag(nags, NAG_white_has_a_moderate_advantage),
@@ -257,15 +252,10 @@ export function increase_position_evaluation(
 export function decrease_position_evaluation(
 	nags: NumericAnnotationGlyph[],
 ): NumericAnnotationGlyph[] {
-	if (contains_nag(nags, NAG_black_has_a_crushing_advantage)) {
+	if (contains_nag(nags, NAG_black_has_a_decisive_advantage)) {
 		// We make the position evaluation cyclic by removing the annotation.
 		// This allows us to reach a state where there is no position evaluation.
-		return remove_nag(nags, NAG_black_has_a_crushing_advantage);
-	} else if (contains_nag(nags, NAG_black_has_a_decisive_advantage)) {
-		return ensure_nag(
-			remove_nag(nags, NAG_black_has_a_decisive_advantage),
-			NAG_black_has_a_crushing_advantage,
-		);
+		return remove_nag(nags, NAG_black_has_a_decisive_advantage);
 	} else if (contains_nag(nags, NAG_black_has_a_moderate_advantage)) {
 		return ensure_nag(
 			remove_nag(nags, NAG_black_has_a_moderate_advantage),
