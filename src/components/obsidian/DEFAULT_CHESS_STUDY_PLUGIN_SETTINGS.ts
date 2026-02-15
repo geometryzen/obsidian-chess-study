@@ -1,4 +1,4 @@
-import { CHESS_STUDY_KIND_GAME, INITIAL_POSITION_BEGIN } from 'src/main';
+import { CHESS_STUDY_KIND_GAME, INITIAL_POSITION_BEGIN } from '../../main';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
 
 /**

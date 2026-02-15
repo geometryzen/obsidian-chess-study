@@ -6,7 +6,7 @@ import { DrawShape } from 'chessground/draw';
 import { App, Notice } from 'obsidian';
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
-import { InitialPosition } from 'src/main';
+import { InitialPosition } from '../../main';
 import { useImmerReducer } from 'use-immer';
 import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPluginSettings';
 import {

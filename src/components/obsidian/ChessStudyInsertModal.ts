@@ -21,7 +21,7 @@ import {
 	INITIAL_POSITION_FIRST,
 	INITIAL_POSITION_YAML_NAME,
 	InitialPosition,
-} from 'src/main';
+} from '../../main';
 
 /**
  * The Modal Dialog that pops up when creating a new Chess Study.

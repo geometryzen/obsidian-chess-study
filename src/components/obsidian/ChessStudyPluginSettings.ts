@@ -3,7 +3,7 @@ import {
 	BoardOrientation,
 	ChessStudyKind,
 	InitialPosition,
-} from 'src/main';
+} from '../../main';
 
 /**
  * Everything in the chessStudy YAML block except the chessStudId

@@ -12,7 +12,7 @@ import ChessStudyPlugin, {
 	INITIAL_POSITION_FIRST,
 	INITIAL_POSITION_YAML_NAME,
 	InitialPosition,
-} from 'src/main';
+} from '../../main';
 
 export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 	#plugin: ChessStudyPlugin;

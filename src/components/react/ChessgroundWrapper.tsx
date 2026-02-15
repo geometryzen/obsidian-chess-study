@@ -6,8 +6,8 @@ import { DrawShape } from 'chessground/draw';
 import { Key, MoveMetadata } from 'chessground/types';
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
-import { playOtherSide, legalMoves } from 'src/lib/chess-logic';
-import { turnColor } from 'src/lib/chess-logic/turnColor';
+import { playOtherSide, legalMoves } from '../../lib/chess-logic';
+import { turnColor } from '../../lib/chess-logic/turnColor';
 
 /**
  * Strictly speaking, these are the React properties of our Chessground wrapper.

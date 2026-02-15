@@ -1,6 +1,6 @@
 import { Chess as ChessModel } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
-import { ChessStudyKind } from 'src/main';
+import { ChessStudyKind } from '../../main';
 import { GameChessStudyEventHandler } from './GameChessStudyEventHandler';
 import { NoopChessStudyEventHandler } from './NoopChessStudyEventHandler';
 import { PuzzleChessStudyEventHandler } from './PuzzleChessStudyEventHandler';

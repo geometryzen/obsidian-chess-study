@@ -1,4 +1,4 @@
-import { ChessStudyMove } from 'src/lib/storage';
+import { ChessStudyMove } from '../../lib/storage';
 import { ControlProps } from './ControlsProps';
 
 /**

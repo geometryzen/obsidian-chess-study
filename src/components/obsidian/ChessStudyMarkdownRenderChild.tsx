@@ -4,9 +4,9 @@ import * as ReactDOM from 'react-dom/client';
 import {
 	ChessStudyAppConfig,
 	parse_user_config,
-} from 'src/lib/obsidian/parse_user_config';
-import { ChessStudyFileContent } from 'src/lib/storage';
-import { ChessStudyDataAdapter } from 'src/lib/storage/ChessStudyDataAdapter';
+} from '../../lib/obsidian/parse_user_config';
+import { ChessStudyFileContent } from '../../lib/storage';
+import { ChessStudyDataAdapter } from '../../lib/storage/ChessStudyDataAdapter';
 import { ChessStudy } from '../react/ChessStudy';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
 

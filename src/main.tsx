@@ -4,7 +4,7 @@ import { ChessStudyMarkdownRenderChild } from './components/obsidian/ChessStudyM
 import { ChessStudyPluginSettingsTab } from './components/obsidian/ChessStudyPluginSettingsTab';
 
 // these styles must be imported somewhere
-import 'assets/board/green.css';
+import '../assets/board/green.css';
 import 'chessground/assets/chessground.base.css';
 import 'chessground/assets/chessground.brown.css';
 import 'chessground/assets/chessground.cburnett.css';

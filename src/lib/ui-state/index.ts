@@ -1,7 +1,7 @@
 import { Chess } from 'chess.js';
 import { Api as ChessgroundApi } from 'chessground/api';
 import { Draft } from 'immer';
-import { GameCurrentMove, GameState } from 'src/components/react/ChessStudy';
+import { GameCurrentMove, GameState } from '../../components/react/ChessStudy';
 import { legalMoves } from '../chess-logic';
 import { turnColor } from '../chess-logic/turnColor';
 import { ChessStudyMove } from '../storage';
