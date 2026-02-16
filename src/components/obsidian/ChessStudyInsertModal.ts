@@ -158,7 +158,7 @@ export class ChessStudyInsertModal extends Modal {
 		new Setting(contentEl)
 			.setName('viewComments')
 			.addToggle((toggle: ToggleComponent) => {
-				toggle.setValue(false);
+				toggle.setValue(this.#viewComments);
 				toggle.setTooltip('Determines whether move comments are displayed', {});
 				toggle.onChange((viewComments) => {
 					this.#viewComments = viewComments;
