@@ -28,13 +28,13 @@ import {
  */
 export class ChessStudyInsertModal extends Modal {
 	#chessString: ChessString;
+	#chessStudyKind: ChessStudyKind = CHESS_STUDY_KIND_GAME;
 	#boardOrientation: BoardOrientation = 'white';
 	#disableCopy = false;
 	#disableNavigation = false;
 	#initialPosition: InitialPosition = 'begin';
 	#readOnly = false;
-	#chessStudyKind: ChessStudyKind = CHESS_STUDY_KIND_GAME;
-	#viewComments = false;
+	#viewComments = true;
 
 	onSubmit: (
 		pgn: string,
