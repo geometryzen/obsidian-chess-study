@@ -37,7 +37,7 @@ This action will trigger a modal window, where you have the option to paste your
 
 ![chess-study-modal](imgs/chess-study-modal.png)
 
-Once you click `Submit`, Obsidian Chess Study will parse the PGN, generate a new JSON file in your vault located at `.obsidian/plugins/obsidian-chess-study/storage/{id}.json`, and insert a chessStudy codeblock at the cursor's position. Here's an example of the chessStudy codeblock:
+Once you click `Submit`, Obsidian Chess Study will parse the PGN, generate a new JSON file in your vault located at `.obsidian/plugins/obsidian-chess-study/studies/{id}.json`, and insert a chessStudy codeblock at the cursor's position. Here's an example of the chessStudy codeblock:
 
 ![chess-study-codeblock](imgs/chess-study-codeblock.png)
 
@@ -77,7 +77,7 @@ Here are the available settings for a `chessStudy` code block:
 
 | Setting             | Possible Values                              | Description                                      |
 | ------------------- | -------------------------------------------- | ------------------------------------------------ |
-| `chessStudyId`      | Valid nanoid                                 | Valid ID for a file stored in the plugin storage |
+| `chessStudyId`      | Valid nanoid                                 | Valid ID for a file stored in the plugin store   |
 | `boardOrientation`  | `white` \| `black`                           | Orientation of the board                         |
 | `boardColor`        | `green` \| `brown`                           | Color of the board                               |
 | `disableCopy`       | `true`  \| `false`                           | Determines whether the study can be copied       |

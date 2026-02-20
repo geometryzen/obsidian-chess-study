@@ -1,4 +1,4 @@
-import { ChessStudyMove, Variation } from '../storage';
+import { ChessStudyMove, Variation } from '../store';
 
 export function is_first_move_in_variation(
 	variation: Variation,

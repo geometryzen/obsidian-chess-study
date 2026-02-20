@@ -1,8 +1,8 @@
 import { describe, expect, test } from '@jest/globals';
 import { compile_pgn_or_fen } from '../lib/chess-logic';
 import { isFEN } from '../lib/fen-or-pgn';
-import { ChessStudyFileContent } from '../lib/storage';
-import { chess_study_to_pgn } from '../lib/storage/chess_study_to_pgn';
+import { ChessStudyFileContent } from '../lib/store';
+import { chess_study_to_pgn } from '../lib/store/chess_study_to_pgn';
 
 function simple_fen(fen: string, moves: string): string {
 	// TODO: I don't think we need two New Lins

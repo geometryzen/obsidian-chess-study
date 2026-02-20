@@ -1,4 +1,4 @@
-import { Variation } from '../storage';
+import { Variation } from '../store';
 import { is_first_move_in_variation } from './is_first_move_in_variation';
 
 /**

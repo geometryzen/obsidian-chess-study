@@ -10,8 +10,8 @@ import 'chessground/assets/chessground.brown.css';
 import 'chessground/assets/chessground.cburnett.css';
 import { compile_pgn_or_fen } from './lib/chess-logic';
 import { parse_user_config } from './lib/obsidian/parse_user_config';
-import { ChessStudyFileContent } from './lib/storage';
-import { ChessStudyDataAdapter } from './lib/storage/ChessStudyDataAdapter';
+import { ChessStudyFileContent } from './lib/store';
+import { ChessStudyDataAdapter } from './lib/store/ChessStudyDataAdapter';
 import './main.css';
 import { ChessStudyPluginSettings } from './components/obsidian/ChessStudyPluginSettings';
 import { DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS } from './components/obsidian/DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS';
@@ -44,8 +44,8 @@ export const INITIAL_POSITION_FIRST: InitialPosition = 'first';
 export default class ChessStudyPlugin extends Plugin {
 	settings: ChessStudyPluginSettings;
 	dataAdapter: ChessStudyDataAdapter;
-	storagePath = normalizePath(
-		`${this.app.vault.configDir}/plugins/${this.manifest.id}/storage/`,
+	readonly #studiesPath = normalizePath(
+		`${this.app.vault.configDir}/plugins/${this.manifest.id}/studies/`,
 	);
 
 	/**
@@ -58,10 +58,10 @@ export default class ChessStudyPlugin extends Plugin {
 		// Register Data Adapter
 		this.dataAdapter = new ChessStudyDataAdapter(
 			this.app.vault.adapter,
-			this.storagePath,
+			this.#studiesPath,
 		);
 
-		await this.dataAdapter.createStorageFolderIfNotExists();
+		await this.dataAdapter.createStudiesFolderIfNotExists();
 
 		// Add settings tab
 		this.addSettingTab(new ChessStudyPluginSettingsTab(this.app, this));
@@ -92,7 +92,7 @@ export default class ChessStudyPlugin extends Plugin {
 							chessStringOrStartPos,
 						);
 
-						this.dataAdapter.createStorageFolderIfNotExists();
+						this.dataAdapter.createStudiesFolderIfNotExists();
 
 						const id = await this.dataAdapter.saveFile(fileContent);
 

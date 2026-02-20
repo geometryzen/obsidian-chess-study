@@ -28,9 +28,9 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { ChessStudyFileContent, ChessStudyMove } from '../../lib/storage';
-import { ChessStudyDataAdapter } from '../../lib/storage/ChessStudyDataAdapter';
-import { chess_study_to_pgn } from '../../lib/storage/chess_study_to_pgn';
+import { ChessStudyFileContent, ChessStudyMove } from '../../lib/store';
+import { ChessStudyDataAdapter } from '../../lib/store/ChessStudyDataAdapter';
+import { chess_study_to_pgn } from '../../lib/store/chess_study_to_pgn';
 import {
 	displayRelativeMoveInHistory,
 	getCurrentMove,

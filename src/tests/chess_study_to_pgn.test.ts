@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
-import { ChessStudyFileContent } from '../lib/storage';
-import { chess_study_to_pgn } from '../lib/storage/chess_study_to_pgn';
+import { ChessStudyFileContent } from '../lib/store';
+import { chess_study_to_pgn } from '../lib/store/chess_study_to_pgn';
 
 function simple(moves: string): string {
 	return `[Event "?"]\n[Site "?"]\n[Date "????.??.??"]\n[Round "?"]\n[White "?"]\n[Black "?"]\n[Result "*"]\n\n${moves}`;

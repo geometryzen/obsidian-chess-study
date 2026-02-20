@@ -1,6 +1,6 @@
 import { Move } from 'chess.js';
 import { GameCurrentMove, GameState } from './ChessStudy';
-import { ChessStudyFileContent } from '../../lib/storage';
+import { ChessStudyFileContent } from '../../lib/store';
 
 export interface ChessStudyEventHandler {
 	setInitialState(

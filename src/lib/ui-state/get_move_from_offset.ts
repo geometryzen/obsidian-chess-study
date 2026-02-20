@@ -1,4 +1,4 @@
-import { ChessStudyMove, Variation } from '../storage';
+import { ChessStudyMove, Variation } from '../store';
 import { find_move_index_from_move_id } from './find_move_index_from_move_id';
 
 export function get_move_from_offset(

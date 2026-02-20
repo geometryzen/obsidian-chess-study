@@ -1,7 +1,7 @@
 import { Chess as ChessModel, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { nanoid } from 'nanoid';
-import { ChessStudyFileContent, ChessStudyMove } from '../../lib/storage';
+import { ChessStudyFileContent, ChessStudyMove } from '../../lib/store';
 import {
 	displayRelativeMoveInHistory,
 	getMoveById,

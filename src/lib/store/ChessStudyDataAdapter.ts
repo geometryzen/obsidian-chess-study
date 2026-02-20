@@ -16,25 +16,24 @@ export class ChessStudyDataAdapter {
 	 * The adapter is an Obsidian thing.
 	 */
 	readonly #adapter: DataAdapter;
-	readonly #storagePath: string;
+	readonly #studiesPath: string;
 
-	constructor(adapter: DataAdapter, storagePath: string) {
+	constructor(adapter: DataAdapter, studiesPath: string) {
 		this.#adapter = adapter;
-		this.#storagePath = storagePath;
+		this.#studiesPath = studiesPath;
 	}
 
 	async saveFile(fileContent: ChessStudyFileContent, id?: string) {
 		const chessStudyId = id || nanoid();
-		/*
-		console.lg(
+
+		console.log(
 			`Writing file to ${normalizePath(
-				`${this.#storagePath}/${chessStudyId}.json`,
+				`${this.#studiesPath}/${chessStudyId}.json`,
 			)}`,
 		);
-		*/
 
 		await this.#adapter.write(
-			normalizePath(`${this.#storagePath}/${chessStudyId}.json`),
+			normalizePath(`${this.#studiesPath}/${chessStudyId}.json`),
 			JSON.stringify(fileContent, null, 2),
 			{},
 		);
@@ -43,14 +42,12 @@ export class ChessStudyDataAdapter {
 	}
 
 	async loadFile(id: string): Promise<ChessStudyFileContent> {
-		/*
-		console.lg(
-			`Reading file from ${normalizePath(`${this.#storagePath}/${id}.json`)}`,
+		console.log(
+			`Reading file from ${normalizePath(`${this.#studiesPath}/${id}.json`)}`,
 		);
-		*/
 
 		const data = await this.#adapter.read(
-			normalizePath(`${this.#storagePath}/${id}.json`),
+			normalizePath(`${this.#studiesPath}/${id}.json`),
 		);
 
 		const fileContent = JSON.parse(data) as ChessStudyFileContent;
@@ -81,7 +78,7 @@ export class ChessStudyDataAdapter {
 			}
 		}
 
-		// Make sure data is compatible with storage version 0.0.1.
+		// Make sure data is compatible with version 0.0.1.
 		if (!fileContent.rootFEN) {
 			return { ...fileContent, rootFEN: ROOT_FEN };
 		}
@@ -89,12 +86,12 @@ export class ChessStudyDataAdapter {
 		return fileContent;
 	}
 
-	async createStorageFolderIfNotExists() {
-		const folderExists = await this.#adapter.exists(this.#storagePath);
+	async createStudiesFolderIfNotExists() {
+		const folderExists = await this.#adapter.exists(this.#studiesPath);
 
 		if (!folderExists) {
-			// console.lg(`Creating storage folder at: ${this.#storagePath}`);
-			this.#adapter.mkdir(this.#storagePath);
+			console.log(`Creating studies folder at: ${this.#studiesPath}`);
+			this.#adapter.mkdir(this.#studiesPath);
 		}
 	}
 }

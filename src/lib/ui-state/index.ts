@@ -4,7 +4,7 @@ import { Draft } from 'immer';
 import { GameCurrentMove, GameState } from '../../components/react/ChessStudy';
 import { legalMoves } from '../chess-logic';
 import { turnColor } from '../chess-logic/turnColor';
-import { ChessStudyMove } from '../storage';
+import { ChessStudyMove } from '../store';
 import { find_move_index_from_move_id } from './find_move_index_from_move_id';
 import { get_move_from_offset } from './get_move_from_offset';
 

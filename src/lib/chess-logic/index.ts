@@ -18,7 +18,7 @@ import {
 	ChessStudyMove,
 	CURRENT_STORAGE_VERSION,
 	Variation,
-} from '../storage';
+} from '../store';
 import { ROOT_FEN } from './ROOT_FEN';
 import { turnColor } from './turnColor';
 

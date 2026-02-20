@@ -1,4 +1,4 @@
-import { ChessStudyMove } from '../storage';
+import { ChessStudyMove } from '../store';
 import { MoveIndex } from './MoveIndex';
 
 /**
