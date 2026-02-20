@@ -1,4 +1,5 @@
 import {
+	BookmarkPlus,
 	Bookmark,
 	BookmarkCheck,
 	BookmarkMinus,
@@ -12,6 +13,9 @@ import {
 	Save,
 	// Settings,
 	Delete,
+	DatabaseSearch,
+	ToggleLeft,
+	Settings,
 } from 'lucide-react';
 import * as React from 'react';
 import { ControlProps } from './ControlsProps';
@@ -28,51 +32,43 @@ export const Controls = (props: ControlProps) => {
 						<button title="Forward" onClick={() => props.onForwardButtonClick()}>
 							<ArrowBigRight strokeWidth={'2px'} />
 						</button>
-						<button
-							title="Increase Position Evaluation"
-							onClick={() => props.onIncreasePositionEvaluation()}
-						>
-							<ClipboardPlus color="blue" strokeWidth={'2px'} />
+						<button title="Search Database" onClick={() => props.onSearchDatabase()}>
+							<DatabaseSearch strokeWidth={'2px'} />
 						</button>
-						<button
-							title="Decrease Position Evaluation"
-							onClick={() => props.onDecreasePositionEvaluation()}
-						>
-							<ClipboardMinus color="blue" strokeWidth={'2px'} />
+						<button title="Settings" onClick={() => props.onSettingsButtonClick()}>
+							<Settings strokeWidth={'2px'} />
 						</button>
 					</React.Fragment>
 				)}
 			</div>
-			<div className="button-section">
-				{props.readOnly ? null : (
-					<React.Fragment>
-						<button
-							title="Annotate Move as Correct or Acceptable"
-							onClick={() => props.onAnnotateMoveCorrect()}
-						>
-							<BookmarkCheck color="blue" strokeWidth={'2px'} />
-						</button>
-						<button
-							title="Annotate Move as Inaccurate (?!)"
-							onClick={() => props.onAnnotateMoveInaccurate()}
-						>
-							<Bookmark color="blue" strokeWidth={'2px'} />
-						</button>
-						<button
-							title="Annotate Move as a Mistake (?)"
-							onClick={() => props.onAnnotateMoveMistake()}
-						>
-							<BookmarkMinus color="blue" strokeWidth={'2px'} />
-						</button>
-						<button
-							title="Annotate Move as a Blunder (??)"
-							onClick={() => props.onAnnotateMoveBlunder()}
-						>
-							<BookmarkX color="blue" strokeWidth={'2px'} />
-						</button>
-					</React.Fragment>
-				)}
-			</div>
+			{props.readOnly ? null : (
+				<div className="button-section">
+					<button
+						title="Increase Move Annotation"
+						onClick={() => props.onIncreaseMoveAnnotation()}
+					>
+						<BookmarkPlus color="blue" strokeWidth={'2px'} />
+					</button>
+					<button
+						title="Decrease Move Annotation"
+						onClick={() => props.onDecreaseMoveAnnotation()}
+					>
+						<BookmarkMinus color="blue" strokeWidth={'2px'} />
+					</button>
+					<button
+						title="Increase Position Evaluation"
+						onClick={() => props.onIncreasePositionEvaluation()}
+					>
+						<ClipboardPlus color="blue" strokeWidth={'2px'} />
+					</button>
+					<button
+						title="Decrease Position Evaluation"
+						onClick={() => props.onDecreasePositionEvaluation()}
+					>
+						<ClipboardMinus color="blue" strokeWidth={'2px'} />
+					</button>
+				</div>
+			)}
 			<div className="button-section">
 				{props.disableCopy ? null : (
 					<React.Fragment>

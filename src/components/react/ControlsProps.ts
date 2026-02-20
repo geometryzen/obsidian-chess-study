@@ -17,7 +17,10 @@ export interface ControlProps {
 	onAnnotateMoveInaccurate: () => void;
 	onAnnotateMoveMistake: () => void;
 	onAnnotateMoveBlunder: () => void;
+	onIncreaseMoveAnnotation: () => void;
+	onDecreaseMoveAnnotation: () => void;
 	onIncreasePositionEvaluation: () => void;
 	onDecreasePositionEvaluation: () => void;
 	onSettingsButtonClick: () => void;
+	onSearchDatabase: () => void;
 }

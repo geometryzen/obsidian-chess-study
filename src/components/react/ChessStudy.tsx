@@ -14,7 +14,9 @@ import {
 	annotate_move_correct,
 	annotate_move_inaccurate,
 	annotate_move_mistake,
+	decrease_move_evaluation,
 	decrease_position_evaluation,
+	increase_move_evaluation,
 	increase_position_evaluation,
 	NAG_null,
 	NAG_poor_move,
@@ -89,6 +91,7 @@ export type GameEvent =
 	| { type: 'GOTO_END_POSITION' }
 	| { type: 'GOTO_MOVE'; moveId: string }
 	| { type: 'ANNOTATE_MOVE'; glyph: NumericAnnotationGlyph }
+	| { type: 'EVALUATE_MOVE'; direction: 1 | -1 }
 	| { type: 'EVALUATE_POSITION'; direction: 1 | -1 }
 	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
@@ -397,6 +400,28 @@ export const ChessStudy = ({
 					}
 					return state;
 				}
+				case 'EVALUATE_MOVE': {
+					const currentMove = getCurrentMove(state);
+
+					if (currentMove) {
+						switch (event.direction) {
+							case 1: {
+								currentMove.nags = increase_move_evaluation(currentMove.nags);
+								break;
+							}
+							case -1: {
+								currentMove.nags = decrease_move_evaluation(currentMove.nags);
+								break;
+							}
+							default: {
+								new Notice(`${currentMove.san} ${event.direction}`);
+							}
+						}
+					} else {
+						// Do nothing
+					}
+					return state;
+				}
 				case 'EVALUATE_POSITION': {
 					const currentMove = getCurrentMove(state);
 
@@ -516,12 +541,25 @@ export const ChessStudy = ({
 							onAnnotateMoveBlunder={() =>
 								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_very_poor_move })
 							}
+							onIncreaseMoveAnnotation={() =>
+								dispatch({ type: 'EVALUATE_MOVE', direction: +1 })
+							}
+							onDecreaseMoveAnnotation={() =>
+								dispatch({ type: 'EVALUATE_MOVE', direction: -1 })
+							}
 							onIncreasePositionEvaluation={() =>
 								dispatch({ type: 'EVALUATE_POSITION', direction: +1 })
 							}
 							onDecreasePositionEvaluation={() =>
 								dispatch({ type: 'EVALUATE_POSITION', direction: -1 })
 							}
+							onSearchDatabase={() => {
+								try {
+									new Notice("I'm afraid I can't do that Dave??");
+								} catch (e) {
+									new Notice('Something is rotten in Denmark:', e);
+								}
+							}}
 							onSettingsButtonClick={() => {
 								try {
 									new Notice("I'm afraid I can't do that Dave??");

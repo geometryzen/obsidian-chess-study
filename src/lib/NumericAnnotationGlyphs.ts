@@ -1,12 +1,18 @@
 import { is_shallow_arrays_equal } from './lang/is_shallow_arrays_equal';
 
 export const NAG_null = 0;
+/**
+ * !
+ */
 export const NAG_good_move = 1;
 /**
  * Mistake
  */
 export const NAG_poor_move = 2;
-export const NAG_very_good_move = 3;
+/**
+ * !!
+ */
+export const NAG_excellent_move = 3;
 /**
  * Blunder
  */
@@ -31,7 +37,7 @@ export const NAG_white_has_a_crushing_advantage = 20;
 export const NAG_black_has_a_crushing_advantage = 21;
 
 const move_quality_nags: NumericAnnotationGlyph[] = [
-	NAG_very_good_move,
+	NAG_excellent_move,
 	NAG_good_move,
 	NAG_speculative_move,
 	NAG_questionable_move,
@@ -53,7 +59,7 @@ export type NumericAnnotationGlyph =
 	| typeof NAG_null
 	| typeof NAG_good_move
 	| typeof NAG_poor_move
-	| typeof NAG_very_good_move
+	| typeof NAG_excellent_move
 	| typeof NAG_very_poor_move
 	| typeof NAG_speculative_move
 	| typeof NAG_questionable_move
@@ -93,7 +99,7 @@ export function nag_to_human(nag: NumericAnnotationGlyph): string {
 			return '!';
 		case NAG_poor_move:
 			return '?';
-		case NAG_very_good_move:
+		case NAG_excellent_move:
 			return '!!';
 		case NAG_very_poor_move:
 			return '??';
@@ -184,6 +190,46 @@ export function contains_nag(
 		return nags.indexOf(target) !== -1;
 	} else {
 		return false;
+	}
+}
+
+export function increase_move_evaluation(
+	nags: NumericAnnotationGlyph[],
+): NumericAnnotationGlyph[] {
+	if (contains_nag(nags, NAG_excellent_move)) {
+		return nags;
+	} else if (contains_nag(nags, NAG_good_move)) {
+		return ensure_nag(remove_nag(nags, NAG_good_move), NAG_excellent_move);
+	} else if (contains_nag(nags, NAG_speculative_move)) {
+		return ensure_nag(remove_nag(nags, NAG_speculative_move), NAG_good_move);
+	} else if (contains_nag(nags, NAG_questionable_move)) {
+		return remove_nag(nags, NAG_questionable_move);
+	} else if (contains_nag(nags, NAG_poor_move)) {
+		return ensure_nag(remove_nag(nags, NAG_poor_move), NAG_questionable_move);
+	} else if (contains_nag(nags, NAG_very_poor_move)) {
+		return ensure_nag(remove_nag(nags, NAG_very_poor_move), NAG_poor_move);
+	} else {
+		return ensure_nag(nags, NAG_speculative_move);
+	}
+}
+
+export function decrease_move_evaluation(
+	nags: NumericAnnotationGlyph[],
+): NumericAnnotationGlyph[] {
+	if (contains_nag(nags, NAG_very_poor_move)) {
+		return nags;
+	} else if (contains_nag(nags, NAG_poor_move)) {
+		return ensure_nag(remove_nag(nags, NAG_poor_move), NAG_very_poor_move);
+	} else if (contains_nag(nags, NAG_questionable_move)) {
+		return ensure_nag(remove_nag(nags, NAG_questionable_move), NAG_poor_move);
+	} else if (contains_nag(nags, NAG_speculative_move)) {
+		return remove_nag(nags, NAG_speculative_move);
+	} else if (contains_nag(nags, NAG_good_move)) {
+		return ensure_nag(remove_nag(nags, NAG_good_move), NAG_speculative_move);
+	} else if (contains_nag(nags, NAG_excellent_move)) {
+		return ensure_nag(remove_nag(nags, NAG_excellent_move), NAG_good_move);
+	} else {
+		return ensure_nag(nags, NAG_questionable_move);
 	}
 }
 
