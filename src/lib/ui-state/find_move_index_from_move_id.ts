@@ -3,7 +3,7 @@ import { MoveIndex } from './MoveIndex';
 
 /**
  *
- * @param moves The moves, assumed to be the moves in the study
+ * @param moves The moves, assumed to be the moves in the study (i.e. the Main Line)
  * @param moveId The move identifier.
  * @returns An index which can be used to retrieve the move.
  */

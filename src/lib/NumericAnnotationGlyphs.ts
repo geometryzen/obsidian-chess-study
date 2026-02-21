@@ -138,7 +138,6 @@ export function nag_to_human(nag: NumericAnnotationGlyph): string {
 }
 
 export function nags_to_human(nags: NumericAnnotationGlyph[]): string {
-	console.log('nags_to_human', JSON.stringify(nags));
 	if (Array.isArray(nags)) {
 		return nags.map(nag_to_human).join(' ');
 	} else {

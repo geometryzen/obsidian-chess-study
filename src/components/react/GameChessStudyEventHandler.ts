@@ -97,6 +97,8 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				currentMoveId,
 			);
 
+			// console.lg('indexLocation', indexLocation);
+
 			if (indexLocation) {
 				// The current move belongs to a variation (not the Main Line).
 				const mainLineMove: ChessStudyMove = moves[indexLocation.mainLineMoveIndex];
@@ -137,10 +139,17 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				}
 			} else {
 				// The current move belongs to the Main Line.
+				// I think the currentMoveIndex is in the second parameter, moveIndex.
+				// So the following code is redundant.
+				// console.lg('moveIndex', moveIndex);
+				/*
 				const currentMoveIndex = moves.findIndex(
 					(move: ChessStudyMove) => move.moveId === currentMoveId,
 				);
-				const isCurrentMoveLast = currentMoveIndex === moves.length - 1;
+				*/
+				// console.lg('currentMoveIndex', moveIndex);
+				const isCurrentMoveLast = moveIndex === moves.length - 1;
+				// console.lg('isCurrentMoveLast', isCurrentMoveLast);
 				if (isCurrentMoveLast) {
 					// If the current move is the last move then the played move
 					// should be added as a Main Line move.
@@ -162,7 +171,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					state.currentMove = move;
 				} else {
 					// The current move is not the last in the Main Line.
-					const currentMove = moves[moveIndex];
+					// const currentMove = moves[moveIndex];
 
 					// check if the next move is the same move
 					const nextMove = moves[moveIndex + 1];
@@ -174,13 +183,15 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						// The played move is not the same as the next Main Line move.
 						// If a variation exists that starts with the playedMove, then go into that variation.
 						// Otherwise, create a new variation with the played move as the first move
+						// console.lg("nextMove.variants", JSON.stringify(nextMove.variants))
 						const variationIndex = find_variation_index_with_first_move(
-							currentMove.variants,
+							nextMove.variants,
 							m.san,
 						);
+						// console.lg("variationIndex", variationIndex)
 						if (variationIndex !== -1) {
 							// We must set the state.currentMove to that move
-							state.currentMove = currentMove.variants[variationIndex].moves[0];
+							state.currentMove = nextMove.variants[variationIndex].moves[0];
 						} else {
 							// The move does not exist in any existing variation so we create a new variation
 							const move: ChessStudyMove = {
