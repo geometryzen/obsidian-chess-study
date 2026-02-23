@@ -1,16 +1,16 @@
 import { Chess as ChessModel, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
-import { nanoid } from 'nanoid';
 import { ChessStudyFileContent, ChessStudyMove } from '../../lib/store';
 import {
 	displayRelativeMoveInHistory,
 	getMoveById,
 	updateView,
 } from '../../lib/ui-state';
-import { find_variation_index_with_first_move } from '../../lib/ui-state/find_variation_index_with_first_move';
 import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
+import { chess_study_move_from_user_move } from './chess_study_move_from_user_move';
 import { GameCurrentMove, GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
+import { ensure_move_in_scope } from './ensure_move_in_owner';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
@@ -83,8 +83,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 * @override
 	 *
 	 * @param state
-	 * @param m This move comes from the
-	 * @returns
+	 * @param m The played move that comes from the user.
 	 */
 	playMove(state: GameState, m: Move): void {
 		const moves = state.study.moves;
@@ -109,19 +108,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 
 				// Only push if its the last move in the variant because depth can only be 1
 				if (isLastMove) {
-					const variantMove: ChessStudyMove = {
-						moveId: nanoid(),
-						variants: [],
-						shapes: [],
-						comment: null,
-						color: m.color,
-						san: m.san,
-						after: m.after,
-						from: m.from,
-						to: m.to,
-						promotion: m.promotion,
-						nags: [],
-					};
+					const variantMove = chess_study_move_from_user_move(m);
 					variantMoves.push(variantMove);
 
 					const tempChess = new ChessModel(m.after);
@@ -139,121 +126,34 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				}
 			} else {
 				// The current move belongs to the Main Line.
-				// I think the currentMoveIndex is in the second parameter, moveIndex.
-				// So the following code is redundant.
-				// console.lg('moveIndex', moveIndex);
-				/*
-				const currentMoveIndex = moves.findIndex(
-					(move: ChessStudyMove) => move.moveId === currentMoveId,
-				);
-				*/
-				// console.lg('currentMoveIndex', moveIndex);
 				const isCurrentMoveLast = moveIndex === moves.length - 1;
-				// console.lg('isCurrentMoveLast', isCurrentMoveLast);
 				if (isCurrentMoveLast) {
 					// If the current move is the last move then the played move
 					// should be added as a Main Line move.
-					const move: ChessStudyMove = {
-						moveId: nanoid(),
-						variants: [],
-						shapes: [],
-						comment: null,
-						color: m.color,
-						san: m.san,
-						after: m.after,
-						from: m.from,
-						to: m.to,
-						promotion: m.promotion,
-						nags: [],
-					};
+					const move = chess_study_move_from_user_move(m);
 					moves.push(move);
 
 					state.currentMove = move;
 				} else {
 					// The current move is not the last in the Main Line.
-					// const currentMove = moves[moveIndex];
-
-					// check if the next move is the same move
-					const nextMove = moves[moveIndex + 1];
-
-					if (nextMove.san === m.san) {
-						state.currentMove = nextMove;
-						return;
-					} else {
-						// The played move is not the same as the next Main Line move.
-						// If a variation exists that starts with the playedMove, then go into that variation.
-						// Otherwise, create a new variation with the played move as the first move
-						// console.lg("nextMove.variants", JSON.stringify(nextMove.variants))
-						const variationIndex = find_variation_index_with_first_move(
-							nextMove.variants,
-							m.san,
-						);
-						// console.lg("variationIndex", variationIndex)
-						if (variationIndex !== -1) {
-							// We must set the state.currentMove to that move
-							state.currentMove = nextMove.variants[variationIndex].moves[0];
-						} else {
-							// The move does not exist in any existing variation so we create a new variation
-							const move: ChessStudyMove = {
-								moveId: nanoid(),
-								variants: [],
-								shapes: [],
-								comment: null,
-								color: m.color,
-								san: m.san,
-								after: m.after,
-								from: m.from,
-								to: m.to,
-								promotion: m.promotion,
-								nags: [],
-							};
-
-							// Notice how the variations belong to the next move, not the current move.
-							nextMove.variants.push({
-								parentMoveId: nextMove.moveId,
-								variantId: nanoid(),
-								moves: [move],
-							});
-
-							state.currentMove = move;
-						}
-					}
+					state.currentMove = ensure_move_in_scope(m, moves[moveIndex + 1]);
 				}
 			}
 		} else {
-			// There is no current move.
 			// This means we are positioned at the beginning of the game.
 			// If there are no moves in the game then add it as the first move.
 			// If there are moves in the game then
 			// TODO: This is probably where we should check the moves and proceed accordingly.
+			console.log('moves.length', moves.length);
 			if (moves.length === 0) {
-				const move: ChessStudyMove = {
-					moveId: nanoid(),
-					variants: [],
-					shapes: [],
-					comment: null,
-					promotion: m.promotion,
-					nags: [],
-					color: m.color,
-					san: m.san,
-					after: m.after,
-					from: m.from,
-					to: m.to,
-				};
+				const move = chess_study_move_from_user_move(m);
 				moves.push(move);
-
 				state.currentMove = move;
 			} else {
-				// Do nothing for now.
-				// The problem with doing nothing is that the move will be displayed
-				const firstMove = moves[0];
-
-				if (firstMove.san === m.san) {
-					state.currentMove = firstMove;
-				} else {
-					// What do we do if the moves do not match?
-					// I think it becomes a Variation.
-				}
+				// There are Main Line moves and yet there is no curent move.
+				// So we must be positioned before the start of the first move.
+				// This is the move to which the played move belongs.
+				state.currentMove = ensure_move_in_scope(m, moves[0]);
 			}
 		}
 	}

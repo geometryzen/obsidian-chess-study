@@ -13,6 +13,7 @@ export interface Variation {
 	 * The identifier of the Main Line move corresponding to this variation.
 	 * This is not the prior move.
 	 * It is the move containing this Variation in its variations list.
+	 * It would be better if thisa was called the ownerMoveId?
 	 */
 	parentMoveId: string;
 	moves: ChessStudyMove[];
