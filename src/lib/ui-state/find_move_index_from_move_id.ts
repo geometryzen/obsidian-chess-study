@@ -13,11 +13,13 @@ export function find_move_index_from_move_id(
 ): MoveIndex {
 	for (const [iMainLine, move] of moves.entries()) {
 		if (move.moveId === moveId) {
+			// The case when the move is in the main line returns only a single number.
 			return { indexLocation: null, moveIndex: iMainLine };
 		} else {
 			// Look in each of the variations for the moveId
 			for (const [iVariant, variant] of move.variants.entries()) {
 				// TODO: We should be able to go recursive.
+				// We are only looking at the main move in each variation.
 				const moveIndex = variant.moves.findIndex((move) => move.moveId === moveId);
 
 				if (moveIndex >= 0) {

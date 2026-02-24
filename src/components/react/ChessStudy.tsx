@@ -6,7 +6,6 @@ import { DrawShape } from 'chessground/draw';
 import { App, Notice } from 'obsidian';
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
-import { InitialPosition } from '../../main';
 import { useImmerReducer } from 'use-immer';
 import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPluginSettings';
 import {
@@ -29,13 +28,14 @@ import {
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
 import { ChessStudyFileContent, ChessStudyMove } from '../../lib/store';
-import { ChessStudyDataAdapter } from '../../lib/store/ChessStudyDataAdapter';
 import { chess_study_to_pgn } from '../../lib/store/chess_study_to_pgn';
+import { ChessStudyDataAdapter } from '../../lib/store/ChessStudyDataAdapter';
 import {
 	displayRelativeMoveInHistory,
 	getCurrentMove,
 } from '../../lib/ui-state';
 import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
+import { InitialPosition } from '../../main';
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { CommentSection } from './CommentSection';
@@ -482,7 +482,7 @@ export const ChessStudy = ({
 						syncShapes={(shapes: DrawShape[]) =>
 							dispatch({ type: 'SYNC_SHAPES', shapes })
 						}
-						shapes={gameState.currentMove?.shapes || []}
+						shapes={handler.shapes(gameState)}
 					/>
 				</div>
 				{(chessStudyKind as string) !== 'foo' && (

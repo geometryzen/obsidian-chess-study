@@ -1,5 +1,7 @@
 import { Chess as ChessModel, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
+import { DrawShape } from 'chessground/draw';
+import { is_index_last_in_array } from '../../lib/lang/is_index_last_in_array';
 import { ChessStudyFileContent, ChessStudyMove } from '../../lib/store';
 import {
 	displayRelativeMoveInHistory,
@@ -96,7 +98,9 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				currentMoveId,
 			);
 
-			// console.lg('indexLocation', indexLocation);
+			console.log('currentMove', JSON.stringify(state.currentMove, null, 2));
+			console.log('indexLocation', indexLocation);
+			console.log('moveIndex', moveIndex);
 
 			if (indexLocation) {
 				// The current move belongs to a variation (not the Main Line).
@@ -120,14 +124,27 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						check: tempChess.isCheck(),
 					});
 				} else {
-					// We should provide some notice?
-					// We also must revert the board.
-					// Easier may be simply to allow variations of variaton.
+					/*
+					console.log("dropping the move", m.san, "on the floor because the current move", state.currentMove.moveId, " is in a variation")
+					console.log("variantMoves", JSON.stringify(variantMoves, null, 2))
+					const vml = find_move_index_from_move_id(variantMoves, state.currentMove.moveId)
+					console.log("vml", vml)
+					if (is_index_last_in_array(vml.moveIndex, variantMoves)) {
+						// If the current move is the last move then the played move
+						// should be added as a Main Line move.
+						const move = chess_study_move_from_user_move(m);
+						variantMoves.push(move);
+
+						state.currentMove = move;
+					} else {
+						// The current move is not the last in the Main Line.
+						state.currentMove = ensure_move_in_scope(m, variantMoves[vml.moveIndex + 1]);
+					}
+					*/
 				}
 			} else {
 				// The current move belongs to the Main Line.
-				const isCurrentMoveLast = moveIndex === moves.length - 1;
-				if (isCurrentMoveLast) {
+				if (is_index_last_in_array(moveIndex, moves)) {
 					// If the current move is the last move then the played move
 					// should be added as a Main Line move.
 					const move = chess_study_move_from_user_move(m);
@@ -156,5 +173,8 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				state.currentMove = ensure_move_in_scope(m, moves[0]);
 			}
 		}
+	}
+	shapes(state: GameState): DrawShape[] {
+		return state.currentMove?.shapes || [];
 	}
 }

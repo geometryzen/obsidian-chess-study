@@ -58,7 +58,7 @@ export const ChessgroundWrapper = React.memo(
 						lastMove: true,
 					},
 					drawable: {
-						onChange: (shapes) => {
+						onChange: (shapes: DrawShape[]) => {
 							setShapes(shapes);
 						},
 					},
@@ -79,7 +79,7 @@ export const ChessgroundWrapper = React.memo(
 						// Hook up the Chessground UI changes to our App State
 						after: (orig: Key, dest: Key, _metadata: MoveMetadata) => {
 							const handler = playOtherSide(api, chess);
-							// This name assumes a particulat usage
+							// This name assumes a particular usage.
 							const move: Move = handler(orig, dest);
 							onMove(move);
 						},

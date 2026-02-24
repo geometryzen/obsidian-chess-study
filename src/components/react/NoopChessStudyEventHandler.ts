@@ -1,6 +1,7 @@
 import { Move } from 'chess.js';
 import { GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
+import { DrawShape } from 'chessground/draw';
 
 export class NoopChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
@@ -32,5 +33,8 @@ export class NoopChessStudyEventHandler implements ChessStudyEventHandler {
 	 */
 	playMove(state: GameState, move: Move): void {
 		// Do nothing
+	}
+	shapes(state: GameState): DrawShape[] {
+		return [];
 	}
 }
