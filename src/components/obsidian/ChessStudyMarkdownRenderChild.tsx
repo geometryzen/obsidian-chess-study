@@ -5,8 +5,8 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { ChessStudyFileContent } from '../../lib/store';
 import { ChessStudyDataAdapter } from '../../lib/store/ChessStudyDataAdapter';
+import { ChessStudyFileContent } from '../../lib/store/ChessStudyFileContent';
 import { ChessStudy } from '../react/ChessStudy';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
 

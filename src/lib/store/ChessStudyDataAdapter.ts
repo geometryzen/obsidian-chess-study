@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { DataAdapter, normalizePath } from 'obsidian';
-import { ChessStudyFileContent } from '.';
+import { ChessStudyFileContent } from './ChessStudyFileContent';
 import { ROOT_FEN } from '../chess-logic/ROOT_FEN';
 
 interface UnwantedMoveProperties {

@@ -1,6 +1,6 @@
 import { Move } from 'chess.js';
 import { nanoid } from 'nanoid';
-import { ChessStudyMove } from '../../lib/store';
+import { ChessStudyFileMove } from '../../lib/store/ChessStudyFileMove';
 import { find_variation_index_with_first_move } from '../../lib/ui-state/find_variation_index_with_first_move';
 import { chess_study_move_from_user_move } from './chess_study_move_from_user_move';
 
@@ -13,8 +13,8 @@ import { chess_study_move_from_user_move } from './chess_study_move_from_user_mo
  */
 export function ensure_move_in_scope(
 	m: Move,
-	ownerMove: ChessStudyMove,
-): ChessStudyMove {
+	ownerMove: ChessStudyFileMove,
+): ChessStudyFileMove {
 	if (ownerMove.san === m.san) {
 		return ownerMove;
 	} else {

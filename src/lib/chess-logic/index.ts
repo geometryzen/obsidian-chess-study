@@ -13,12 +13,12 @@ import { Config } from 'chessground/config';
 import { nanoid } from 'nanoid';
 import { getChessDataFormat } from '../fen-or-pgn';
 import { NAG_null, NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
+import { ChessStudyFileContent } from '../store/ChessStudyFileContent';
 import {
-	ChessStudyFileContent,
-	ChessStudyMove,
+	ChessStudyFileMove,
 	CURRENT_STORAGE_VERSION,
-	Variation,
-} from '../store';
+	ChessStudyFileVariation,
+} from '../store/ChessStudyFileMove';
 import { ROOT_FEN } from './ROOT_FEN';
 import { turnColor } from './turnColor';
 
@@ -364,8 +364,8 @@ function from_pgn_variation(
 	moves: PgnMove[],
 	parentMoveId: string,
 	fen: string,
-): Variation {
-	const variation: Variation = {
+): ChessStudyFileVariation {
+	const variation: ChessStudyFileVariation = {
 		parentMoveId,
 		moves: pgn_moves_to_chess_study_moves(moves, fen),
 		variantId: nanoid(),
@@ -377,8 +377,8 @@ function from_pgn_variations(
 	movess: PgnMove[][],
 	parentMoveId: string,
 	fen: string,
-): Variation[] {
-	const variations: Variation[] = [];
+): ChessStudyFileVariation[] {
+	const variations: ChessStudyFileVariation[] = [];
 	for (let i = 0; i < movess.length; i++) {
 		const variation = from_pgn_variation(movess[i], parentMoveId, fen);
 		variations.push(variation);
@@ -411,10 +411,10 @@ function evaluation_from_comment_diag(
 function pgn_moves_to_chess_study_moves(
 	gms: PgnMove[],
 	fen: string,
-): ChessStudyMove[] {
+): ChessStudyFileMove[] {
 	// We use chess.js to compute the after, from, and to properties.
 	const chess = new Chess(fen);
-	const moves: ChessStudyMove[] = [];
+	const moves: ChessStudyFileMove[] = [];
 	for (let i = 0; i < gms.length; i++) {
 		const pgnMove = gms[i];
 		// console.lg(JSON.stringify(pgnMove, null, 2))
@@ -427,7 +427,7 @@ function pgn_moves_to_chess_study_moves(
 		pgnMove.drawOffer;
 		pgnMove.commentMove;
 		const moveId = nanoid();
-		const move: ChessStudyMove = {
+		const move: ChessStudyFileMove = {
 			moveId,
 			variants: from_pgn_variations(pgnMove.variations, moveId, chessMove.before),
 			shapes: [],

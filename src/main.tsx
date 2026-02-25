@@ -10,7 +10,7 @@ import 'chessground/assets/chessground.brown.css';
 import 'chessground/assets/chessground.cburnett.css';
 import { compile_pgn_or_fen } from './lib/chess-logic';
 import { parse_user_config } from './lib/obsidian/parse_user_config';
-import { ChessStudyFileContent } from './lib/store';
+import { ChessStudyFileContent } from './lib/store/ChessStudyFileContent';
 import { ChessStudyDataAdapter } from './lib/store/ChessStudyDataAdapter';
 import './main.css';
 import { ChessStudyPluginSettings } from './components/obsidian/ChessStudyPluginSettings';

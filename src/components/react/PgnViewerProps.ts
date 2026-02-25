@@ -1,11 +1,11 @@
-import { ChessStudyMove } from '../../lib/store';
+import { ChessStudyFileMove } from '../../lib/store/ChessStudyFileMove';
 import { ControlProps } from './ControlsProps';
 
 /**
  * Notice that by design, the PgnViewerProps extends ControlProps to pass the properties through.
  */
 export interface PgnViewerProps extends ControlProps {
-	history: ChessStudyMove[];
+	history: ChessStudyFileMove[];
 	currentMoveId: string | null;
 	/**
 	 * The player to move in the initial position.

@@ -4,11 +4,11 @@ import { Draft } from 'immer';
 import { GameCurrentMove, GameState } from '../../components/react/ChessStudy';
 import { legalMoves } from '../chess-logic';
 import { turnColor } from '../chess-logic/turnColor';
-import { ChessStudyMove } from '../store';
+import { ChessStudyFileMove } from '../store/ChessStudyFileMove';
 import { find_move_index_from_move_id } from './find_move_index_from_move_id';
 import { get_move_from_offset } from './get_move_from_offset';
 
-export const getMoveById = (moves: ChessStudyMove[], moveId: string) => {
+export const getMoveById = (moves: ChessStudyFileMove[], moveId: string) => {
 	const { indexLocation: variant, moveIndex } = find_move_index_from_move_id(
 		moves,
 		moveId,
@@ -43,7 +43,7 @@ export const displayRelativeMoveInHistory = (
 	options: { offset: 1 | -1; selectedMoveId: string | null },
 ): GameCurrentMove => {
 	let moveToDisplay: Pick<
-		ChessStudyMove,
+		ChessStudyFileMove,
 		'moveId' | 'comment' | 'shapes' | 'after'
 	> | null = null;
 
@@ -110,7 +110,7 @@ export const updateView = (
 
 export const getCurrentMove = (
 	draft: Draft<GameState>,
-): Draft<ChessStudyMove> | null => {
+): Draft<ChessStudyFileMove> | null => {
 	const currentMoveId = draft.currentMove?.moveId;
 	const moves = draft.study.moves;
 

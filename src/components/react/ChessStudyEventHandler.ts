@@ -1,7 +1,7 @@
 import { Move } from 'chess.js';
-import { GameCurrentMove, GameState } from './ChessStudy';
-import { ChessStudyFileContent } from '../../lib/store';
 import { DrawShape } from 'chessground/draw';
+import { ChessStudyFileContent } from '../../lib/store/ChessStudyFileContent';
+import { GameCurrentMove, GameState } from './ChessStudy';
 
 export interface ChessStudyEventHandler {
 	setInitialState(

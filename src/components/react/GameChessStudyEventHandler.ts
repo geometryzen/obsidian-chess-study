@@ -2,7 +2,8 @@ import { Chess as ChessModel, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
 import { is_index_last_in_array } from '../../lib/lang/is_index_last_in_array';
-import { ChessStudyFileContent, ChessStudyMove } from '../../lib/store';
+import { ChessStudyFileContent } from '../../lib/store/ChessStudyFileContent';
+import { ChessStudyFileMove } from '../../lib/store/ChessStudyFileMove';
 import {
 	displayRelativeMoveInHistory,
 	getMoveById,
@@ -104,7 +105,8 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 
 			if (indexLocation) {
 				// The current move belongs to a variation (not the Main Line).
-				const mainLineMove: ChessStudyMove = moves[indexLocation.mainLineMoveIndex];
+				const mainLineMove: ChessStudyFileMove =
+					moves[indexLocation.mainLineMoveIndex];
 				const variantMoves =
 					mainLineMove.variants[indexLocation.variationIndex].moves;
 

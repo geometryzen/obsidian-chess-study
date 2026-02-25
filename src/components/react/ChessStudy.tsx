@@ -27,9 +27,10 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { ChessStudyFileContent, ChessStudyMove } from '../../lib/store';
-import { chess_study_to_pgn } from '../../lib/store/chess_study_to_pgn';
+import { chess_study_to_pgn_string } from '../../lib/store/chess_study_to_pgn_string';
 import { ChessStudyDataAdapter } from '../../lib/store/ChessStudyDataAdapter';
+import { ChessStudyFileContent } from '../../lib/store/ChessStudyFileContent';
+import { ChessStudyFileMove } from '../../lib/store/ChessStudyFileMove';
 import {
 	displayRelativeMoveInHistory,
 	getCurrentMove,
@@ -57,7 +58,7 @@ interface AppProps {
 }
 
 export type GameCurrentMove = Pick<
-	ChessStudyMove,
+	ChessStudyFileMove,
 	'moveId' | 'comment' | 'shapes'
 > | null;
 
@@ -517,7 +518,7 @@ export const ChessStudy = ({
 							}}
 							onCopyPgnButtonClick={() => {
 								try {
-									const pgn_string = chess_study_to_pgn(gameState.study);
+									const pgn_string = chess_study_to_pgn_string(gameState.study);
 									// console.lg('pgn', pgn_string);
 									navigator.clipboard.writeText(pgn_string);
 									new Notice('Copied PGN to clipboard!');

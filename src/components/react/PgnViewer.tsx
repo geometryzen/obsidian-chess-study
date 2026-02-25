@@ -57,7 +57,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 						{main_move_pairs.map((pair, main_move_pairs_index) => {
 							// In general this pair correctly contains White and Black moves.
 							// However, for the first move when Black is the initial player,
-							// bMove will be empty and wMove will contain the move by the Black player
+							// black_main_move will be empty and white_main_move will contain the move by the Black player
 							const [white_main_move, black_main_move] = pair;
 							// console.lg("wMove", JSON.stringify(wMove,null,2))
 							// console.lg("bMove", JSON.stringify(bMove,null,2))

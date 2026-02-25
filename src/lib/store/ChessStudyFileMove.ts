@@ -7,7 +7,7 @@ export const CURRENT_STORAGE_VERSION = '0.0.2';
 /**
  * This interface is part of the serialization structure and should not be changed.
  */
-export interface Variation {
+export interface ChessStudyFileVariation {
 	variantId: string;
 	/**
 	 * The identifier of the Main Line move corresponding to this variation.
@@ -16,7 +16,7 @@ export interface Variation {
 	 * It would be better if thisa was called the ownerMoveId?
 	 */
 	parentMoveId: string;
-	moves: ChessStudyMove[];
+	moves: ChessStudyFileMove[];
 }
 
 /**
@@ -24,9 +24,9 @@ export interface Variation {
  * This interface is part of the serialization structure and should not be changed.
  * FIXME: Extending Move couples to chess.js
  */
-export interface ChessStudyMove /* extends Move*/ {
+export interface ChessStudyFileMove /* extends Move*/ {
 	moveId: string;
-	variants: Variation[];
+	variants: ChessStudyFileVariation[];
 	shapes: DrawShape[];
 	comment: JSONContent | null;
 	color: 'w' | 'b';
@@ -47,31 +47,4 @@ export interface ChessStudyMove /* extends Move*/ {
 	 *
 	 */
 	evaluation?: number;
-}
-
-/**
- * A version, headers, comment (top level), moves, and a rootFEN.
- * This interface defines the serialization structure and should not be changed.
- */
-export interface ChessStudyFileContent {
-	/**
-	 * The version is not being used at present.
-	 */
-	version: string;
-	/**
-	 * The headers are obtained from chess.js, which does the parsing of PGN data.
-	 */
-	headers: Record<string, string>;
-	/**
-	 * The top-level comment.
-	 */
-	comment: JSONContent | null;
-	/**
-	 * The moves that follow from the root FEN.
-	 */
-	moves: ChessStudyMove[];
-	/**
-	 * The starting position.
-	 */
-	rootFEN: string;
 }

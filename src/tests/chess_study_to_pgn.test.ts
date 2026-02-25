@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
-import { ChessStudyFileContent } from '../lib/store';
-import { chess_study_to_pgn } from '../lib/store/chess_study_to_pgn';
+import { ChessStudyFileContent } from '../lib/store/ChessStudyFileContent';
+import { chess_study_to_pgn_string } from '../lib/store/chess_study_to_pgn_string';
 
 function simple(moves: string): string {
 	return `[Event "?"]\n[Site "?"]\n[Date "????.??.??"]\n[Round "?"]\n[White "?"]\n[Black "?"]\n[Result "*"]\n\n${moves}`;
@@ -22,7 +22,7 @@ describe('fen-or-pgn module', () => {
 		chessStudy.headers['White'] = '?';
 		chessStudy.headers['Black'] = '?';
 		chessStudy.headers['Result'] = '*';
-		const pgn = chess_study_to_pgn(chessStudy);
+		const pgn = chess_study_to_pgn_string(chessStudy);
 
 		expect(pgn).toBe(simple(' *'));
 	});
