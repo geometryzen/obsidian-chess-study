@@ -158,7 +158,7 @@ describe('model_from_json', () => {
 		expect(version).toBe(json.version);
 	});
 	test('1. e4 or 1. e5', () => {
-		const main_move: ChessStudyFileMove = {
+		const e4_move: ChessStudyFileMove = {
 			after: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
 			color: 'w',
 			comment: null,
@@ -171,7 +171,7 @@ describe('model_from_json', () => {
 			to: 'e4',
 			variants: [],
 		};
-		const variation_move: ChessStudyFileMove = {
+		const d4_move: ChessStudyFileMove = {
 			after: 'rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1',
 			color: 'w',
 			comment: null,
@@ -186,15 +186,15 @@ describe('model_from_json', () => {
 		};
 		const variation: ChessStudyFileVariation = {
 			variantId: nanoid(),
-			parentMoveId: main_move.moveId,
-			moves: [variation_move],
+			parentMoveId: e4_move.moveId,
+			moves: [d4_move],
 		};
-		main_move.variants.push(variation);
+		e4_move.variants.push(variation);
 		const json: ChessStudyFileContent = {
 			version: '',
 			headers: {},
 			comment: null,
-			moves: [main_move, variation_move],
+			moves: [e4_move, d4_move],
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
@@ -205,36 +205,36 @@ describe('model_from_json', () => {
 		expect(model.root).not.toBe(null);
 
 		const root = model.root as ChessStudyNode;
-		expect(root.after).toBe(main_move.after);
-		expect(root.clock).toBe(main_move.clock);
-		expect(root.color).toBe(main_move.color);
-		expect(root.comment).toBe(main_move.comment);
-		expect(root.evaluation).toBe(main_move.evaluation);
-		expect(root.from).toBe(main_move.from);
+		expect(root.after).toBe(e4_move.after);
+		expect(root.clock).toBe(e4_move.clock);
+		expect(root.color).toBe(e4_move.color);
+		expect(root.comment).toBe(e4_move.comment);
+		expect(root.evaluation).toBe(e4_move.evaluation);
+		expect(root.from).toBe(e4_move.from);
 		// Do we need to preseve the move identifier?
-		expect(root.id).toBe(main_move.moveId);
-		expect(root.nags).toBe(main_move.nags);
-		expect(root.promotion).toBe(main_move.promotion);
-		expect(root.san).toBe(main_move.san);
-		expect(root.shapes).toBe(main_move.shapes);
-		expect(root.to).toBe(main_move.to);
+		expect(root.id).toBe(e4_move.moveId);
+		expect(root.nags).toBe(e4_move.nags);
+		expect(root.promotion).toBe(e4_move.promotion);
+		expect(root.san).toBe(e4_move.san);
+		expect(root.shapes).toBe(e4_move.shapes);
+		expect(root.to).toBe(e4_move.to);
 
 		expect(root.left).not.toBe(null);
 		expect(root.right).not.toBe(null);
 		const right = root.right as ChessStudyNode;
-		expect(right.after).toBe(variation_move.after);
-		expect(right.clock).toBe(variation_move.clock);
-		expect(right.color).toBe(variation_move.color);
-		expect(right.comment).toBe(variation_move.comment);
-		expect(right.evaluation).toBe(variation_move.evaluation);
-		expect(right.from).toBe(variation_move.from);
+		expect(right.after).toBe(d4_move.after);
+		expect(right.clock).toBe(d4_move.clock);
+		expect(right.color).toBe(d4_move.color);
+		expect(right.comment).toBe(d4_move.comment);
+		expect(right.evaluation).toBe(d4_move.evaluation);
+		expect(right.from).toBe(d4_move.from);
 		// Do we need to preseve the move identifier?
-		expect(right.id).toBe(variation_move.moveId);
-		expect(right.nags).toBe(variation_move.nags);
-		expect(right.promotion).toBe(variation_move.promotion);
-		expect(right.san).toBe(variation_move.san);
-		expect(right.shapes).toBe(variation_move.shapes);
-		expect(right.to).toBe(variation_move.to);
+		expect(right.id).toBe(d4_move.moveId);
+		expect(right.nags).toBe(d4_move.nags);
+		expect(right.promotion).toBe(d4_move.promotion);
+		expect(right.san).toBe(d4_move.san);
+		expect(right.shapes).toBe(d4_move.shapes);
+		expect(right.to).toBe(d4_move.to);
 		expect(right.left).toBe(null);
 		expect(right.right).toBe(null);
 

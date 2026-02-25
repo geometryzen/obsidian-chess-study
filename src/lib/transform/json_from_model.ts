@@ -1,5 +1,8 @@
 import { ChessStudyFileContent } from '../store/ChessStudyFileContent';
-import { ChessStudyFileMove } from '../store/ChessStudyFileMove';
+import {
+	ChessStudyFileMove,
+	ChessStudyFileVariation,
+} from '../store/ChessStudyFileMove';
 import { ChessStudyModel } from '../tree/ChessStudyModel';
 import { ChessStudyNode } from '../tree/ChessStudyNode';
 
@@ -19,10 +22,8 @@ export function json_from_model(
 
 function moves_from_node(node: ChessStudyNode | null): ChessStudyFileMove[] {
 	if (node) {
-		// These are the follwing moves.
-		const following = moves_from_node(node.left);
-		// These are the variations for this node
-		const x: ChessStudyFileMove = {
+		const following_moves = moves_from_node(node.left);
+		const move: ChessStudyFileMove = {
 			after: node.after,
 			color: node.color,
 			comment: node.comment,
@@ -33,12 +34,27 @@ function moves_from_node(node: ChessStudyNode | null): ChessStudyFileMove[] {
 			san: node.san,
 			shapes: node.shapes,
 			to: node.to,
-			variants: [],
+			variants: variations_from_node(node.right),
 			clock: node.clock,
 			evaluation: node.evaluation,
 		};
-		// moves_from_node(node.right)
-		return [x, ...following];
+		return [move, ...following_moves];
+	} else {
+		return [];
+	}
+}
+
+function variations_from_node(
+	node: ChessStudyNode | null,
+): ChessStudyFileVariation[] {
+	if (node) {
+		const following_variations = variations_from_node(node.right);
+		const variation: ChessStudyFileVariation = {
+			parentMoveId: '',
+			variantId: '',
+			moves: moves_from_node(node.left),
+		};
+		return [variation, ...following_variations];
 	} else {
 		return [];
 	}
