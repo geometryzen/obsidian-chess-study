@@ -1,6 +1,6 @@
 import { parse, ParseTree } from '@mliebelt/pgn-parser';
 import { JSONContent } from '@tiptap/react';
-import { Chess as ChessModel, Move } from 'chess.js';
+import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
 import { App, Notice } from 'obsidian';
@@ -173,7 +173,7 @@ export const ChessStudy = ({
 	 *
 	 */
 	const [initialChessModel, initialPlayer, initialMoveNumber] = useMemo(() => {
-		const chess = new ChessModel(jgnContent.rootFEN);
+		const chess = new ChessJs(jgnContent.rootFEN);
 
 		const initialPlayer: 'w' | 'b' = chess.turn();
 		const initialMoveNumber = chess.moveNumber();

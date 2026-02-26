@@ -1,4 +1,4 @@
-import { Chess as ChessModel, Move } from 'chess.js';
+import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
 import { is_index_last_in_array } from '../../lib/lang/is_index_last_in_array';
@@ -18,10 +18,10 @@ import { ensure_move_in_scope } from './ensure_move_in_owner';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
-	readonly #setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>;
+	readonly #setChessLogic: React.Dispatch<React.SetStateAction<ChessJs>>;
 	constructor(
 		chessView: ChessView | null,
-		setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>,
+		setChessLogic: React.Dispatch<React.SetStateAction<ChessJs>>,
 	) {
 		this.#chessView = chessView;
 		this.#setChessLogic = setChessLogic;
@@ -118,7 +118,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					const variantMove = chess_study_move_from_user_move(m);
 					variantMoves.push(variantMove);
 
-					const tempChess = new ChessModel(m.after);
+					const tempChess = new ChessJs(m.after);
 
 					state.currentMove = variantMove;
 

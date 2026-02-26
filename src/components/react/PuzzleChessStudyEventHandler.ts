@@ -1,4 +1,4 @@
-import { Chess as ChessModel, Move } from 'chess.js';
+import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { updateView } from '../../lib/ui-state';
 import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
@@ -8,10 +8,10 @@ import { DrawShape } from 'chessground/draw';
 
 export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
-	readonly #setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>;
+	readonly #setChessLogic: React.Dispatch<React.SetStateAction<ChessJs>>;
 	constructor(
 		chessView: ChessView | null,
-		setChessLogic: React.Dispatch<React.SetStateAction<ChessModel>>,
+		setChessLogic: React.Dispatch<React.SetStateAction<ChessJs>>,
 	) {
 		this.#chessView = chessView;
 		this.#setChessLogic = setChessLogic;
