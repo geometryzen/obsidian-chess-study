@@ -338,7 +338,7 @@ describe('model_from_json', () => {
 		expect(d4_node.left).toBe(null);
 		// The right of the d4_mode should be c4
 		// TODO
-		// expect(d4_node.right).not.toBe(null);
+		expect(d4_node.right).not.toBe(null);
 
 		expect(model.rootFEN).toBe(json.rootFEN);
 		expect(version).toBe(json.version);

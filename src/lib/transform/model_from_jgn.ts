@@ -2,6 +2,7 @@ import { JgnContent } from '../store/JgnContent';
 import { JgnMove, JgnVariation } from '../store/JgnMove';
 import { ChessStudyModel } from '../tree/ChessStudyModel';
 import { ChessStudyNode } from '../tree/ChessStudyNode';
+import { head_and_remaining } from './head_and_remaining';
 
 export function model_from_jgn(fileContent: JgnContent): {
 	model: ChessStudyModel;
@@ -17,44 +18,60 @@ export function model_from_jgn(fileContent: JgnContent): {
 	};
 }
 
-function node_from_jgn_moves(ms: JgnMove[]): ChessStudyNode | null {
-	// Make a copy because we are going to mutate
-	const moves = [...ms];
-	if (Array.isArray(moves)) {
-		// We will grow the tree from the bottom
-		let left: ChessStudyNode | null = null;
-		while (moves.length > 0) {
-			const move = moves.pop() as JgnMove;
-			let right: ChessStudyNode | null = null;
-			const variations = [...move.variants];
-			while (variations.length > 0) {
-				const variation = variations.pop() as JgnVariation;
-				// The variation identifier has been dropped.
-				// The owner or parent identifier has been dropped.
-				// These could be passed in to provide back-pointing identifiers?
-				variation.variantId;
-				variation.parentMoveId;
-				right = node_from_jgn_moves(variation.moves);
-			}
-			left = new ChessStudyNode(
-				move.after,
-				move.clock,
-				move.color,
-				move.comment,
-				move.evaluation,
-				move.from,
-				move.moveId,
-				move.nags,
-				move.promotion,
-				move.san,
-				move.shapes,
-				move.to,
-				left,
-				right,
-			);
-		}
-		return left;
+function node_from_jgn_moves(moves: JgnMove[]): ChessStudyNode | null {
+	if (moves.length > 0) {
+		const { x: move, remaining } = head_and_remaining(moves);
+		const left = node_from_jgn_moves(remaining);
+		const right: ChessStudyNode | null = node_from_jgn_variations(move.variants);
+		return new ChessStudyNode(
+			move.after,
+			move.clock,
+			move.color,
+			move.comment,
+			move.evaluation,
+			move.from,
+			move.moveId,
+			move.nags,
+			move.promotion,
+			move.san,
+			move.shapes,
+			move.to,
+			left,
+			right,
+		);
 	} else {
-		throw new Error('moves must be an array');
+		return null;
+	}
+}
+
+function node_from_jgn_variations(
+	variations: JgnVariation[],
+): ChessStudyNode | null {
+	if (variations.length > 0) {
+		const { x: variation, remaining: remaining_variations } =
+			head_and_remaining(variations);
+		const right = node_from_jgn_variations(remaining_variations);
+		const { x: move, remaining: following_moves } = head_and_remaining(
+			variation.moves,
+		);
+		const left = node_from_jgn_moves(following_moves);
+		return new ChessStudyNode(
+			move.after,
+			move.clock,
+			move.color,
+			move.comment,
+			move.evaluation,
+			move.from,
+			move.moveId,
+			move.nags,
+			move.promotion,
+			move.san,
+			move.shapes,
+			move.to,
+			left,
+			right,
+		);
+	} else {
+		return null;
 	}
 }
