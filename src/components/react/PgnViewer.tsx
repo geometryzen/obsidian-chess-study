@@ -102,7 +102,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 												<VariantContainer>
 													{white_main_move.variants.map((variant) => {
 														return (
-															<VariantMoveItemContainer key={variant.variantId}>
+															<VariantMoveItemContainer key={variant.moves[0].moveId}>
 																{chunkArray(variant.moves, 2).map((pair, wMoveVarianti) => {
 																	const [white_variation_move, black_variation_move] = pair;
 
@@ -182,7 +182,7 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 												<VariantContainer>
 													{black_main_move.variants.map((variant) => {
 														return (
-															<VariantMoveItemContainer key={variant.variantId}>
+															<VariantMoveItemContainer key={variant.moves[0].moveId}>
 																{chunkArray(variant.moves, 2).map((pair, bMoveVarianti) => {
 																	const [black_variation_move, white_variation_move] = pair;
 																	return (

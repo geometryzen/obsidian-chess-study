@@ -7,10 +7,6 @@ import { JgnMove } from './JgnMove';
  */
 export interface JgnContent {
 	/**
-	 * The version is not being used at present.
-	 */
-	version: string;
-	/**
 	 * The headers are obtained from chess.js, which does the parsing of PGN data.
 	 */
 	headers: Record<string, string>;

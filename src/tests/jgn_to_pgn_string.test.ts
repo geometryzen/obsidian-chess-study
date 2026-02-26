@@ -6,10 +6,9 @@ function simple(moves: string): string {
 	return `[Event "?"]\n[Site "?"]\n[Date "????.??.??"]\n[Round "?"]\n[White "?"]\n[Black "?"]\n[Result "*"]\n\n${moves}`;
 }
 
-describe('fen-or-pgn module', () => {
+describe('jgn_to_pgn_string', () => {
 	test('isFEN', () => {
 		const chessStudy: JgnContent = {
-			version: '',
 			headers: {},
 			comment: null,
 			moves: [],

@@ -27,7 +27,7 @@ export class JgnLoader {
 	}
 
 	async save(model: ChessStudyModel, id?: string): Promise<string> {
-		const jgn = jgn_from_model(model, '0.0.2');
+		const jgn = jgn_from_model(model);
 		return this.saveFile(jgn, id);
 	}
 
@@ -49,7 +49,7 @@ export class JgnLoader {
 		return chessStudyId;
 	}
 
-	async load(id: string): Promise<{ model: ChessStudyModel; version: string }> {
+	async load(id: string): Promise<ChessStudyModel> {
 		const jgnContent = await this.loadFile(id);
 		return model_from_jgn(jgnContent);
 	}

@@ -2,13 +2,10 @@ import { JSONContent } from '@tiptap/react';
 import { DrawShape } from 'chessground/draw';
 import { NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
 
-export const CURRENT_STORAGE_VERSION = '0.0.2';
-
 /**
  * This interface is part of the serialization structure and should not be changed.
  */
 export interface JgnVariation {
-	variantId: string;
 	/**
 	 * The identifier of the Main Line move corresponding to this variation.
 	 * This is not the prior move.

@@ -27,7 +27,6 @@ describe('compile_pgn_or_fen', () => {
 describe('compile_pgn_or_fen', () => {
 	test('should compile PGN', () => {
 		const chessStudy: JgnContent = compile_pgn_or_fen('1. e4');
-		expect(chessStudy.version).toBe('0.0.2');
 		const pgn = jgn_to_pgn_string(chessStudy);
 
 		expect(pgn).toBe(simple_pgn('1. e4 *'));
@@ -50,7 +49,6 @@ describe('compile_pgn_or_fen', () => {
 				},
 			],
 		};
-		expect(chessStudy.version).toBe('0.0.2');
 		const pgn = jgn_to_pgn_string(chessStudy);
 
 		const expected = `[Event "?"]\n[Site "?"]\n[Date "????.??.??"]\n[Round "?"]\n[White "?"]\n[Black "?"]\n[Result "*"]\n\n{This is a game commentary.}\n1. e4 *`;

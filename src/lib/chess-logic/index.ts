@@ -14,11 +14,7 @@ import { nanoid } from 'nanoid';
 import { getChessDataFormat } from '../fen-or-pgn';
 import { NAG_null, NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
 import { JgnContent } from '../store/JgnContent';
-import {
-	JgnMove,
-	CURRENT_STORAGE_VERSION,
-	JgnVariation,
-} from '../store/JgnMove';
+import { JgnMove, JgnVariation } from '../store/JgnMove';
 import { ROOT_FEN } from './ROOT_FEN';
 import { turnColor } from './turnColor';
 
@@ -116,7 +112,6 @@ function chess_to_study(
 	};
 
 	const fileContent: JgnContent = {
-		version: CURRENT_STORAGE_VERSION,
 		headers: chess.getHeaders(),
 		comment: gameComment(), // seems to return the last comment
 		moves: chess.history({ verbose: true }).map((move) => ({
@@ -368,7 +363,6 @@ function from_pgn_variation(
 	const variation: JgnVariation = {
 		parentMoveId,
 		moves: pgn_moves_to_chess_study_moves(moves, fen),
-		variantId: nanoid(),
 	};
 	return variation;
 }
@@ -459,7 +453,6 @@ export function compile_pgn(pgn: string): JgnContent {
 	// These could be returned in a different data structure.
 	game.messages;
 	const fileContent: JgnContent = {
-		version: CURRENT_STORAGE_VERSION,
 		headers: tags_to_headers(game.tags),
 		comment: game_comment_to_json_comment(game.gameComment),
 		moves: pgn_moves_to_chess_study_moves(game.moves, ROOT_FEN),

@@ -7,7 +7,7 @@ import { jgn_from_model } from '../lib/transform/jgn_from_model';
 import { ChessStudyModel } from '../lib/tree/ChessStudyModel';
 import { ChessStudyNode } from '../lib/tree/ChessStudyNode';
 
-describe('json_from_model', () => {
+describe('jgn_from_model', () => {
 	test('headers', () => {
 		const headers: Record<string, string> = {};
 		headers['Event'] = '?';
@@ -24,12 +24,11 @@ describe('json_from_model', () => {
 			null,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: JgnContent = jgn_from_model(model, '3.1.4');
+		const json: JgnContent = jgn_from_model(model);
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
 		expect(json.moves).toStrictEqual([]);
 		expect(json.rootFEN).toBe(model.rootFEN);
-		expect(json.version).toBe('3.1.4');
 	});
 	test('1. e4', () => {
 		const headers: Record<string, string> = {};
@@ -78,7 +77,7 @@ describe('json_from_model', () => {
 			root,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: JgnContent = jgn_from_model(model, '3.1.4');
+		const json: JgnContent = jgn_from_model(model);
 
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
@@ -98,7 +97,6 @@ describe('json_from_model', () => {
 		expect(move.to).toBe(to);
 		expect(move.variants).toStrictEqual([]);
 		expect(json.rootFEN).toBe(model.rootFEN);
-		expect(json.version).toBe('3.1.4');
 	});
 	test('1. e4 e5', () => {
 		const headers: Record<string, string> = {};
@@ -180,7 +178,7 @@ describe('json_from_model', () => {
 			white_node,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: JgnContent = jgn_from_model(model, '3.1.4');
+		const json: JgnContent = jgn_from_model(model);
 
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
@@ -214,9 +212,8 @@ describe('json_from_model', () => {
 		expect(m1.to).toBe(black_to);
 		expect(m1.variants).toStrictEqual([]);
 		expect(json.rootFEN).toBe(model.rootFEN);
-		expect(json.version).toBe('3.1.4');
 	});
-	test('1. e4 or 1. d4', () => {
+	test('1. e4 (1. d4) *', () => {
 		const headers: Record<string, string> = {};
 		headers['Event'] = '?';
 		headers['Site'] = '?';
@@ -239,8 +236,6 @@ describe('json_from_model', () => {
 		const d4_san = 'e5';
 		const d4_shapes: DrawShape[] = [];
 		const d4_to = 'e5';
-		const d4_left: ChessStudyNode | null = null;
-		const d4_right: ChessStudyNode | null = null;
 		const d4_node = new ChessStudyNode(
 			d4_after,
 			d4_clock,
@@ -254,8 +249,8 @@ describe('json_from_model', () => {
 			d4_san,
 			d4_shapes,
 			d4_to,
-			d4_left,
-			d4_right,
+			null,
+			null,
 		);
 
 		const e4_after = 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1';
@@ -270,8 +265,6 @@ describe('json_from_model', () => {
 		const e4_san = 'e4';
 		const e4_shapes: DrawShape[] = [];
 		const e4_to = 'e4';
-		const e4_left: ChessStudyNode | null = null;
-		const e4_right: ChessStudyNode | null = d4_node;
 		const e4_node = new ChessStudyNode(
 			e4_after,
 			e4_clock,
@@ -285,8 +278,8 @@ describe('json_from_model', () => {
 			e4_san,
 			e4_shapes,
 			e4_to,
-			e4_left,
-			e4_right,
+			null,
+			d4_node,
 		);
 
 		const model = new ChessStudyModel(
@@ -295,12 +288,12 @@ describe('json_from_model', () => {
 			e4_node,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: JgnContent = jgn_from_model(model, '3.1.4');
+		const jgn: JgnContent = jgn_from_model(model);
 
-		expect(json.comment).toBe(model.comment);
-		expect(json.headers).toBe(model.headers);
-		expect(json.moves.length).toBe(1);
-		const m0 = json.moves[0];
+		expect(jgn.comment).toBe(model.comment);
+		expect(jgn.headers).toBe(model.headers);
+		expect(jgn.moves.length).toBe(1);
+		const m0 = jgn.moves[0];
 		expect(m0.after).toBe(e4_after);
 		expect(m0.clock).toBe(e4_clock);
 		expect(m0.color).toBe(e4_color);
@@ -314,6 +307,8 @@ describe('json_from_model', () => {
 		expect(m0.shapes).toBe(e4_shapes);
 		expect(m0.to).toBe(e4_to);
 		expect(m0.variants.length).toBe(1);
+		const variation = m0.variants[0];
+		expect(variation.moves.length).toBe(1);
 		/*
 		const m1 = json.moves[1];
 		expect(m1.after).toBe(black_after);
@@ -330,7 +325,6 @@ describe('json_from_model', () => {
 		expect(m1.to).toBe(black_to);
 		expect(m1.variants).toStrictEqual([]);
 		*/
-		expect(json.rootFEN).toBe(model.rootFEN);
-		expect(json.version).toBe('3.1.4');
+		expect(jgn.rootFEN).toBe(model.rootFEN);
 	});
 });

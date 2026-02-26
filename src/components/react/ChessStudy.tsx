@@ -27,9 +27,9 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { JgnLoader } from '../../lib/store/JgnLoader';
 import { jgn_to_pgn_string } from '../../lib/store/jgn_to_pgn_string';
 import { JgnContent } from '../../lib/store/JgnContent';
+import { JgnLoader } from '../../lib/store/JgnLoader';
 import { JgnMove } from '../../lib/store/JgnMove';
 import { model_from_jgn } from '../../lib/transform/model_from_jgn';
 import { ChessStudyModel } from '../../lib/tree/ChessStudyModel';
@@ -259,7 +259,7 @@ export const ChessStudy = ({
 		/**
 		 * Placing this here to illustrate how the game state can migrate toward the tree model.
 		 */
-		model: model_from_jgn(jgnContent).model,
+		model: model_from_jgn(jgnContent),
 	};
 
 	handler.setInitialState(

@@ -1,5 +1,4 @@
 import { Move } from 'chess.js';
-import { nanoid } from 'nanoid';
 import { JgnMove } from '../../lib/store/JgnMove';
 import { find_variation_index_with_first_move } from '../../lib/ui-state/find_variation_index_with_first_move';
 import { chess_study_move_from_user_move } from './chess_study_move_from_user_move';
@@ -29,7 +28,6 @@ export function ensure_move_in_scope(m: Move, ownerMove: JgnMove): JgnMove {
 			const move = chess_study_move_from_user_move(m);
 			ownerMove.variants.push({
 				parentMoveId: ownerMove.moveId,
-				variantId: nanoid(),
 				moves: [move],
 			});
 			return move;

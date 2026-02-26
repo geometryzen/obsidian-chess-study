@@ -5,10 +5,9 @@ import { JgnMove, JgnVariation } from '../lib/store/JgnMove';
 import { model_from_jgn } from '../lib/transform/model_from_jgn';
 import { ChessStudyNode } from '../lib/tree/ChessStudyNode';
 
-describe('model_from_json', () => {
+describe('model_from_jgn', () => {
 	test('headers', () => {
 		const json: JgnContent = {
-			version: '',
 			headers: {},
 			comment: null,
 			moves: [],
@@ -22,13 +21,12 @@ describe('model_from_json', () => {
 		json.headers['Black'] = '?';
 		json.headers['Result'] = '*';
 
-		const { model, version } = model_from_jgn(json);
+		const model = model_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
 		expect(model.root).toBe(null);
 		expect(model.rootFEN).toBe(json.rootFEN);
-		expect(version).toBe(json.version);
 	});
 	test('1. e4', () => {
 		const move: JgnMove = {
@@ -45,14 +43,13 @@ describe('model_from_json', () => {
 			variants: [],
 		};
 		const json: JgnContent = {
-			version: '',
 			headers: {},
 			comment: null,
 			moves: [move],
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
-		const { model, version } = model_from_jgn(json);
+		const model = model_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -75,7 +72,6 @@ describe('model_from_json', () => {
 		expect(root.right).toBe(null);
 
 		expect(model.rootFEN).toBe(json.rootFEN);
-		expect(version).toBe(json.version);
 	});
 	test('1. e4 e5', () => {
 		const white_move: JgnMove = {
@@ -105,14 +101,13 @@ describe('model_from_json', () => {
 			variants: [],
 		};
 		const json: JgnContent = {
-			version: '',
 			headers: {},
 			comment: null,
 			moves: [white_move, black_move],
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
-		const { model, version } = model_from_jgn(json);
+		const model = model_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -152,7 +147,6 @@ describe('model_from_json', () => {
 		expect(root.right).toBe(null);
 
 		expect(model.rootFEN).toBe(json.rootFEN);
-		expect(version).toBe(json.version);
 	});
 	test('1. e4 or 1. d4', () => {
 		const e4_move: JgnMove = {
@@ -182,20 +176,18 @@ describe('model_from_json', () => {
 			variants: [],
 		};
 		const variation: JgnVariation = {
-			variantId: nanoid(),
 			parentMoveId: e4_move.moveId,
 			moves: [d4_move],
 		};
 		e4_move.variants.push(variation);
 		const json: JgnContent = {
-			version: '',
 			headers: {},
 			comment: null,
 			moves: [e4_move, d4_move],
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
-		const { model, version } = model_from_jgn(json);
+		const model = model_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -236,7 +228,6 @@ describe('model_from_json', () => {
 		expect(right.right).toBe(null);
 
 		expect(model.rootFEN).toBe(json.rootFEN);
-		expect(version).toBe(json.version);
 	});
 	test('1. e4 or 1. d4 or 1. c4', () => {
 		const e4_move: JgnMove = {
@@ -279,26 +270,23 @@ describe('model_from_json', () => {
 			variants: [],
 		};
 		const d4_variation: JgnVariation = {
-			variantId: nanoid(),
 			parentMoveId: e4_move.moveId,
 			moves: [d4_move],
 		};
 		const c4_variation: JgnVariation = {
-			variantId: nanoid(),
 			parentMoveId: e4_move.moveId,
 			moves: [c4_move],
 		};
 		e4_move.variants.push(d4_variation);
 		e4_move.variants.push(c4_variation);
 		const json: JgnContent = {
-			version: '',
 			headers: {},
 			comment: null,
 			moves: [e4_move],
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
-		const { model, version } = model_from_jgn(json);
+		const model = model_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -341,6 +329,5 @@ describe('model_from_json', () => {
 		expect(d4_node.right).not.toBe(null);
 
 		expect(model.rootFEN).toBe(json.rootFEN);
-		expect(version).toBe(json.version);
 	});
 });
