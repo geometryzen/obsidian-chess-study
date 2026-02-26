@@ -5,8 +5,8 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { ChessStudyDataAdapter } from '../../lib/store/ChessStudyDataAdapter';
-import { ChessStudyFileContent } from '../../lib/store/ChessStudyFileContent';
+import { JgnLoader } from '../../lib/store/JgnLoader';
+import { JgnContent } from '../../lib/store/JgnContent';
 import { ChessStudy } from '../react/ChessStudy';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
 
@@ -19,8 +19,8 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	source: string;
 	app: App;
 	settings: ChessStudyPluginSettings;
-	fileContent: ChessStudyFileContent;
-	dataAdapter: ChessStudyDataAdapter;
+	readonly #jgnContent: JgnContent;
+	readonly #jgnLoader: JgnLoader;
 
 	/**
 	 * The constructor is called from the Obsidian Plugin onload method.
@@ -37,15 +37,15 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 		source: string,
 		app: App,
 		settings: ChessStudyPluginSettings,
-		fileContent: ChessStudyFileContent,
-		dataAdapter: ChessStudyDataAdapter,
+		fileContent: JgnContent,
+		dataAdapter: JgnLoader,
 	) {
 		super(containerEL);
 		this.source = source;
 		this.app = app;
 		this.settings = settings;
-		this.fileContent = fileContent;
-		this.dataAdapter = dataAdapter;
+		this.#jgnContent = fileContent;
+		this.#jgnLoader = dataAdapter;
 	}
 
 	/**
@@ -68,8 +68,8 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 					pluginSettings={this.settings}
 					initialPos={config.initialPosition}
 					config={config}
-					fileContent={this.fileContent}
-					dataAdapter={this.dataAdapter}
+					jgnContent={this.#jgnContent}
+					jgnLoader={this.#jgnLoader}
 				/>
 			</React.StrictMode>,
 		);

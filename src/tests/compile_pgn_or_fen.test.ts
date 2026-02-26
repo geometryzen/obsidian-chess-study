@@ -1,8 +1,8 @@
 import { describe, expect, test } from '@jest/globals';
 import { compile_pgn_or_fen } from '../lib/chess-logic';
 import { isFEN } from '../lib/fen-or-pgn';
-import { ChessStudyFileContent } from '../lib/store/ChessStudyFileContent';
-import { chess_study_to_pgn_string } from '../lib/store/chess_study_to_pgn_string';
+import { JgnContent } from '../lib/store/JgnContent';
+import { jgn_to_pgn_string } from '../lib/store/jgn_to_pgn_string';
 
 function simple_fen(fen: string, moves: string): string {
 	// TODO: I don't think we need two New Lins
@@ -17,8 +17,8 @@ describe('compile_pgn_or_fen', () => {
 	test('should compile FEN', () => {
 		expect(isFEN('8/R3P3/2Rk1K2/N7/2P5/8/8/8 b - - 3 2')).toBe(true);
 		const fen = '8/R3P3/2Rk1K2/N7/2P5/8/8/8 b - - 3 2';
-		const chessStudy: ChessStudyFileContent = compile_pgn_or_fen(fen);
-		const pgn = chess_study_to_pgn_string(chessStudy);
+		const chessStudy: JgnContent = compile_pgn_or_fen(fen);
+		const pgn = jgn_to_pgn_string(chessStudy);
 
 		expect(pgn).toBe(simple_fen(fen, '*'));
 	});
@@ -26,16 +26,16 @@ describe('compile_pgn_or_fen', () => {
 
 describe('compile_pgn_or_fen', () => {
 	test('should compile PGN', () => {
-		const chessStudy: ChessStudyFileContent = compile_pgn_or_fen('1. e4');
+		const chessStudy: JgnContent = compile_pgn_or_fen('1. e4');
 		expect(chessStudy.version).toBe('0.0.2');
-		const pgn = chess_study_to_pgn_string(chessStudy);
+		const pgn = jgn_to_pgn_string(chessStudy);
 
 		expect(pgn).toBe(simple_pgn('1. e4 *'));
 	});
 });
 describe('compile_pgn_or_fen', () => {
 	test('should export the game comment', () => {
-		const chessStudy: ChessStudyFileContent = compile_pgn_or_fen('1. e4');
+		const chessStudy: JgnContent = compile_pgn_or_fen('1. e4');
 		chessStudy.comment = {
 			type: 'doc',
 			content: [
@@ -51,7 +51,7 @@ describe('compile_pgn_or_fen', () => {
 			],
 		};
 		expect(chessStudy.version).toBe('0.0.2');
-		const pgn = chess_study_to_pgn_string(chessStudy);
+		const pgn = jgn_to_pgn_string(chessStudy);
 
 		const expected = `[Event "?"]\n[Site "?"]\n[Date "????.??.??"]\n[Round "?"]\n[White "?"]\n[Black "?"]\n[Result "*"]\n\n{This is a game commentary.}\n1. e4 *`;
 

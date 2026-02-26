@@ -10,8 +10,8 @@ import 'chessground/assets/chessground.brown.css';
 import 'chessground/assets/chessground.cburnett.css';
 import { compile_pgn_or_fen } from './lib/chess-logic';
 import { parse_user_config } from './lib/obsidian/parse_user_config';
-import { ChessStudyFileContent } from './lib/store/ChessStudyFileContent';
-import { ChessStudyDataAdapter } from './lib/store/ChessStudyDataAdapter';
+import { JgnContent } from './lib/store/JgnContent';
+import { JgnLoader } from './lib/store/JgnLoader';
 import './main.css';
 import { ChessStudyPluginSettings } from './components/obsidian/ChessStudyPluginSettings';
 import { DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS } from './components/obsidian/DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS';
@@ -43,7 +43,7 @@ export const INITIAL_POSITION_FIRST: InitialPosition = 'first';
 
 export default class ChessStudyPlugin extends Plugin {
 	settings: ChessStudyPluginSettings;
-	dataAdapter: ChessStudyDataAdapter;
+	#dataAdapter: JgnLoader;
 	readonly #studiesPath = normalizePath(
 		`${this.app.vault.configDir}/plugins/${this.manifest.id}/studies/`,
 	);
@@ -56,12 +56,9 @@ export default class ChessStudyPlugin extends Plugin {
 		await this.loadSettings();
 
 		// Register Data Adapter
-		this.dataAdapter = new ChessStudyDataAdapter(
-			this.app.vault.adapter,
-			this.#studiesPath,
-		);
+		this.#dataAdapter = new JgnLoader(this.app.vault.adapter, this.#studiesPath);
 
-		await this.dataAdapter.createStudiesFolderIfNotExists();
+		await this.#dataAdapter.createStudiesFolderIfNotExists();
 
 		// Add settings tab
 		this.addSettingTab(new ChessStudyPluginSettingsTab(this.app, this));
@@ -88,13 +85,11 @@ export default class ChessStudyPlugin extends Plugin {
 						const chessStringOrStartPos =
 							chessStringTrimmed.length > 0 ? chessStringTrimmed : ROOT_FEN;
 
-						const fileContent: ChessStudyFileContent = compile_pgn_or_fen(
-							chessStringOrStartPos,
-						);
+						const fileContent: JgnContent = compile_pgn_or_fen(chessStringOrStartPos);
 
-						this.dataAdapter.createStudiesFolderIfNotExists();
+						this.#dataAdapter.createStudiesFolderIfNotExists();
 
-						const id = await this.dataAdapter.saveFile(fileContent);
+						const id = await this.#dataAdapter.saveFile(fileContent);
 
 						// TODO: It would be nice for the boardOrientation and viewComments to be in the UI as configuration options.
 						editor.replaceRange(
@@ -126,7 +121,7 @@ export default class ChessStudyPlugin extends Plugin {
 					);
 
 				try {
-					const data = await this.dataAdapter.loadFile(chessStudyId);
+					const data = await this.#dataAdapter.loadFile(chessStudyId);
 
 					ctx.addChild(
 						new ChessStudyMarkdownRenderChild(
@@ -135,7 +130,7 @@ export default class ChessStudyPlugin extends Plugin {
 							this.app,
 							this.settings,
 							data,
-							this.dataAdapter,
+							this.#dataAdapter,
 						),
 					);
 				} catch (e) {

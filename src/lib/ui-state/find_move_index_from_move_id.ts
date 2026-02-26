@@ -1,4 +1,4 @@
-import { ChessStudyFileMove } from '../store/ChessStudyFileMove';
+import { JgnMove } from '../store/JgnMove';
 import { MoveIndex } from './MoveIndex';
 
 /**
@@ -8,7 +8,7 @@ import { MoveIndex } from './MoveIndex';
  * @returns An index which can be used to retrieve the move.
  */
 export function find_move_index_from_move_id(
-	moves: ChessStudyFileMove[],
+	moves: JgnMove[],
 	moveId: string,
 ): MoveIndex {
 	for (const [iMainLine, move] of moves.entries()) {

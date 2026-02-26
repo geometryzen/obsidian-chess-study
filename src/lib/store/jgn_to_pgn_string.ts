@@ -5,8 +5,8 @@ import {
 	nags_to_dollars,
 	NumericAnnotationGlyph,
 } from '../NumericAnnotationGlyphs';
-import { ChessStudyFileContent } from './ChessStudyFileContent';
-import { ChessStudyFileMove } from './ChessStudyFileMove';
+import { JgnContent } from './JgnContent';
+import { JgnMove } from './JgnMove';
 
 /**
  * The keys of the Seven Tags Roster in the canonical ordering.
@@ -38,7 +38,7 @@ function move_san_and_nags_to_pgn_string(
 
 const seven_tag_defaults = ['?', '?', '????.??.??', '?', '?', '?', '*'];
 
-function commands_from_move(move: ChessStudyFileMove): [string, string][] {
+function commands_from_move(move: JgnMove): [string, string][] {
 	const commands: [string, string][] = [];
 	if (typeof move.evaluation === 'number') {
 		commands.push(['eval', move.evaluation.toString()]);
@@ -58,7 +58,7 @@ function comment_from_commands(commands: [string, string][]): string {
 	return `{ ${blocks} }`;
 }
 
-function append_comments(base: string, move: ChessStudyFileMove): string {
+function append_comments(base: string, move: JgnMove): string {
 	if (move.comment) {
 		try {
 			const text = generateText(move.comment, [StarterKit]);
@@ -73,7 +73,7 @@ function append_comments(base: string, move: ChessStudyFileMove): string {
 	}
 }
 
-function append_commands(base: string, move: ChessStudyFileMove): string {
+function append_commands(base: string, move: JgnMove): string {
 	const commands = commands_from_move(move);
 	if (commands.length > 0) {
 		return `${base} ${comment_from_commands(commands)}`;
@@ -85,9 +85,7 @@ function append_commands(base: string, move: ChessStudyFileMove): string {
 /**
  * Converts the proprietary chess-study data to a PGN string in canonical format.
  */
-export function chess_study_to_pgn_string(
-	study: ChessStudyFileContent,
-): string {
+export function jgn_to_pgn_string(study: JgnContent): string {
 	// console.lg(JSON.stringify(study, null, 2));
 	const root = new Chess(study.rootFEN);
 	const result = study.headers ? study.headers['Result'] : '*';

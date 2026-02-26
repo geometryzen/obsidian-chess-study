@@ -1,16 +1,13 @@
 import { describe, expect, test } from '@jest/globals';
 import { nanoid } from 'nanoid';
-import { ChessStudyFileContent } from '../lib/store/ChessStudyFileContent';
-import {
-	ChessStudyFileMove,
-	ChessStudyFileVariation,
-} from '../lib/store/ChessStudyFileMove';
-import { model_from_json } from '../lib/transform/model_from_json';
+import { JgnContent } from '../lib/store/JgnContent';
+import { JgnMove, JgnVariation } from '../lib/store/JgnMove';
+import { model_from_jgn } from '../lib/transform/model_from_jgn';
 import { ChessStudyNode } from '../lib/tree/ChessStudyNode';
 
 describe('model_from_json', () => {
 	test('headers', () => {
-		const json: ChessStudyFileContent = {
+		const json: JgnContent = {
 			version: '',
 			headers: {},
 			comment: null,
@@ -25,7 +22,7 @@ describe('model_from_json', () => {
 		json.headers['Black'] = '?';
 		json.headers['Result'] = '*';
 
-		const { model, version } = model_from_json(json);
+		const { model, version } = model_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -34,7 +31,7 @@ describe('model_from_json', () => {
 		expect(version).toBe(json.version);
 	});
 	test('1. e4', () => {
-		const move: ChessStudyFileMove = {
+		const move: JgnMove = {
 			after: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
 			color: 'w',
 			comment: null,
@@ -47,7 +44,7 @@ describe('model_from_json', () => {
 			to: 'e4',
 			variants: [],
 		};
-		const json: ChessStudyFileContent = {
+		const json: JgnContent = {
 			version: '',
 			headers: {},
 			comment: null,
@@ -55,7 +52,7 @@ describe('model_from_json', () => {
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
-		const { model, version } = model_from_json(json);
+		const { model, version } = model_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -81,7 +78,7 @@ describe('model_from_json', () => {
 		expect(version).toBe(json.version);
 	});
 	test('1. e4 e5', () => {
-		const white_move: ChessStudyFileMove = {
+		const white_move: JgnMove = {
 			after: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
 			color: 'w',
 			comment: null,
@@ -94,7 +91,7 @@ describe('model_from_json', () => {
 			to: 'e4',
 			variants: [],
 		};
-		const black_move: ChessStudyFileMove = {
+		const black_move: JgnMove = {
 			after: 'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',
 			color: 'b',
 			comment: null,
@@ -107,7 +104,7 @@ describe('model_from_json', () => {
 			to: 'e5',
 			variants: [],
 		};
-		const json: ChessStudyFileContent = {
+		const json: JgnContent = {
 			version: '',
 			headers: {},
 			comment: null,
@@ -115,7 +112,7 @@ describe('model_from_json', () => {
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
-		const { model, version } = model_from_json(json);
+		const { model, version } = model_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -157,8 +154,8 @@ describe('model_from_json', () => {
 		expect(model.rootFEN).toBe(json.rootFEN);
 		expect(version).toBe(json.version);
 	});
-	test('1. e4 or 1. e5', () => {
-		const e4_move: ChessStudyFileMove = {
+	test('1. e4 or 1. d4', () => {
+		const e4_move: JgnMove = {
 			after: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
 			color: 'w',
 			comment: null,
@@ -171,7 +168,7 @@ describe('model_from_json', () => {
 			to: 'e4',
 			variants: [],
 		};
-		const d4_move: ChessStudyFileMove = {
+		const d4_move: JgnMove = {
 			after: 'rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1',
 			color: 'w',
 			comment: null,
@@ -184,13 +181,13 @@ describe('model_from_json', () => {
 			to: 'd4',
 			variants: [],
 		};
-		const variation: ChessStudyFileVariation = {
+		const variation: JgnVariation = {
 			variantId: nanoid(),
 			parentMoveId: e4_move.moveId,
 			moves: [d4_move],
 		};
 		e4_move.variants.push(variation);
-		const json: ChessStudyFileContent = {
+		const json: JgnContent = {
 			version: '',
 			headers: {},
 			comment: null,
@@ -198,7 +195,7 @@ describe('model_from_json', () => {
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
-		const { model, version } = model_from_json(json);
+		const { model, version } = model_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -237,6 +234,111 @@ describe('model_from_json', () => {
 		expect(right.to).toBe(d4_move.to);
 		expect(right.left).toBe(null);
 		expect(right.right).toBe(null);
+
+		expect(model.rootFEN).toBe(json.rootFEN);
+		expect(version).toBe(json.version);
+	});
+	test('1. e4 or 1. d4 or 1. c4', () => {
+		const e4_move: JgnMove = {
+			after: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
+			color: 'w',
+			comment: null,
+			from: 'e2',
+			moveId: nanoid(),
+			nags: [],
+			promotion: 'q',
+			san: 'e4',
+			shapes: [],
+			to: 'e4',
+			variants: [],
+		};
+		const d4_move: JgnMove = {
+			after: 'rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1',
+			color: 'w',
+			comment: null,
+			from: 'd2',
+			moveId: nanoid(),
+			nags: [],
+			promotion: 'q',
+			san: 'd4',
+			shapes: [],
+			to: 'd4',
+			variants: [],
+		};
+		const c4_move: JgnMove = {
+			after: 'rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq - 0 1',
+			color: 'w',
+			comment: null,
+			from: 'c2',
+			moveId: nanoid(),
+			nags: [],
+			promotion: 'q',
+			san: 'c4',
+			shapes: [],
+			to: 'c4',
+			variants: [],
+		};
+		const d4_variation: JgnVariation = {
+			variantId: nanoid(),
+			parentMoveId: e4_move.moveId,
+			moves: [d4_move],
+		};
+		const c4_variation: JgnVariation = {
+			variantId: nanoid(),
+			parentMoveId: e4_move.moveId,
+			moves: [c4_move],
+		};
+		e4_move.variants.push(d4_variation);
+		e4_move.variants.push(c4_variation);
+		const json: JgnContent = {
+			version: '',
+			headers: {},
+			comment: null,
+			moves: [e4_move],
+			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+		};
+
+		const { model, version } = model_from_jgn(json);
+
+		expect(model.comment).toBe(json.comment);
+		expect(model.headers).toBe(json.headers);
+		expect(model.root).not.toBe(null);
+
+		const e4_node = model.root as ChessStudyNode;
+		expect(e4_node.after).toBe(e4_move.after);
+		expect(e4_node.clock).toBe(e4_move.clock);
+		expect(e4_node.color).toBe(e4_move.color);
+		expect(e4_node.comment).toBe(e4_move.comment);
+		expect(e4_node.evaluation).toBe(e4_move.evaluation);
+		expect(e4_node.from).toBe(e4_move.from);
+		// Do we need to preseve the move identifier?
+		expect(e4_node.id).toBe(e4_move.moveId);
+		expect(e4_node.nags).toBe(e4_move.nags);
+		expect(e4_node.promotion).toBe(e4_move.promotion);
+		expect(e4_node.san).toBe(e4_move.san);
+		expect(e4_node.shapes).toBe(e4_move.shapes);
+		expect(e4_node.to).toBe(e4_move.to);
+
+		expect(e4_node.left).toBe(null);
+		expect(e4_node.right).not.toBe(null);
+		const d4_node = e4_node.right as ChessStudyNode;
+		expect(d4_node.after).toBe(d4_move.after);
+		expect(d4_node.clock).toBe(d4_move.clock);
+		expect(d4_node.color).toBe(d4_move.color);
+		expect(d4_node.comment).toBe(d4_move.comment);
+		expect(d4_node.evaluation).toBe(d4_move.evaluation);
+		expect(d4_node.from).toBe(d4_move.from);
+		// Do we need to preseve the move identifier?
+		expect(d4_node.id).toBe(d4_move.moveId);
+		expect(d4_node.nags).toBe(d4_move.nags);
+		expect(d4_node.promotion).toBe(d4_move.promotion);
+		expect(d4_node.san).toBe(d4_move.san);
+		expect(d4_node.shapes).toBe(d4_move.shapes);
+		expect(d4_node.to).toBe(d4_move.to);
+		expect(d4_node.left).toBe(null);
+		// The right of the d4_mode should be c4
+		// TODO
+		// expect(d4_node.right).not.toBe(null);
 
 		expect(model.rootFEN).toBe(json.rootFEN);
 		expect(version).toBe(json.version);

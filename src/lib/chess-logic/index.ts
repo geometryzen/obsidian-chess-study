@@ -13,12 +13,12 @@ import { Config } from 'chessground/config';
 import { nanoid } from 'nanoid';
 import { getChessDataFormat } from '../fen-or-pgn';
 import { NAG_null, NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
-import { ChessStudyFileContent } from '../store/ChessStudyFileContent';
+import { JgnContent } from '../store/JgnContent';
 import {
-	ChessStudyFileMove,
+	JgnMove,
 	CURRENT_STORAGE_VERSION,
-	ChessStudyFileVariation,
-} from '../store/ChessStudyFileMove';
+	JgnVariation,
+} from '../store/JgnMove';
 import { ROOT_FEN } from './ROOT_FEN';
 import { turnColor } from './turnColor';
 
@@ -86,7 +86,7 @@ function chess_to_study(
 	chess: Chess,
 	format: 'FEN' | 'PGN',
 	chessStringOrStartPos: string,
-): ChessStudyFileContent {
+): JgnContent {
 	const findComment = (fen: string): JSONContent | null => {
 		const comments = chess.getComments();
 		for (let i = 0; i < comments.length; i++) {
@@ -115,7 +115,7 @@ function chess_to_study(
 		return null;
 	};
 
-	const fileContent: ChessStudyFileContent = {
+	const fileContent: JgnContent = {
 		version: CURRENT_STORAGE_VERSION,
 		headers: chess.getHeaders(),
 		comment: gameComment(), // seems to return the last comment
@@ -364,8 +364,8 @@ function from_pgn_variation(
 	moves: PgnMove[],
 	parentMoveId: string,
 	fen: string,
-): ChessStudyFileVariation {
-	const variation: ChessStudyFileVariation = {
+): JgnVariation {
+	const variation: JgnVariation = {
 		parentMoveId,
 		moves: pgn_moves_to_chess_study_moves(moves, fen),
 		variantId: nanoid(),
@@ -377,8 +377,8 @@ function from_pgn_variations(
 	movess: PgnMove[][],
 	parentMoveId: string,
 	fen: string,
-): ChessStudyFileVariation[] {
-	const variations: ChessStudyFileVariation[] = [];
+): JgnVariation[] {
+	const variations: JgnVariation[] = [];
 	for (let i = 0; i < movess.length; i++) {
 		const variation = from_pgn_variation(movess[i], parentMoveId, fen);
 		variations.push(variation);
@@ -411,10 +411,10 @@ function evaluation_from_comment_diag(
 function pgn_moves_to_chess_study_moves(
 	gms: PgnMove[],
 	fen: string,
-): ChessStudyFileMove[] {
+): JgnMove[] {
 	// We use chess.js to compute the after, from, and to properties.
 	const chess = new Chess(fen);
-	const moves: ChessStudyFileMove[] = [];
+	const moves: JgnMove[] = [];
 	for (let i = 0; i < gms.length; i++) {
 		const pgnMove = gms[i];
 		// console.lg(JSON.stringify(pgnMove, null, 2))
@@ -427,7 +427,7 @@ function pgn_moves_to_chess_study_moves(
 		pgnMove.drawOffer;
 		pgnMove.commentMove;
 		const moveId = nanoid();
-		const move: ChessStudyFileMove = {
+		const move: JgnMove = {
 			moveId,
 			variants: from_pgn_variations(pgnMove.variations, moveId, chessMove.before),
 			shapes: [],
@@ -447,18 +447,18 @@ function pgn_moves_to_chess_study_moves(
 	return moves;
 }
 
-export function compile_fen(fen: string): ChessStudyFileContent {
+export function compile_fen(fen: string): JgnContent {
 	const chess = new Chess(fen);
 	return chess_to_study(chess, 'FEN', fen);
 }
 
-export function compile_pgn(pgn: string): ChessStudyFileContent {
+export function compile_pgn(pgn: string): JgnContent {
 	const game = parse(pgn, { startRule: 'game' }) as ParseTree;
 	// console.lg(JSON.stringify(game, null, 2));
 	// The messages contain statements about the parsing.
 	// These could be returned in a different data structure.
 	game.messages;
-	const fileContent: ChessStudyFileContent = {
+	const fileContent: JgnContent = {
 		version: CURRENT_STORAGE_VERSION,
 		headers: tags_to_headers(game.tags),
 		comment: game_comment_to_json_comment(game.gameComment),
@@ -469,7 +469,7 @@ export function compile_pgn(pgn: string): ChessStudyFileContent {
 	return fileContent;
 }
 
-export function compile_pgn_or_fen(pgn_or_fen: string): ChessStudyFileContent {
+export function compile_pgn_or_fen(pgn_or_fen: string): JgnContent {
 	const format = getChessDataFormat(pgn_or_fen);
 	switch (format) {
 		case 'FEN': {

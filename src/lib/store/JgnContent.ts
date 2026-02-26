@@ -1,11 +1,11 @@
 import { JSONContent } from '@tiptap/react';
-import { ChessStudyFileMove } from './ChessStudyFileMove';
+import { JgnMove } from './JgnMove';
 
 /**
  * A version, headers, comment (top level), moves, and a rootFEN.
  * This interface defines the serialization structure and should not be changed.
  */
-export interface ChessStudyFileContent {
+export interface JgnContent {
 	/**
 	 * The version is not being used at present.
 	 */
@@ -21,7 +21,7 @@ export interface ChessStudyFileContent {
 	/**
 	 * The moves that follow from the root FEN.
 	 */
-	moves: ChessStudyFileMove[];
+	moves: JgnMove[];
 	/**
 	 * The starting position.
 	 */

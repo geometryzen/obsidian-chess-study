@@ -7,7 +7,7 @@ export const CURRENT_STORAGE_VERSION = '0.0.2';
 /**
  * This interface is part of the serialization structure and should not be changed.
  */
-export interface ChessStudyFileVariation {
+export interface JgnVariation {
 	variantId: string;
 	/**
 	 * The identifier of the Main Line move corresponding to this variation.
@@ -16,7 +16,7 @@ export interface ChessStudyFileVariation {
 	 * It would be better if thisa was called the ownerMoveId?
 	 */
 	parentMoveId: string;
-	moves: ChessStudyFileMove[];
+	moves: JgnMove[];
 }
 
 /**
@@ -24,9 +24,9 @@ export interface ChessStudyFileVariation {
  * This interface is part of the serialization structure and should not be changed.
  * FIXME: Extending Move couples to chess.js
  */
-export interface ChessStudyFileMove /* extends Move*/ {
+export interface JgnMove /* extends Move*/ {
 	moveId: string;
-	variants: ChessStudyFileVariation[];
+	variants: JgnVariation[];
 	shapes: DrawShape[];
 	comment: JSONContent | null;
 	color: 'w' | 'b';

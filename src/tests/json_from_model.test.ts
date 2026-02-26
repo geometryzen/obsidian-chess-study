@@ -2,8 +2,8 @@ import { describe, expect, test } from '@jest/globals';
 import { DrawShape } from 'chessground/draw';
 import { nanoid } from 'nanoid';
 import { NumericAnnotationGlyph } from '../lib/NumericAnnotationGlyphs';
-import { ChessStudyFileContent } from '../lib/store/ChessStudyFileContent';
-import { json_from_model } from '../lib/transform/json_from_model';
+import { JgnContent } from '../lib/store/JgnContent';
+import { jgn_from_model } from '../lib/transform/jgn_from_model';
 import { ChessStudyModel } from '../lib/tree/ChessStudyModel';
 import { ChessStudyNode } from '../lib/tree/ChessStudyNode';
 
@@ -24,7 +24,7 @@ describe('json_from_model', () => {
 			null,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: ChessStudyFileContent = json_from_model(model, '3.1.4');
+		const json: JgnContent = jgn_from_model(model, '3.1.4');
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
 		expect(json.moves).toStrictEqual([]);
@@ -78,7 +78,7 @@ describe('json_from_model', () => {
 			root,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: ChessStudyFileContent = json_from_model(model, '3.1.4');
+		const json: JgnContent = jgn_from_model(model, '3.1.4');
 
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
@@ -180,7 +180,7 @@ describe('json_from_model', () => {
 			white_node,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: ChessStudyFileContent = json_from_model(model, '3.1.4');
+		const json: JgnContent = jgn_from_model(model, '3.1.4');
 
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
@@ -295,7 +295,7 @@ describe('json_from_model', () => {
 			e4_node,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: ChessStudyFileContent = json_from_model(model, '3.1.4');
+		const json: JgnContent = jgn_from_model(model, '3.1.4');
 
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);

@@ -1,4 +1,4 @@
-import { ChessStudyFileVariation } from '../store/ChessStudyFileMove';
+import { JgnVariation } from '../store/JgnMove';
 import { is_first_move_in_variation } from './is_first_move_in_variation';
 
 /**
@@ -8,7 +8,7 @@ import { is_first_move_in_variation } from './is_first_move_in_variation';
  * @returns
  */
 export function find_variation_index_with_first_move(
-	variations: ChessStudyFileVariation[],
+	variations: JgnVariation[],
 	san: string,
 ): number {
 	for (let i = 0; i < variations.length; i++) {

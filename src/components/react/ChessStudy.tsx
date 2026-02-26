@@ -27,10 +27,12 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { chess_study_to_pgn_string } from '../../lib/store/chess_study_to_pgn_string';
-import { ChessStudyDataAdapter } from '../../lib/store/ChessStudyDataAdapter';
-import { ChessStudyFileContent } from '../../lib/store/ChessStudyFileContent';
-import { ChessStudyFileMove } from '../../lib/store/ChessStudyFileMove';
+import { JgnLoader } from '../../lib/store/JgnLoader';
+import { jgn_to_pgn_string } from '../../lib/store/jgn_to_pgn_string';
+import { JgnContent } from '../../lib/store/JgnContent';
+import { JgnMove } from '../../lib/store/JgnMove';
+import { model_from_jgn } from '../../lib/transform/model_from_jgn';
+import { ChessStudyModel } from '../../lib/tree/ChessStudyModel';
 import {
 	displayRelativeMoveInHistory,
 	getCurrentMove,
@@ -53,12 +55,12 @@ interface AppProps {
 	pluginSettings: ChessStudyPluginSettings;
 	initialPos: InitialPosition;
 	config: ChessStudyAppConfig;
-	fileContent: ChessStudyFileContent;
-	dataAdapter: ChessStudyDataAdapter;
+	jgnContent: JgnContent;
+	jgnLoader: JgnLoader;
 }
 
 export type GameCurrentMove = Pick<
-	ChessStudyFileMove,
+	JgnMove,
 	'moveId' | 'comment' | 'shapes'
 > | null;
 
@@ -80,7 +82,11 @@ export interface GameState {
 	 * This part is what goes in the file.
 	 * It is a similar to a PGN in content except
 	 */
-	study: ChessStudyFileContent;
+	study: JgnContent;
+	/**
+	 *
+	 */
+	model: ChessStudyModel;
 }
 
 export type GameEvent =
@@ -97,7 +103,7 @@ export type GameEvent =
 	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
 
-const initialMove = (
+const initial_move_from_moves = (
 	moves: GameCurrentMove[],
 	initialPosition: InitialPosition,
 ): GameCurrentMove => {
@@ -143,8 +149,8 @@ export const ChessStudy = ({
 	config,
 	// This is destructuring with a rename?
 	// The thing on the left is what's coming in, on the right is the destructured name.
-	fileContent: data,
-	dataAdapter,
+	jgnContent,
+	jgnLoader,
 }: AppProps) => {
 	// Parse Obsidian / Code Block Settings
 	const {
@@ -167,14 +173,14 @@ export const ChessStudy = ({
 	 *
 	 */
 	const [initialChessModel, initialPlayer, initialMoveNumber] = useMemo(() => {
-		const chess = new ChessModel(data.rootFEN);
+		const chess = new ChessModel(jgnContent.rootFEN);
 
 		const initialPlayer: 'w' | 'b' = chess.turn();
 		const initialMoveNumber = chess.moveNumber();
 
 		switch (config.initialPosition) {
 			case 'end': {
-				data.moves.forEach((move) => {
+				jgnContent.moves.forEach((move) => {
 					chess.move({
 						from: move.from,
 						to: move.to,
@@ -184,7 +190,7 @@ export const ChessStudy = ({
 				break;
 			}
 			case 'first': {
-				const move = data.moves[0];
+				const move = jgnContent.moves[0];
 				if (move) {
 					chess.move({
 						from: move.from,
@@ -199,10 +205,13 @@ export const ChessStudy = ({
 				break;
 			}
 			default: {
-				const desiredMove = initialMove(data.moves, config.initialPosition);
+				const desiredMove = initial_move_from_moves(
+					jgnContent.moves,
+					config.initialPosition,
+				);
 				if (desiredMove) {
-					for (let i = 0; i < data.moves.length; i++) {
-						const move = data.moves[i];
+					for (let i = 0; i < jgnContent.moves.length; i++) {
+						const move = jgnContent.moves[i];
 						chess.move({
 							from: move.from,
 							to: move.to,
@@ -217,7 +226,7 @@ export const ChessStudy = ({
 		}
 
 		return [chess, initialPlayer, initialMoveNumber];
-	}, [data.moves, data.rootFEN, config.initialPosition]);
+	}, [jgnContent.moves, jgnContent.rootFEN, config.initialPosition]);
 
 	/**
 	 * These names are quite good since we would like to use chess.js
@@ -233,7 +242,7 @@ export const ChessStudy = ({
 
 	// Because of strict rendering, the initialState is created when the chessView
 	const initialState: GameState = {
-		currentMove: initialMove(data.moves, initialPosition),
+		currentMove: initial_move_from_moves(jgnContent.moves, initialPosition),
 		/**
 		 * In most use cases the notation is visible.
 		 * However, in the case of a puzzle, the notation is the solution, and may be hidden.
@@ -243,13 +252,20 @@ export const ChessStudy = ({
 		 * This property is synchronized with the Board View (currently Chessground).
 		 */
 		isViewOnly: false,
-
-		study: data,
+		/**
+		 * The "legacy" data structure is in fact the serialization format - JSON Game Notation (proprietary) a.k.a. Jgn.
+		 */
+		study: jgnContent,
+		/**
+		 * Placing this here to illustrate how the game state can migrate toward the tree model.
+		 */
+		model: model_from_jgn(jgnContent).model,
 	};
 
 	handler.setInitialState(
 		initialState,
 		initialState.currentMove,
+		initialState.model,
 		initialState.study,
 	);
 
@@ -459,12 +475,12 @@ export const ChessStudy = ({
 
 	const onSaveButtonClick = useCallback(async () => {
 		try {
-			await dataAdapter.saveFile(gameState.study, chessStudyId);
+			await jgnLoader.saveFile(gameState.study, chessStudyId);
 			new Notice('Save successfull!');
 		} catch (e) {
 			new Notice('Something went wrong during saving:', e);
 		}
-	}, [chessStudyId, dataAdapter, gameState.study]);
+	}, [chessStudyId, jgnLoader, gameState.study]);
 
 	return (
 		<div className="chess-study">
@@ -518,7 +534,7 @@ export const ChessStudy = ({
 							}}
 							onCopyPgnButtonClick={() => {
 								try {
-									const pgn_string = chess_study_to_pgn_string(gameState.study);
+									const pgn_string = jgn_to_pgn_string(gameState.study);
 									// console.lg('pgn', pgn_string);
 									navigator.clipboard.writeText(pgn_string);
 									new Notice('Copied PGN to clipboard!');

@@ -1,14 +1,11 @@
-import {
-	ChessStudyFileMove,
-	ChessStudyFileVariation,
-} from '../store/ChessStudyFileMove';
+import { JgnMove, JgnVariation } from '../store/JgnMove';
 
 export function is_first_move_in_variation(
-	variation: ChessStudyFileVariation,
+	variation: JgnVariation,
 	san: string,
 ): boolean {
 	if (variation.moves.length > 0) {
-		const firstMove: ChessStudyFileMove = variation.moves[0];
+		const firstMove: JgnMove = variation.moves[0];
 		if (firstMove.san === san) {
 			return true;
 		} else {

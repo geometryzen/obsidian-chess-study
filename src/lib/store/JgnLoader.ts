@@ -1,7 +1,10 @@
 import { nanoid } from 'nanoid';
 import { DataAdapter, normalizePath } from 'obsidian';
-import { ChessStudyFileContent } from './ChessStudyFileContent';
 import { ROOT_FEN } from '../chess-logic/ROOT_FEN';
+import { jgn_from_model } from '../transform/jgn_from_model';
+import { model_from_jgn } from '../transform/model_from_jgn';
+import { ChessStudyModel } from '../tree/ChessStudyModel';
+import { JgnContent } from './JgnContent';
 
 interface UnwantedMoveProperties {
 	before: string | undefined;
@@ -11,7 +14,7 @@ interface UnwantedMoveProperties {
 	piece: string | undefined;
 }
 
-export class ChessStudyDataAdapter {
+export class JgnLoader {
 	/**
 	 * The adapter is an Obsidian thing.
 	 */
@@ -23,7 +26,12 @@ export class ChessStudyDataAdapter {
 		this.#studiesPath = studiesPath;
 	}
 
-	async saveFile(fileContent: ChessStudyFileContent, id?: string) {
+	async save(model: ChessStudyModel, id?: string): Promise<string> {
+		const jgn = jgn_from_model(model, '0.0.2');
+		return this.saveFile(jgn, id);
+	}
+
+	async saveFile(jgn: JgnContent, id?: string): Promise<string> {
 		const chessStudyId = id || nanoid();
 
 		console.log(
@@ -34,14 +42,19 @@ export class ChessStudyDataAdapter {
 
 		await this.#adapter.write(
 			normalizePath(`${this.#studiesPath}/${chessStudyId}.json`),
-			JSON.stringify(fileContent, null, 2),
+			JSON.stringify(jgn, null, 2),
 			{},
 		);
 
 		return chessStudyId;
 	}
 
-	async loadFile(id: string): Promise<ChessStudyFileContent> {
+	async load(id: string): Promise<{ model: ChessStudyModel; version: string }> {
+		const jgnContent = await this.loadFile(id);
+		return model_from_jgn(jgnContent);
+	}
+
+	async loadFile(id: string): Promise<JgnContent> {
 		console.log(
 			`Reading file from ${normalizePath(`${this.#studiesPath}/${id}.json`)}`,
 		);
@@ -50,7 +63,7 @@ export class ChessStudyDataAdapter {
 			normalizePath(`${this.#studiesPath}/${id}.json`),
 		);
 
-		const fileContent = JSON.parse(data) as ChessStudyFileContent;
+		const fileContent = JSON.parse(data) as JgnContent;
 
 		// Perform conversions based upon version or otherwise.
 		const moves = fileContent.moves;

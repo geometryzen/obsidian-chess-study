@@ -1,9 +1,9 @@
 import { Move } from 'chess.js';
 import { nanoid } from 'nanoid';
-import { ChessStudyFileMove } from '../../lib/store/ChessStudyFileMove';
+import { JgnMove } from '../../lib/store/JgnMove';
 
-export function chess_study_move_from_user_move(m: Move): ChessStudyFileMove {
-	const move: ChessStudyFileMove = {
+export function chess_study_move_from_user_move(m: Move): JgnMove {
+	const move: JgnMove = {
 		moveId: nanoid(),
 		variants: [],
 		shapes: [],
