@@ -2,12 +2,12 @@ import { Move } from 'chess.js';
 import { DrawShape } from 'chessground/draw';
 import { JgnContent } from '../../lib/store/JgnContent';
 import { ChessStudyModel } from '../../lib/tree/ChessStudyModel';
-import { GameCurrentMove, GameState } from './ChessStudy';
+import { GameState, MoveToken } from './ChessStudy';
 
 export interface ChessStudyEventHandler {
 	setInitialState(
 		state: Pick<GameState, 'isNotationHidden'>,
-		currentMove: GameCurrentMove,
+		currentMove: MoveToken | null,
 		model: ChessStudyModel,
 		study: JgnContent,
 	): void;

@@ -17,11 +17,10 @@ export interface JgnVariation {
 }
 
 /**
- * The design of extending Move seems questionable to me.
  * This interface is part of the serialization structure and should not be changed.
  * FIXME: Extending Move couples to chess.js
  */
-export interface JgnMove /* extends Move*/ {
+export interface JgnMove {
 	moveId: string;
 	variants: JgnVariation[];
 	shapes: DrawShape[];

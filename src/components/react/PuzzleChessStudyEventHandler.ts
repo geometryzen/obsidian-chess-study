@@ -48,8 +48,8 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 
 		const moves = state.study.moves;
 
-		if (state.currentMove) {
-			const currentMoveId = state.currentMove.moveId;
+		if (state.currentMoveToken) {
+			const currentMoveId = state.currentMoveToken.moveId;
 			const currentMoveIndex = moves.findIndex(
 				(move) => move.moveId === currentMoveId,
 			);
@@ -81,10 +81,10 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 						const replyMove = moves[moveIndex + 2];
 						if (replyMove) {
 							updateView(this.#chessView, this.#setChessLogic, replyMove.after);
-							state.currentMove = replyMove;
+							state.currentMoveToken = replyMove;
 						} else {
 							updateView(this.#chessView, this.#setChessLogic, nextMove.after);
-							state.currentMove = nextMove;
+							state.currentMoveToken = nextMove;
 							state.isNotationHidden = false;
 						}
 					} else {
@@ -116,10 +116,10 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 					const replyMove = moves[1];
 					if (replyMove) {
 						updateView(this.#chessView, this.#setChessLogic, replyMove.after);
-						state.currentMove = replyMove;
+						state.currentMoveToken = replyMove;
 					} else {
 						updateView(this.#chessView, this.#setChessLogic, firstMove.after);
-						state.currentMove = firstMove;
+						state.currentMoveToken = firstMove;
 					}
 				} else {
 					// It's not the correct move

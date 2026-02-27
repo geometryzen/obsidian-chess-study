@@ -1,7 +1,7 @@
 import { Chess } from 'chess.js';
 import { Api as ChessgroundApi } from 'chessground/api';
 import { Draft } from 'immer';
-import { GameCurrentMove, GameState } from '../../components/react/ChessStudy';
+import { GameState, MoveToken } from '../../components/react/ChessStudy';
 import { legalMoves } from '../chess-logic';
 import { turnColor } from '../chess-logic/turnColor';
 import { JgnMove } from '../store/JgnMove';
@@ -41,7 +41,7 @@ export const displayRelativeMoveInHistory = (
 	chessView: ChessgroundApi,
 	setChessLogic: React.Dispatch<React.SetStateAction<Chess>>,
 	options: { offset: 1 | -1; selectedMoveId: string | null },
-): GameCurrentMove => {
+): MoveToken | null => {
 	let moveToDisplay: Pick<
 		JgnMove,
 		'moveId' | 'comment' | 'shapes' | 'after'
@@ -50,7 +50,7 @@ export const displayRelativeMoveInHistory = (
 	const { offset, selectedMoveId } = options;
 
 	// Figure out where we are
-	const currentMove = state.currentMove;
+	const currentMove = state.currentMoveToken;
 
 	if (currentMove) {
 		const currentMoveId = currentMove.moveId;
@@ -108,11 +108,9 @@ export const updateView = (
 	setChessLogic(chess);
 };
 
-export const getCurrentMove = (
-	draft: Draft<GameState>,
-): Draft<JgnMove> | null => {
-	const currentMoveId = draft.currentMove?.moveId;
-	const moves = draft.study.moves;
+export function getCurrentMove(state: Draft<GameState>): Draft<JgnMove> | null {
+	const currentMoveId = state.currentMoveToken?.moveId;
+	const moves = state.study.moves;
 
 	if (currentMoveId) {
 		const { indexLocation: variant, moveIndex } = find_move_index_from_move_id(
@@ -129,4 +127,4 @@ export const getCurrentMove = (
 	}
 
 	return null;
-};
+}

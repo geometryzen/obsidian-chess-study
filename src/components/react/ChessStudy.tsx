@@ -30,7 +30,6 @@ import {
 import { jgn_to_pgn_string } from '../../lib/store/jgn_to_pgn_string';
 import { JgnContent } from '../../lib/store/JgnContent';
 import { JgnLoader } from '../../lib/store/JgnLoader';
-import { JgnMove } from '../../lib/store/JgnMove';
 import { model_from_jgn } from '../../lib/transform/model_from_jgn';
 import { ChessStudyModel } from '../../lib/tree/ChessStudyModel';
 import {
@@ -59,17 +58,20 @@ interface AppProps {
 	jgnLoader: JgnLoader;
 }
 
-export type GameCurrentMove = Pick<
-	JgnMove,
-	'moveId' | 'comment' | 'shapes'
-> | null;
+export interface MoveToken {
+	readonly moveId: string;
+	readonly comment: JSONContent | null;
+	readonly shapes: DrawShape[];
+}
 
 export interface GameState {
 	/**
 	 * Most importantly, we have the `moveId` property.
 	 * But there is also the `comment` and the `shapes` property.
+	 * What we are calling the currentMove is really a token.
+	 * This is why we have to dereference it in order to
 	 */
-	currentMove: GameCurrentMove;
+	currentMoveToken: MoveToken | null;
 	/**
 	 * Determines whether the game notation is visible or not.
 	 */
@@ -89,6 +91,16 @@ export interface GameState {
 	model: ChessStudyModel;
 }
 
+function comment_from_game_state(gameState: GameState): JSONContent | null {
+	return gameState.currentMoveToken
+		? gameState.currentMoveToken.comment
+			? gameState.currentMoveToken.comment
+			: null
+		: gameState.study.comment
+			? gameState.study.comment
+			: null;
+}
+
 export type GameEvent =
 	| { type: 'PLAY_MOVE'; move: Move }
 	| { type: 'REMOVE_LAST_MOVE' }
@@ -104,9 +116,9 @@ export type GameEvent =
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
 
 const initial_move_from_moves = (
-	moves: GameCurrentMove[],
+	moves: MoveToken[],
 	initialPosition: InitialPosition,
-): GameCurrentMove => {
+): MoveToken | null => {
 	switch (initialPosition) {
 		case 'begin': {
 			return null;
@@ -242,7 +254,7 @@ export const ChessStudy = ({
 
 	// Because of strict rendering, the initialState is created when the chessView
 	const initialState: GameState = {
-		currentMove: initial_move_from_moves(jgnContent.moves, initialPosition),
+		currentMoveToken: initial_move_from_moves(jgnContent.moves, initialPosition),
 		/**
 		 * In most use cases the notation is visible.
 		 * However, in the case of a puzzle, the notation is the solution, and may be hidden.
@@ -264,7 +276,7 @@ export const ChessStudy = ({
 
 	handler.setInitialState(
 		initialState,
-		initialState.currentMove,
+		initialState.currentMoveToken,
 		initialState.model,
 		initialState.study,
 	);
@@ -290,7 +302,7 @@ export const ChessStudy = ({
 
 					const moves = state.study.moves;
 
-					const currentMoveId = state.currentMove?.moveId;
+					const currentMoveId = state.currentMoveToken?.moveId;
 
 					if (currentMoveId) {
 						const { indexLocation, moveIndex } = find_move_index_from_move_id(
@@ -306,7 +318,7 @@ export const ChessStudy = ({
 							const isLastMove = moveIndex === variantMoves.length - 1;
 
 							if (isLastMove) {
-								state.currentMove = displayRelativeMoveInHistory(
+								state.currentMoveToken = displayRelativeMoveInHistory(
 									state,
 									chessView,
 									setChessLogic,
@@ -323,7 +335,7 @@ export const ChessStudy = ({
 							}
 
 							if (isLastMove) {
-								state.currentMove =
+								state.currentMoveToken =
 									variantMoves.length > 0
 										? variantMoves[variantMoves.length - 1]
 										: moves[indexLocation.mainLineMoveIndex];
@@ -332,7 +344,7 @@ export const ChessStudy = ({
 							const isLastMove = moveIndex === moves.length - 1;
 
 							if (isLastMove) {
-								state.currentMove = displayRelativeMoveInHistory(
+								state.currentMoveToken = displayRelativeMoveInHistory(
 									state,
 									chessView,
 									setChessLogic,
@@ -346,7 +358,8 @@ export const ChessStudy = ({
 							moves.pop();
 
 							if (isLastMove) {
-								state.currentMove = moves.length > 0 ? moves[moves.length - 1] : null;
+								state.currentMoveToken =
+									moves.length > 0 ? moves[moves.length - 1] : null;
 							}
 						}
 					}
@@ -364,7 +377,9 @@ export const ChessStudy = ({
 
 					if (move) {
 						move.shapes = event.shapes;
-						state.currentMove = move;
+						// Isn't this redundant? Didn't we just get the current move?
+						// Caution: The issue may be that we have changed the comment of the current move.
+						state.currentMoveToken = move;
 					}
 
 					return state;
@@ -372,11 +387,13 @@ export const ChessStudy = ({
 				case 'SYNC_COMMENT': {
 					if (!chessView || hasNoMoves) return state;
 
-					const currentMove = getCurrentMove(state);
+					const move = getCurrentMove(state);
 
-					if (currentMove) {
-						currentMove.comment = event.comment;
-						state.currentMove = currentMove;
+					if (move) {
+						move.comment = event.comment;
+						// Isn't this redundant? Didn't we just get the current move?
+						// Caution: The issue may be that we have changed the comment of the current move.
+						state.currentMoveToken = move;
 					} else {
 						state.study.comment = event.comment;
 					}
@@ -388,28 +405,28 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'ANNOTATE_MOVE': {
-					const currentMove = getCurrentMove(state);
+					const move = getCurrentMove(state);
 
-					if (currentMove) {
+					if (move) {
 						switch (event.glyph) {
 							case NAG_null: {
-								currentMove.nags = annotate_move_correct(currentMove.nags);
+								move.nags = annotate_move_correct(move.nags);
 								break;
 							}
 							case NAG_questionable_move: {
-								currentMove.nags = annotate_move_inaccurate(currentMove.nags);
+								move.nags = annotate_move_inaccurate(move.nags);
 								break;
 							}
 							case NAG_poor_move: {
-								currentMove.nags = annotate_move_mistake(currentMove.nags);
+								move.nags = annotate_move_mistake(move.nags);
 								break;
 							}
 							case NAG_very_poor_move: {
-								currentMove.nags = annotate_move_blunder(currentMove.nags);
+								move.nags = annotate_move_blunder(move.nags);
 								break;
 							}
 							default: {
-								new Notice(`${currentMove.san} ${event.glyph}`);
+								new Notice(`${move.san} ${event.glyph}`);
 							}
 						}
 					} else {
@@ -418,20 +435,20 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'EVALUATE_MOVE': {
-					const currentMove = getCurrentMove(state);
+					const move = getCurrentMove(state);
 
-					if (currentMove) {
+					if (move) {
 						switch (event.direction) {
 							case 1: {
-								currentMove.nags = increase_move_evaluation(currentMove.nags);
+								move.nags = increase_move_evaluation(move.nags);
 								break;
 							}
 							case -1: {
-								currentMove.nags = decrease_move_evaluation(currentMove.nags);
+								move.nags = decrease_move_evaluation(move.nags);
 								break;
 							}
 							default: {
-								new Notice(`${currentMove.san} ${event.direction}`);
+								new Notice(`${move.san} ${event.direction}`);
 							}
 						}
 					} else {
@@ -440,20 +457,20 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'EVALUATE_POSITION': {
-					const currentMove = getCurrentMove(state);
+					const move = getCurrentMove(state);
 
-					if (currentMove) {
+					if (move) {
 						switch (event.direction) {
 							case 1: {
-								currentMove.nags = increase_position_evaluation(currentMove.nags);
+								move.nags = increase_position_evaluation(move.nags);
 								break;
 							}
 							case -1: {
-								currentMove.nags = decrease_position_evaluation(currentMove.nags);
+								move.nags = decrease_position_evaluation(move.nags);
 								break;
 							}
 							default: {
-								new Notice(`${currentMove.san} ${event.direction}`);
+								new Notice(`${move.san} ${event.direction}`);
 							}
 						}
 					} else {
@@ -506,7 +523,7 @@ export const ChessStudy = ({
 					<div className="pgn-container">
 						<PgnViewer
 							history={gameState.study.moves}
-							currentMoveId={gameState.currentMove?.moveId ?? null}
+							currentMoveId={gameState.currentMoveToken?.moveId ?? null}
 							initialPlayer={initialPlayer}
 							initialMoveNumber={initialMoveNumber}
 							isVisible={!gameState.isNotationHidden}
@@ -591,15 +608,7 @@ export const ChessStudy = ({
 			{viewComments && (
 				<div className="CommentSection">
 					<CommentSection
-						currentComment={
-							gameState.currentMove
-								? gameState.currentMove.comment
-									? gameState.currentMove.comment
-									: null
-								: gameState.study.comment
-									? gameState.study.comment
-									: null
-						}
+						currentComment={comment_from_game_state(gameState)}
 						setComments={(comment: JSONContent) =>
 							dispatch({ type: 'SYNC_COMMENT', comment: comment })
 						}

@@ -12,7 +12,7 @@ import {
 } from '../../lib/ui-state';
 import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
 import { chess_study_move_from_user_move } from './chess_study_move_from_user_move';
-import { GameCurrentMove, GameState } from './ChessStudy';
+import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { ensure_move_in_scope } from './ensure_move_in_owner';
 
@@ -31,7 +31,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 */
 	setInitialState(
 		state: Pick<GameState, 'isNotationHidden'>,
-		currentMove: GameCurrentMove,
+		currentMove: MoveToken,
 		model: ChessStudyModel,
 		study: JgnContent,
 	): void {
@@ -49,7 +49,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	gotoNextMove(state: GameState): void {
 		if (!this.#chessView) return;
 
-		state.currentMove = displayRelativeMoveInHistory(
+		state.currentMoveToken = displayRelativeMoveInHistory(
 			state,
 			this.#chessView,
 			this.#setChessLogic,
@@ -65,7 +65,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	gotoPrevMove(state: GameState): void {
 		if (!this.#chessView) return;
 
-		state.currentMove = displayRelativeMoveInHistory(
+		state.currentMoveToken = displayRelativeMoveInHistory(
 			state,
 			this.#chessView,
 			this.#setChessLogic,
@@ -82,7 +82,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 		if (!this.#chessView) return;
 		const move = getMoveById(state.study.moves, moveId);
 		updateView(this.#chessView, this.#setChessLogic, move.after);
-		state.currentMove = move;
+		state.currentMoveToken = move;
 	}
 	/**
 	 * @override
@@ -93,15 +93,15 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	playMove(state: GameState, m: Move): void {
 		const moves = state.study.moves;
 
-		if (state.currentMove) {
-			const currentMoveId = state.currentMove.moveId;
+		if (state.currentMoveToken) {
+			const currentMoveId = state.currentMoveToken.moveId;
 
 			const { indexLocation, moveIndex } = find_move_index_from_move_id(
 				moves,
 				currentMoveId,
 			);
 
-			console.log('currentMove', JSON.stringify(state.currentMove, null, 2));
+			console.log('currentMove', JSON.stringify(state.currentMoveToken, null, 2));
 			console.log('indexLocation', indexLocation);
 			console.log('moveIndex', moveIndex);
 
@@ -120,7 +120,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 
 					const tempChess = new ChessJs(m.after);
 
-					state.currentMove = variantMove;
+					state.currentMoveToken = variantMove;
 
 					this.#chessView?.set({
 						fen: m.after,
@@ -153,10 +153,10 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					const move = chess_study_move_from_user_move(m);
 					moves.push(move);
 
-					state.currentMove = move;
+					state.currentMoveToken = move;
 				} else {
 					// The current move is not the last in the Main Line.
-					state.currentMove = ensure_move_in_scope(m, moves[moveIndex + 1]);
+					state.currentMoveToken = ensure_move_in_scope(m, moves[moveIndex + 1]);
 				}
 			}
 		} else {
@@ -168,16 +168,19 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 			if (moves.length === 0) {
 				const move = chess_study_move_from_user_move(m);
 				moves.push(move);
-				state.currentMove = move;
+				state.currentMoveToken = move;
 			} else {
 				// There are Main Line moves and yet there is no curent move.
 				// So we must be positioned before the start of the first move.
 				// This is the move to which the played move belongs.
-				state.currentMove = ensure_move_in_scope(m, moves[0]);
+				state.currentMoveToken = ensure_move_in_scope(m, moves[0]);
 			}
 		}
 	}
+	/**
+	 * @override
+	 */
 	shapes(state: GameState): DrawShape[] {
-		return state.currentMove?.shapes || [];
+		return state.currentMoveToken?.shapes || [];
 	}
 }
