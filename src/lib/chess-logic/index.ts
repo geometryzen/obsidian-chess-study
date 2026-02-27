@@ -13,8 +13,8 @@ import { Config } from 'chessground/config';
 import { nanoid } from 'nanoid';
 import { getChessDataFormat } from '../fen-or-pgn';
 import { NAG_null, NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
-import { JgnContent } from '../store/JgnContent';
-import { JgnMove, JgnVariation } from '../store/JgnMove';
+import { JgnContent } from '../jgn/JgnContent';
+import { JgnMove, JgnVariation } from '../jgn/JgnMove';
 import { ROOT_FEN } from './ROOT_FEN';
 import { turnColor } from './turnColor';
 

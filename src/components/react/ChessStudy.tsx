@@ -27,9 +27,9 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { jgn_to_pgn_string } from '../../lib/store/jgn_to_pgn_string';
-import { JgnContent } from '../../lib/store/JgnContent';
-import { JgnLoader } from '../../lib/store/JgnLoader';
+import { jgn_to_pgn_string } from '../../lib/jgn/jgn_to_pgn_string';
+import { JgnContent } from '../../lib/jgn/JgnContent';
+import { JgnLoader } from '../../lib/jgn/JgnLoader';
 import { model_from_jgn } from '../../lib/transform/model_from_jgn';
 import { ChessStudyModel } from '../../lib/tree/ChessStudyModel';
 import {

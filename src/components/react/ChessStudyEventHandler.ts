@@ -1,6 +1,6 @@
 import { Move } from 'chess.js';
 import { DrawShape } from 'chessground/draw';
-import { JgnContent } from '../../lib/store/JgnContent';
+import { JgnContent } from '../../lib/jgn/JgnContent';
 import { ChessStudyModel } from '../../lib/tree/ChessStudyModel';
 import { GameState, MoveToken } from './ChessStudy';
 

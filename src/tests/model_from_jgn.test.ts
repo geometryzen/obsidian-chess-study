@@ -1,7 +1,7 @@
 import { describe, expect, test } from '@jest/globals';
 import { nanoid } from 'nanoid';
-import { JgnContent } from '../lib/store/JgnContent';
-import { JgnMove, JgnVariation } from '../lib/store/JgnMove';
+import { JgnContent } from '../lib/jgn/JgnContent';
+import { JgnMove, JgnVariation } from '../lib/jgn/JgnMove';
 import { model_from_jgn } from '../lib/transform/model_from_jgn';
 import { ChessStudyNode } from '../lib/tree/ChessStudyNode';
 

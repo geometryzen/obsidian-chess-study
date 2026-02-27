@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 import { compile_pgn_or_fen } from '../lib/chess-logic';
-import { JgnContent } from '../lib/store/JgnContent';
+import { JgnContent } from '../lib/jgn/JgnContent';
 import { jgn_from_model } from '../lib/transform/jgn_from_model';
 import { model_from_jgn } from '../lib/transform/model_from_jgn';
 

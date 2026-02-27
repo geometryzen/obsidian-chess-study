@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
-import { JgnContent } from '../lib/store/JgnContent';
-import { jgn_to_pgn_string } from '../lib/store/jgn_to_pgn_string';
+import { JgnContent } from '../lib/jgn/JgnContent';
+import { jgn_to_pgn_string } from '../lib/jgn/jgn_to_pgn_string';
 
 function simple(moves: string): string {
 	return `[Event "?"]\n[Site "?"]\n[Date "????.??.??"]\n[Round "?"]\n[White "?"]\n[Black "?"]\n[Result "*"]\n\n${moves}`;

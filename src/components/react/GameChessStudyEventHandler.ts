@@ -2,8 +2,8 @@ import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
 import { is_index_last_in_array } from '../../lib/lang/is_index_last_in_array';
-import { JgnContent } from '../../lib/store/JgnContent';
-import { JgnMove } from '../../lib/store/JgnMove';
+import { JgnContent } from '../../lib/jgn/JgnContent';
+import { JgnMove } from '../../lib/jgn/JgnMove';
 import { ChessStudyModel } from '../../lib/tree/ChessStudyModel';
 import {
 	displayRelativeMoveInHistory,
@@ -101,10 +101,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				currentMoveId,
 			);
 
-			console.log('currentMove', JSON.stringify(state.currentMoveToken, null, 2));
-			console.log('indexLocation', indexLocation);
-			console.log('moveIndex', moveIndex);
-
 			if (indexLocation) {
 				// The current move belongs to a variation (not the Main Line).
 				const mainLineMove: JgnMove = moves[indexLocation.mainLineMoveIndex];
@@ -128,10 +124,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					});
 				} else {
 					/*
-					console.log("dropping the move", m.san, "on the floor because the current move", state.currentMove.moveId, " is in a variation")
-					console.log("variantMoves", JSON.stringify(variantMoves, null, 2))
 					const vml = find_move_index_from_move_id(variantMoves, state.currentMove.moveId)
-					console.log("vml", vml)
 					if (is_index_last_in_array(vml.moveIndex, variantMoves)) {
 						// If the current move is the last move then the played move
 						// should be added as a Main Line move.
@@ -164,7 +157,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 			// If there are no moves in the game then add it as the first move.
 			// If there are moves in the game then
 			// TODO: This is probably where we should check the moves and proceed accordingly.
-			console.log('moves.length', moves.length);
 			if (moves.length === 0) {
 				const move = chess_study_move_from_user_move(m);
 				moves.push(move);

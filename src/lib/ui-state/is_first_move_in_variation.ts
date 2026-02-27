@@ -1,4 +1,4 @@
-import { JgnMove, JgnVariation } from '../store/JgnMove';
+import { JgnMove, JgnVariation } from '../jgn/JgnMove';
 
 export function is_first_move_in_variation(
 	variation: JgnVariation,

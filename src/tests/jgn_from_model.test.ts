@@ -2,7 +2,7 @@ import { describe, expect, test } from '@jest/globals';
 import { DrawShape } from 'chessground/draw';
 import { nanoid } from 'nanoid';
 import { NumericAnnotationGlyph } from '../lib/NumericAnnotationGlyphs';
-import { JgnContent } from '../lib/store/JgnContent';
+import { JgnContent } from '../lib/jgn/JgnContent';
 import { jgn_from_model } from '../lib/transform/jgn_from_model';
 import { ChessStudyModel } from '../lib/tree/ChessStudyModel';
 import { ChessStudyNode } from '../lib/tree/ChessStudyNode';

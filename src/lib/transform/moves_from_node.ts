@@ -1,4 +1,4 @@
-import { JgnMove, JgnVariation } from '../store/JgnMove';
+import { JgnMove, JgnVariation } from '../jgn/JgnMove';
 import { ChessStudyNode } from '../tree/ChessStudyNode';
 import { move_from_node_and_variations } from './move_from_node_and_variations';
 

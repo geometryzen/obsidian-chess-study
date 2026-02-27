@@ -1,4 +1,4 @@
-import { JgnMove } from '../store/JgnMove';
+import { JgnMove } from '../jgn/JgnMove';
 import { MoveIndex } from './MoveIndex';
 
 /**

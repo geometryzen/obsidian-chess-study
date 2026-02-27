@@ -1,4 +1,4 @@
-import { JgnMove } from '../store/JgnMove';
+import { JgnMove } from '../jgn/JgnMove';
 import { ChessStudyNode } from '../tree/ChessStudyNode';
 
 export function node_from_move_and_links(

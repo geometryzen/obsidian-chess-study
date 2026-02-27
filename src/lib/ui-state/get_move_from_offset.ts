@@ -1,4 +1,4 @@
-import { JgnMove, JgnVariation } from '../store/JgnMove';
+import { JgnMove, JgnVariation } from '../jgn/JgnMove';
 import { find_move_index_from_move_id } from './find_move_index_from_move_id';
 
 export function get_move_from_offset(

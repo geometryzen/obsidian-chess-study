@@ -1,4 +1,4 @@
-import { JgnMove } from '../../lib/store/JgnMove';
+import { JgnMove } from '../../lib/jgn/JgnMove';
 import { ControlProps } from './ControlsProps';
 
 /**

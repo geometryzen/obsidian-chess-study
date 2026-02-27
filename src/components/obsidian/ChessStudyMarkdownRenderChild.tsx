@@ -5,8 +5,8 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { JgnLoader } from '../../lib/store/JgnLoader';
-import { JgnContent } from '../../lib/store/JgnContent';
+import { JgnLoader } from '../../lib/jgn/JgnLoader';
+import { JgnContent } from '../../lib/jgn/JgnContent';
 import { ChessStudy } from '../react/ChessStudy';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
 

@@ -33,12 +33,13 @@ export class JgnLoader {
 
 	async saveFile(jgn: JgnContent, id?: string): Promise<string> {
 		const chessStudyId = id || nanoid();
-
-		console.log(
+		/*
+		console.lg(
 			`Writing file to ${normalizePath(
 				`${this.#studiesPath}/${chessStudyId}.json`,
 			)}`,
 		);
+		*/
 
 		await this.#adapter.write(
 			normalizePath(`${this.#studiesPath}/${chessStudyId}.json`),
@@ -55,9 +56,11 @@ export class JgnLoader {
 	}
 
 	async loadFile(id: string): Promise<JgnContent> {
-		console.log(
+		/*
+		console.lg(
 			`Reading file from ${normalizePath(`${this.#studiesPath}/${id}.json`)}`,
 		);
+		*/
 
 		const data = await this.#adapter.read(
 			normalizePath(`${this.#studiesPath}/${id}.json`),
@@ -103,7 +106,7 @@ export class JgnLoader {
 		const folderExists = await this.#adapter.exists(this.#studiesPath);
 
 		if (!folderExists) {
-			console.log(`Creating studies folder at: ${this.#studiesPath}`);
+			// console.lg(`Creating studies folder at: ${this.#studiesPath}`);
 			this.#adapter.mkdir(this.#studiesPath);
 		}
 	}

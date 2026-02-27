@@ -1,5 +1,5 @@
-import { JgnContent } from '../store/JgnContent';
-import { JgnMove, JgnVariation } from '../store/JgnMove';
+import { JgnContent } from '../jgn/JgnContent';
+import { JgnMove, JgnVariation } from '../jgn/JgnMove';
 import { ChessStudyModel } from '../tree/ChessStudyModel';
 import { ChessStudyNode } from '../tree/ChessStudyNode';
 import { head_and_remaining } from './head_and_remaining';

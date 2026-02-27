@@ -1,4 +1,4 @@
-import { JgnContent } from '../store/JgnContent';
+import { JgnContent } from '../jgn/JgnContent';
 import { ChessStudyModel } from '../tree/ChessStudyModel';
 import { moves_from_node } from './moves_from_node';
 
