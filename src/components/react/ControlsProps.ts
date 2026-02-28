@@ -1,4 +1,4 @@
-import { ChessStudyKind } from '../../main';
+import { ChessStudyKind } from '../../lib/config/ChessStudyKind';
 
 export interface ControlProps {
 	disableCopy: boolean;

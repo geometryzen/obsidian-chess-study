@@ -1,13 +1,13 @@
 import { describe, expect, test } from '@jest/globals';
 import { nanoid } from 'nanoid';
-import { JgnContent } from '../lib/jgn/JgnContent';
+import { JgnStudy } from '../lib/jgn/JgnStudy';
 import { JgnMove, JgnVariation } from '../lib/jgn/JgnMove';
 import { model_from_jgn } from '../lib/transform/model_from_jgn';
-import { ChessStudyNode } from '../lib/tree/ChessStudyNode';
+import { NeoMove } from '../lib/tree/NeoMove';
 
 describe('model_from_jgn', () => {
 	test('headers', () => {
-		const json: JgnContent = {
+		const json: JgnStudy = {
 			headers: {},
 			comment: null,
 			moves: [],
@@ -42,7 +42,7 @@ describe('model_from_jgn', () => {
 			to: 'e4',
 			variants: [],
 		};
-		const json: JgnContent = {
+		const json: JgnStudy = {
 			headers: {},
 			comment: null,
 			moves: [move],
@@ -54,7 +54,7 @@ describe('model_from_jgn', () => {
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
 		expect(model.root).not.toBe(null);
-		const root = model.root as ChessStudyNode;
+		const root = model.root as NeoMove;
 		expect(root.after).toBe(move.after);
 		expect(root.clock).toBe(move.clock);
 		expect(root.color).toBe(move.color);
@@ -100,7 +100,7 @@ describe('model_from_jgn', () => {
 			to: 'e5',
 			variants: [],
 		};
-		const json: JgnContent = {
+		const json: JgnStudy = {
 			headers: {},
 			comment: null,
 			moves: [white_move, black_move],
@@ -113,7 +113,7 @@ describe('model_from_jgn', () => {
 		expect(model.headers).toBe(json.headers);
 		expect(model.root).not.toBe(null);
 
-		const root = model.root as ChessStudyNode;
+		const root = model.root as NeoMove;
 		expect(root.after).toBe(white_move.after);
 		expect(root.clock).toBe(white_move.clock);
 		expect(root.color).toBe(white_move.color);
@@ -129,7 +129,7 @@ describe('model_from_jgn', () => {
 		expect(root.to).toBe(white_move.to);
 
 		expect(root.left).not.toBe(null);
-		const left = root.left as ChessStudyNode;
+		const left = root.left as NeoMove;
 		expect(left.after).toBe(black_move.after);
 		expect(left.clock).toBe(black_move.clock);
 		expect(left.color).toBe(black_move.color);
@@ -180,7 +180,7 @@ describe('model_from_jgn', () => {
 			moves: [d4_move],
 		};
 		e4_move.variants.push(variation);
-		const json: JgnContent = {
+		const json: JgnStudy = {
 			headers: {},
 			comment: null,
 			moves: [e4_move, d4_move],
@@ -193,7 +193,7 @@ describe('model_from_jgn', () => {
 		expect(model.headers).toBe(json.headers);
 		expect(model.root).not.toBe(null);
 
-		const root = model.root as ChessStudyNode;
+		const root = model.root as NeoMove;
 		expect(root.after).toBe(e4_move.after);
 		expect(root.clock).toBe(e4_move.clock);
 		expect(root.color).toBe(e4_move.color);
@@ -210,7 +210,7 @@ describe('model_from_jgn', () => {
 
 		expect(root.left).not.toBe(null);
 		expect(root.right).not.toBe(null);
-		const right = root.right as ChessStudyNode;
+		const right = root.right as NeoMove;
 		expect(right.after).toBe(d4_move.after);
 		expect(right.clock).toBe(d4_move.clock);
 		expect(right.color).toBe(d4_move.color);
@@ -279,7 +279,7 @@ describe('model_from_jgn', () => {
 		};
 		e4_move.variants.push(d4_variation);
 		e4_move.variants.push(c4_variation);
-		const json: JgnContent = {
+		const json: JgnStudy = {
 			headers: {},
 			comment: null,
 			moves: [e4_move],
@@ -292,7 +292,7 @@ describe('model_from_jgn', () => {
 		expect(model.headers).toBe(json.headers);
 		expect(model.root).not.toBe(null);
 
-		const e4_node = model.root as ChessStudyNode;
+		const e4_node = model.root as NeoMove;
 		expect(e4_node.after).toBe(e4_move.after);
 		expect(e4_node.clock).toBe(e4_move.clock);
 		expect(e4_node.color).toBe(e4_move.color);
@@ -309,7 +309,7 @@ describe('model_from_jgn', () => {
 
 		expect(e4_node.left).toBe(null);
 		expect(e4_node.right).not.toBe(null);
-		const d4_node = e4_node.right as ChessStudyNode;
+		const d4_node = e4_node.right as NeoMove;
 		expect(d4_node.after).toBe(d4_move.after);
 		expect(d4_node.clock).toBe(d4_move.clock);
 		expect(d4_node.color).toBe(d4_move.color);

@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { JgnContent } from '../lib/jgn/JgnContent';
+import { JgnStudy } from '../lib/jgn/JgnStudy';
 import { jgn_to_pgn_string } from '../lib/jgn/jgn_to_pgn_string';
 
 function simple(moves: string): string {
@@ -8,7 +8,7 @@ function simple(moves: string): string {
 
 describe('jgn_to_pgn_string', () => {
 	test('isFEN', () => {
-		const chessStudy: JgnContent = {
+		const chessStudy: JgnStudy = {
 			headers: {},
 			comment: null,
 			moves: [],

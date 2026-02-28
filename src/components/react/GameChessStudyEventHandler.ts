@@ -2,9 +2,9 @@ import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
 import { is_index_last_in_array } from '../../lib/lang/is_index_last_in_array';
-import { JgnContent } from '../../lib/jgn/JgnContent';
+import { JgnStudy } from '../../lib/jgn/JgnStudy';
 import { JgnMove } from '../../lib/jgn/JgnMove';
-import { ChessStudyModel } from '../../lib/tree/ChessStudyModel';
+import { NeoStudy } from '../../lib/tree/NeoStudy';
 import {
 	displayRelativeMoveInHistory,
 	getMoveById,
@@ -32,8 +32,8 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	setInitialState(
 		state: Pick<GameState, 'isNotationHidden'>,
 		currentMove: MoveToken,
-		model: ChessStudyModel,
-		study: JgnContent,
+		model: NeoStudy,
+		study: JgnStudy,
 	): void {
 		state.isNotationHidden = false;
 		if (!this.#chessView) return;
@@ -49,7 +49,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	gotoNextMove(state: GameState): void {
 		if (!this.#chessView) return;
 
-		state.currentMoveToken = displayRelativeMoveInHistory(
+		state.currentMove = displayRelativeMoveInHistory(
 			state,
 			this.#chessView,
 			this.#setChessLogic,
@@ -65,7 +65,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	gotoPrevMove(state: GameState): void {
 		if (!this.#chessView) return;
 
-		state.currentMoveToken = displayRelativeMoveInHistory(
+		state.currentMove = displayRelativeMoveInHistory(
 			state,
 			this.#chessView,
 			this.#setChessLogic,
@@ -82,7 +82,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 		if (!this.#chessView) return;
 		const move = getMoveById(state.study.moves, moveId);
 		updateView(this.#chessView, this.#setChessLogic, move.after);
-		state.currentMoveToken = move;
+		state.currentMove = move;
 	}
 	/**
 	 * @override
@@ -93,8 +93,8 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	playMove(state: GameState, m: Move): void {
 		const moves = state.study.moves;
 
-		if (state.currentMoveToken) {
-			const currentMoveId = state.currentMoveToken.moveId;
+		if (state.currentMove) {
+			const currentMoveId = state.currentMove.moveId;
 
 			const { indexLocation, moveIndex } = find_move_index_from_move_id(
 				moves,
@@ -116,7 +116,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 
 					const tempChess = new ChessJs(m.after);
 
-					state.currentMoveToken = variantMove;
+					state.currentMove = variantMove;
 
 					this.#chessView?.set({
 						fen: m.after,
@@ -146,10 +146,10 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					const move = chess_study_move_from_user_move(m);
 					moves.push(move);
 
-					state.currentMoveToken = move;
+					state.currentMove = move;
 				} else {
 					// The current move is not the last in the Main Line.
-					state.currentMoveToken = ensure_move_in_scope(m, moves[moveIndex + 1]);
+					state.currentMove = ensure_move_in_scope(m, moves[moveIndex + 1]);
 				}
 			}
 		} else {
@@ -160,12 +160,12 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 			if (moves.length === 0) {
 				const move = chess_study_move_from_user_move(m);
 				moves.push(move);
-				state.currentMoveToken = move;
+				state.currentMove = move;
 			} else {
 				// There are Main Line moves and yet there is no curent move.
 				// So we must be positioned before the start of the first move.
 				// This is the move to which the played move belongs.
-				state.currentMoveToken = ensure_move_in_scope(m, moves[0]);
+				state.currentMove = ensure_move_in_scope(m, moves[0]);
 			}
 		}
 	}
@@ -173,6 +173,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 * @override
 	 */
 	shapes(state: GameState): DrawShape[] {
-		return state.currentMoveToken?.shapes || [];
+		return state.currentMove?.shapes || [];
 	}
 }

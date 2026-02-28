@@ -1,9 +1,9 @@
 import { JgnMove, JgnVariation } from '../jgn/JgnMove';
-import { ChessStudyNode } from '../tree/ChessStudyNode';
+import { NeoMove } from '../tree/NeoMove';
 
 export function move_from_node_and_variations(
 	node: Pick<
-		ChessStudyNode,
+		NeoMove,
 		| 'after'
 		| 'color'
 		| 'comment'

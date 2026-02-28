@@ -1,4 +1,3 @@
-import { parse, ParseTree } from '@mliebelt/pgn-parser';
 import { JSONContent } from '@tiptap/react';
 import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
@@ -8,6 +7,12 @@ import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useImmerReducer } from 'use-immer';
 import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPluginSettings';
+import { InitialPosition } from '../../lib/config/InitialPosition';
+import { initial_move_from_study_moves } from '../../lib/jgn/initial_move_from_study_moves';
+import { jgn_to_pgn_string } from '../../lib/jgn/jgn_to_pgn_string';
+import { JgnLoader } from '../../lib/jgn/JgnLoader';
+import { JgnMove } from '../../lib/jgn/JgnMove';
+import { JgnStudy } from '../../lib/jgn/JgnStudy';
 import {
 	annotate_move_blunder,
 	annotate_move_correct,
@@ -27,17 +32,15 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { jgn_to_pgn_string } from '../../lib/jgn/jgn_to_pgn_string';
-import { JgnContent } from '../../lib/jgn/JgnContent';
-import { JgnLoader } from '../../lib/jgn/JgnLoader';
 import { model_from_jgn } from '../../lib/transform/model_from_jgn';
-import { ChessStudyModel } from '../../lib/tree/ChessStudyModel';
+import { initial_node_from_model_root } from '../../lib/tree/initial_node_from_model_root';
+import { NeoMove } from '../../lib/tree/NeoMove';
+import { NeoStudy } from '../../lib/tree/NeoStudy';
 import {
 	displayRelativeMoveInHistory,
 	getCurrentMove,
 } from '../../lib/ui-state';
 import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
-import { InitialPosition } from '../../main';
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { CommentSection } from './CommentSection';
@@ -54,7 +57,7 @@ interface AppProps {
 	pluginSettings: ChessStudyPluginSettings;
 	initialPos: InitialPosition;
 	config: ChessStudyAppConfig;
-	jgnContent: JgnContent;
+	jgnStudy: JgnStudy;
 	jgnLoader: JgnLoader;
 }
 
@@ -66,12 +69,22 @@ export interface MoveToken {
 
 export interface GameState {
 	/**
-	 * Most importantly, we have the `moveId` property.
-	 * But there is also the `comment` and the `shapes` property.
-	 * What we are calling the currentMove is really a token.
-	 * This is why we have to dereference it in order to
+	 *
 	 */
-	currentMoveToken: MoveToken | null;
+	currentMove: Pick<Readonly<JgnMove>, 'comment' | 'moveId' | 'shapes'> | null;
+	/**
+	 * This part is what goes in the file.
+	 * It is a similar to a PGN in content except
+	 */
+	study: JgnStudy;
+	/**
+	 *
+	 */
+	currentNode: Pick<Readonly<NeoMove>, 'comment' | 'id' | 'shapes'> | null;
+	/**
+	 *
+	 */
+	model: NeoStudy;
 	/**
 	 * Determines whether the game notation is visible or not.
 	 */
@@ -80,21 +93,12 @@ export interface GameState {
 	 * Determines whether the Board View has mouse or pointer interaction.
 	 */
 	isViewOnly: boolean;
-	/**
-	 * This part is what goes in the file.
-	 * It is a similar to a PGN in content except
-	 */
-	study: JgnContent;
-	/**
-	 *
-	 */
-	model: ChessStudyModel;
 }
 
 function comment_from_game_state(gameState: GameState): JSONContent | null {
-	return gameState.currentMoveToken
-		? gameState.currentMoveToken.comment
-			? gameState.currentMoveToken.comment
+	return gameState.currentMove
+		? gameState.currentMove.comment
+			? gameState.currentMove.comment
 			: null
 		: gameState.study.comment
 			? gameState.study.comment
@@ -115,42 +119,6 @@ export type GameEvent =
 	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
 
-const initial_move_from_moves = (
-	moves: MoveToken[],
-	initialPosition: InitialPosition,
-): MoveToken | null => {
-	switch (initialPosition) {
-		case 'begin': {
-			return null;
-		}
-		case 'first': {
-			return moves[0] ?? null;
-		}
-		case 'end': {
-			return moves[moves.length - 1] ?? null;
-		}
-		default: {
-			// We are currently defaulting to the last move (legacy behavior)
-			const game = parse(initialPosition, { startRule: 'game' }) as ParseTree;
-			if (Array.isArray(game.moves)) {
-				const ipmoves = game.moves;
-				if (ipmoves.length === 1) {
-					const ipmove = ipmoves[0];
-					const moveNumber = ipmove.moveNumber;
-					// The PGN parsing library seems to get the color wrong.
-					const turn = initialPosition.includes('...') ? 'b' : 'w';
-					// The following needs refinement for when the first move does not start at 1.
-					const index =
-						turn === 'w' ? 2 * (moveNumber - 1) : 2 * (moveNumber - 1) + 1;
-					const move = moves[index];
-					return move;
-				}
-			}
-			return moves[moves.length - 1] ?? null;
-		}
-	}
-};
-
 /**
  * This is the top-level React component in our Markdown renderer.
  */
@@ -161,7 +129,7 @@ export const ChessStudy = ({
 	config,
 	// This is destructuring with a rename?
 	// The thing on the left is what's coming in, on the right is the destructured name.
-	jgnContent,
+	jgnStudy: jgnStudy,
 	jgnLoader,
 }: AppProps) => {
 	// Parse Obsidian / Code Block Settings
@@ -185,14 +153,14 @@ export const ChessStudy = ({
 	 *
 	 */
 	const [initialChessModel, initialPlayer, initialMoveNumber] = useMemo(() => {
-		const chess = new ChessJs(jgnContent.rootFEN);
+		const chess = new ChessJs(jgnStudy.rootFEN);
 
 		const initialPlayer: 'w' | 'b' = chess.turn();
 		const initialMoveNumber = chess.moveNumber();
 
 		switch (config.initialPosition) {
 			case 'end': {
-				jgnContent.moves.forEach((move) => {
+				jgnStudy.moves.forEach((move) => {
 					chess.move({
 						from: move.from,
 						to: move.to,
@@ -202,7 +170,7 @@ export const ChessStudy = ({
 				break;
 			}
 			case 'first': {
-				const move = jgnContent.moves[0];
+				const move = jgnStudy.moves[0];
 				if (move) {
 					chess.move({
 						from: move.from,
@@ -217,13 +185,13 @@ export const ChessStudy = ({
 				break;
 			}
 			default: {
-				const desiredMove = initial_move_from_moves(
-					jgnContent.moves,
+				const desiredMove = initial_move_from_study_moves(
+					jgnStudy.moves,
 					config.initialPosition,
 				);
 				if (desiredMove) {
-					for (let i = 0; i < jgnContent.moves.length; i++) {
-						const move = jgnContent.moves[i];
+					for (let i = 0; i < jgnStudy.moves.length; i++) {
+						const move = jgnStudy.moves[i];
 						chess.move({
 							from: move.from,
 							to: move.to,
@@ -234,11 +202,12 @@ export const ChessStudy = ({
 						}
 					}
 				}
+				// const desiredNode = initial_node_from_model_root(model, config.initialPosition)
 			}
 		}
 
 		return [chess, initialPlayer, initialMoveNumber];
-	}, [jgnContent.moves, jgnContent.rootFEN, config.initialPosition]);
+	}, [jgnStudy.moves, jgnStudy.rootFEN, config.initialPosition]);
 
 	/**
 	 * These names are quite good since we would like to use chess.js
@@ -254,7 +223,25 @@ export const ChessStudy = ({
 
 	// Because of strict rendering, the initialState is created when the chessView
 	const initialState: GameState = {
-		currentMoveToken: initial_move_from_moves(jgnContent.moves, initialPosition),
+		/**
+		 *
+		 */
+		currentMove: initial_move_from_study_moves(jgnStudy.moves, initialPosition),
+		/**
+		 * The "legacy" data structure is in fact the serialization format - JSON Game Notation (proprietary) a.k.a. Jgn.
+		 */
+		study: jgnStudy,
+		/**
+		 *
+		 */
+		currentNode: initial_node_from_model_root(
+			model_from_jgn(jgnStudy).root,
+			initialPosition,
+		),
+		/**
+		 * Placing this here to illustrate how the game state can migrate toward the tree model.
+		 */
+		model: model_from_jgn(jgnStudy),
 		/**
 		 * In most use cases the notation is visible.
 		 * However, in the case of a puzzle, the notation is the solution, and may be hidden.
@@ -264,19 +251,11 @@ export const ChessStudy = ({
 		 * This property is synchronized with the Board View (currently Chessground).
 		 */
 		isViewOnly: false,
-		/**
-		 * The "legacy" data structure is in fact the serialization format - JSON Game Notation (proprietary) a.k.a. Jgn.
-		 */
-		study: jgnContent,
-		/**
-		 * Placing this here to illustrate how the game state can migrate toward the tree model.
-		 */
-		model: model_from_jgn(jgnContent),
 	};
 
 	handler.setInitialState(
 		initialState,
-		initialState.currentMoveToken,
+		initialState.currentMove,
 		initialState.model,
 		initialState.study,
 	);
@@ -302,7 +281,7 @@ export const ChessStudy = ({
 
 					const moves = state.study.moves;
 
-					const currentMoveId = state.currentMoveToken?.moveId;
+					const currentMoveId = state.currentMove?.moveId;
 
 					if (currentMoveId) {
 						const { indexLocation, moveIndex } = find_move_index_from_move_id(
@@ -318,7 +297,7 @@ export const ChessStudy = ({
 							const isLastMove = moveIndex === variantMoves.length - 1;
 
 							if (isLastMove) {
-								state.currentMoveToken = displayRelativeMoveInHistory(
+								state.currentMove = displayRelativeMoveInHistory(
 									state,
 									chessView,
 									setChessLogic,
@@ -335,7 +314,7 @@ export const ChessStudy = ({
 							}
 
 							if (isLastMove) {
-								state.currentMoveToken =
+								state.currentMove =
 									variantMoves.length > 0
 										? variantMoves[variantMoves.length - 1]
 										: moves[indexLocation.mainLineMoveIndex];
@@ -344,7 +323,7 @@ export const ChessStudy = ({
 							const isLastMove = moveIndex === moves.length - 1;
 
 							if (isLastMove) {
-								state.currentMoveToken = displayRelativeMoveInHistory(
+								state.currentMove = displayRelativeMoveInHistory(
 									state,
 									chessView,
 									setChessLogic,
@@ -358,8 +337,7 @@ export const ChessStudy = ({
 							moves.pop();
 
 							if (isLastMove) {
-								state.currentMoveToken =
-									moves.length > 0 ? moves[moves.length - 1] : null;
+								state.currentMove = moves.length > 0 ? moves[moves.length - 1] : null;
 							}
 						}
 					}
@@ -379,7 +357,7 @@ export const ChessStudy = ({
 						move.shapes = event.shapes;
 						// Isn't this redundant? Didn't we just get the current move?
 						// Caution: The issue may be that we have changed the comment of the current move.
-						state.currentMoveToken = move;
+						state.currentMove = move;
 					}
 
 					return state;
@@ -393,7 +371,7 @@ export const ChessStudy = ({
 						move.comment = event.comment;
 						// Isn't this redundant? Didn't we just get the current move?
 						// Caution: The issue may be that we have changed the comment of the current move.
-						state.currentMoveToken = move;
+						state.currentMove = move;
 					} else {
 						state.study.comment = event.comment;
 					}
@@ -523,7 +501,7 @@ export const ChessStudy = ({
 					<div className="pgn-container">
 						<PgnViewer
 							history={gameState.study.moves}
-							currentMoveId={gameState.currentMoveToken?.moveId ?? null}
+							currentMoveId={gameState.currentMove?.moveId ?? null}
 							initialPlayer={initialPlayer}
 							initialMoveNumber={initialMoveNumber}
 							isVisible={!gameState.isNotationHidden}

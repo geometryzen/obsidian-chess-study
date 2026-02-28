@@ -6,7 +6,7 @@ import {
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
 import { JgnLoader } from '../../lib/jgn/JgnLoader';
-import { JgnContent } from '../../lib/jgn/JgnContent';
+import { JgnStudy } from '../../lib/jgn/JgnStudy';
 import { ChessStudy } from '../react/ChessStudy';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
 
@@ -19,8 +19,8 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	source: string;
 	app: App;
 	settings: ChessStudyPluginSettings;
-	readonly #jgnContent: JgnContent;
-	readonly #jgnLoader: JgnLoader;
+	readonly #jgnStudy: JgnStudy;
+	readonly #studyLoader: JgnLoader;
 
 	/**
 	 * The constructor is called from the Obsidian Plugin onload method.
@@ -29,23 +29,23 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	 * @param source
 	 * @param app
 	 * @param settings
-	 * @param fileContent
-	 * @param dataAdapter
+	 * @param jgnStudy
+	 * @param studyLoader
 	 */
 	constructor(
 		containerEL: HTMLElement,
 		source: string,
 		app: App,
 		settings: ChessStudyPluginSettings,
-		fileContent: JgnContent,
-		dataAdapter: JgnLoader,
+		jgnStudy: JgnStudy,
+		studyLoader: JgnLoader,
 	) {
 		super(containerEL);
 		this.source = source;
 		this.app = app;
 		this.settings = settings;
-		this.#jgnContent = fileContent;
-		this.#jgnLoader = dataAdapter;
+		this.#jgnStudy = jgnStudy;
+		this.#studyLoader = studyLoader;
 	}
 
 	/**
@@ -68,8 +68,8 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 					pluginSettings={this.settings}
 					initialPos={config.initialPosition}
 					config={config}
-					jgnContent={this.#jgnContent}
-					jgnLoader={this.#jgnLoader}
+					jgnStudy={this.#jgnStudy}
+					jgnLoader={this.#studyLoader}
 				/>
 			</React.StrictMode>,
 		);

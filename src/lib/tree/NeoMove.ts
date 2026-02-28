@@ -2,7 +2,7 @@ import { JSONContent } from '@tiptap/react';
 import { DrawShape } from 'chessground/draw';
 import { NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
 
-export class ChessStudyNode {
+export class NeoMove {
 	readonly after: string;
 	readonly clock: string | undefined;
 	readonly color: 'w' | 'b';
@@ -18,11 +18,11 @@ export class ChessStudyNode {
 	/**
 	 * The left leg of the tree is the next move.
 	 */
-	readonly left: ChessStudyNode | null;
+	readonly left: NeoMove | null;
 	/**
 	 * The right leg of the tree is the next variation.
 	 */
-	readonly right: ChessStudyNode | null;
+	readonly right: NeoMove | null;
 	constructor(
 		after: string,
 		clock: string | undefined,
@@ -36,8 +36,8 @@ export class ChessStudyNode {
 		san: string,
 		shapes: DrawShape[],
 		to: string,
-		left: ChessStudyNode | null,
-		right: ChessStudyNode | null,
+		left: NeoMove | null,
+		right: NeoMove | null,
 	) {
 		this.after = after;
 		this.clock = clock;

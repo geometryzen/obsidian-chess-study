@@ -1,5 +1,5 @@
 import { JgnMove } from '../jgn/JgnMove';
-import { ChessStudyNode } from '../tree/ChessStudyNode';
+import { NeoMove } from '../tree/NeoMove';
 
 export function node_from_move_and_links(
 	move: Pick<
@@ -17,10 +17,10 @@ export function node_from_move_and_links(
 		| 'shapes'
 		| 'to'
 	>,
-	left: ChessStudyNode | null,
-	right: ChessStudyNode | null,
-): ChessStudyNode {
-	return new ChessStudyNode(
+	left: NeoMove | null,
+	right: NeoMove | null,
+): NeoMove {
+	return new NeoMove(
 		move.after,
 		move.clock,
 		move.color,

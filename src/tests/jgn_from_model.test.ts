@@ -2,10 +2,10 @@ import { describe, expect, test } from '@jest/globals';
 import { DrawShape } from 'chessground/draw';
 import { nanoid } from 'nanoid';
 import { NumericAnnotationGlyph } from '../lib/NumericAnnotationGlyphs';
-import { JgnContent } from '../lib/jgn/JgnContent';
+import { JgnStudy } from '../lib/jgn/JgnStudy';
 import { jgn_from_model } from '../lib/transform/jgn_from_model';
-import { ChessStudyModel } from '../lib/tree/ChessStudyModel';
-import { ChessStudyNode } from '../lib/tree/ChessStudyNode';
+import { NeoStudy } from '../lib/tree/NeoStudy';
+import { NeoMove } from '../lib/tree/NeoMove';
 
 describe('jgn_from_model', () => {
 	test('headers', () => {
@@ -18,13 +18,13 @@ describe('jgn_from_model', () => {
 		headers['Black'] = '?';
 		headers['Result'] = '*';
 
-		const model = new ChessStudyModel(
+		const model = new NeoStudy(
 			null,
 			headers,
 			null,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: JgnContent = jgn_from_model(model);
+		const json: JgnStudy = jgn_from_model(model);
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
 		expect(json.moves).toStrictEqual([]);
@@ -52,9 +52,9 @@ describe('jgn_from_model', () => {
 		const san = 'e4';
 		const shapes: DrawShape[] = [];
 		const to = 'e4';
-		const left: ChessStudyNode | null = null;
-		const right: ChessStudyNode | null = null;
-		const root = new ChessStudyNode(
+		const left: NeoMove | null = null;
+		const right: NeoMove | null = null;
+		const root = new NeoMove(
 			after,
 			clock,
 			color,
@@ -71,13 +71,13 @@ describe('jgn_from_model', () => {
 			right,
 		);
 
-		const model = new ChessStudyModel(
+		const model = new NeoStudy(
 			null,
 			headers,
 			root,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: JgnContent = jgn_from_model(model);
+		const json: JgnStudy = jgn_from_model(model);
 
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
@@ -121,9 +121,9 @@ describe('jgn_from_model', () => {
 		const black_san = 'e5';
 		const black_shapes: DrawShape[] = [];
 		const black_to = 'e5';
-		const black_left: ChessStudyNode | null = null;
-		const black_right: ChessStudyNode | null = null;
-		const black_node = new ChessStudyNode(
+		const black_left: NeoMove | null = null;
+		const black_right: NeoMove | null = null;
+		const black_node = new NeoMove(
 			black_after,
 			black_clock,
 			black_color,
@@ -153,9 +153,9 @@ describe('jgn_from_model', () => {
 		const white_san = 'e4';
 		const white_shapes: DrawShape[] = [];
 		const white_to = 'e4';
-		const white_left: ChessStudyNode | null = black_node;
-		const white_right: ChessStudyNode | null = null;
-		const white_node = new ChessStudyNode(
+		const white_left: NeoMove | null = black_node;
+		const white_right: NeoMove | null = null;
+		const white_node = new NeoMove(
 			white_after,
 			white_clock,
 			white_color,
@@ -172,13 +172,13 @@ describe('jgn_from_model', () => {
 			white_right,
 		);
 
-		const model = new ChessStudyModel(
+		const model = new NeoStudy(
 			null,
 			headers,
 			white_node,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: JgnContent = jgn_from_model(model);
+		const json: JgnStudy = jgn_from_model(model);
 
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
@@ -236,7 +236,7 @@ describe('jgn_from_model', () => {
 		const d4_san = 'e5';
 		const d4_shapes: DrawShape[] = [];
 		const d4_to = 'e5';
-		const d4_node = new ChessStudyNode(
+		const d4_node = new NeoMove(
 			d4_after,
 			d4_clock,
 			d4_color,
@@ -265,7 +265,7 @@ describe('jgn_from_model', () => {
 		const e4_san = 'e4';
 		const e4_shapes: DrawShape[] = [];
 		const e4_to = 'e4';
-		const e4_node = new ChessStudyNode(
+		const e4_node = new NeoMove(
 			e4_after,
 			e4_clock,
 			e4_color,
@@ -282,13 +282,13 @@ describe('jgn_from_model', () => {
 			d4_node,
 		);
 
-		const model = new ChessStudyModel(
+		const model = new NeoStudy(
 			null,
 			headers,
 			e4_node,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const jgn: JgnContent = jgn_from_model(model);
+		const jgn: JgnStudy = jgn_from_model(model);
 
 		expect(jgn.comment).toBe(model.comment);
 		expect(jgn.headers).toBe(model.headers);

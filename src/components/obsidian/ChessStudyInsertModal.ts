@@ -8,20 +8,21 @@ import {
 	ToggleComponent,
 } from 'obsidian';
 import {
-	BoardOrientation,
 	CHESS_STUDY_KIND_GAME,
 	CHESS_STUDY_KIND_LEGACY,
 	CHESS_STUDY_KIND_POSITION,
 	CHESS_STUDY_KIND_PUZZLE,
 	CHESS_STUDY_KIND_YAML_NAME,
-	ChessString,
 	ChessStudyKind,
+} from '../../lib/config/ChessStudyKind';
+import {
 	INITIAL_POSITION_BEGIN,
 	INITIAL_POSITION_END,
 	INITIAL_POSITION_FIRST,
 	INITIAL_POSITION_YAML_NAME,
 	InitialPosition,
-} from '../../main';
+} from '../../lib/config/InitialPosition';
+import { BoardOrientation, ChessString } from '../../main';
 
 /**
  * The Modal Dialog that pops up when creating a new Chess Study.

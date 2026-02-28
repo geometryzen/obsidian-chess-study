@@ -13,7 +13,7 @@ import { Config } from 'chessground/config';
 import { nanoid } from 'nanoid';
 import { getChessDataFormat } from '../fen-or-pgn';
 import { NAG_null, NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
-import { JgnContent } from '../jgn/JgnContent';
+import { JgnStudy } from '../jgn/JgnStudy';
 import { JgnMove, JgnVariation } from '../jgn/JgnMove';
 import { ROOT_FEN } from './ROOT_FEN';
 import { turnColor } from './turnColor';
@@ -82,7 +82,7 @@ function chess_to_study(
 	chess: Chess,
 	format: 'FEN' | 'PGN',
 	chessStringOrStartPos: string,
-): JgnContent {
+): JgnStudy {
 	const findComment = (fen: string): JSONContent | null => {
 		const comments = chess.getComments();
 		for (let i = 0; i < comments.length; i++) {
@@ -111,7 +111,7 @@ function chess_to_study(
 		return null;
 	};
 
-	const fileContent: JgnContent = {
+	const fileContent: JgnStudy = {
 		headers: chess.getHeaders(),
 		comment: gameComment(), // seems to return the last comment
 		moves: chess.history({ verbose: true }).map((move) => ({
@@ -441,18 +441,18 @@ function pgn_moves_to_chess_study_moves(
 	return moves;
 }
 
-export function compile_fen(fen: string): JgnContent {
+export function compile_fen(fen: string): JgnStudy {
 	const chess = new Chess(fen);
 	return chess_to_study(chess, 'FEN', fen);
 }
 
-export function compile_pgn(pgn: string): JgnContent {
+export function compile_pgn(pgn: string): JgnStudy {
 	const game = parse(pgn, { startRule: 'game' }) as ParseTree;
 	// console.lg(JSON.stringify(game, null, 2));
 	// The messages contain statements about the parsing.
 	// These could be returned in a different data structure.
 	game.messages;
-	const fileContent: JgnContent = {
+	const fileContent: JgnStudy = {
 		headers: tags_to_headers(game.tags),
 		comment: game_comment_to_json_comment(game.gameComment),
 		moves: pgn_moves_to_chess_study_moves(game.moves, ROOT_FEN),
@@ -462,7 +462,7 @@ export function compile_pgn(pgn: string): JgnContent {
 	return fileContent;
 }
 
-export function compile_pgn_or_fen(pgn_or_fen: string): JgnContent {
+export function compile_pgn_or_fen(pgn_or_fen: string): JgnStudy {
 	const format = getChessDataFormat(pgn_or_fen);
 	switch (format) {
 		case 'FEN': {

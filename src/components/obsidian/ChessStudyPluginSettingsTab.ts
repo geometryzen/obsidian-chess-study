@@ -1,18 +1,19 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import ChessStudyPlugin, {
-	BoardColor,
-	BoardOrientation,
+import {
 	CHESS_STUDY_KIND_GAME,
 	CHESS_STUDY_KIND_LEGACY,
 	CHESS_STUDY_KIND_POSITION,
 	CHESS_STUDY_KIND_PUZZLE,
 	CHESS_STUDY_KIND_YAML_NAME,
 	ChessStudyKind,
+} from '../../lib/config/ChessStudyKind';
+import {
 	INITIAL_POSITION_END,
 	INITIAL_POSITION_FIRST,
 	INITIAL_POSITION_YAML_NAME,
 	InitialPosition,
-} from '../../main';
+} from '../../lib/config/InitialPosition';
+import ChessStudyPlugin, { BoardColor, BoardOrientation } from '../../main';
 
 export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 	#plugin: ChessStudyPlugin;

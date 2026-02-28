@@ -4,38 +4,32 @@ import { ChessStudyMarkdownRenderChild } from './components/obsidian/ChessStudyM
 import { ChessStudyPluginSettingsTab } from './components/obsidian/ChessStudyPluginSettingsTab';
 
 // these styles must be imported somewhere
-import '../assets/board/green.css';
 import 'chessground/assets/chessground.base.css';
 import 'chessground/assets/chessground.brown.css';
 import 'chessground/assets/chessground.cburnett.css';
-import { compile_pgn_or_fen } from './lib/chess-logic';
-import { parse_user_config } from './lib/obsidian/parse_user_config';
-import { JgnContent } from './lib/jgn/JgnContent';
-import { JgnLoader } from './lib/jgn/JgnLoader';
-import './main.css';
+import '../assets/board/green.css';
 import { ChessStudyPluginSettings } from './components/obsidian/ChessStudyPluginSettings';
 import { DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS } from './components/obsidian/DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS';
+import { compile_pgn_or_fen } from './lib/chess-logic';
 import { ROOT_FEN } from './lib/chess-logic/ROOT_FEN';
+import {
+	CHESS_STUDY_KIND_YAML_NAME,
+	ChessStudyKind,
+} from './lib/config/ChessStudyKind';
+import {
+	INITIAL_POSITION_YAML_NAME,
+	InitialPosition,
+} from './lib/config/InitialPosition';
+import { JgnStudy } from './lib/jgn/JgnStudy';
+import { JgnLoader } from './lib/jgn/JgnLoader';
+import { parse_user_config } from './lib/obsidian/parse_user_config';
+import './main.css';
 
 type FEN = string;
 type PGN = string;
 export type ChessString = FEN | PGN;
-export type ChessStudyKind = 'game' | 'puzzle' | 'position' | 'legacy';
-export const CHESS_STUDY_KIND_YAML_NAME = 'chessStudyKind';
-export const CHESS_STUDY_KIND_GAME: ChessStudyKind = 'game';
-export const CHESS_STUDY_KIND_POSITION: ChessStudyKind = 'position';
-export const CHESS_STUDY_KIND_PUZZLE: ChessStudyKind = 'puzzle';
-export const CHESS_STUDY_KIND_LEGACY: ChessStudyKind = 'legacy';
 export type BoardOrientation = 'white' | 'black';
 export type BoardColor = 'green' | 'brown';
-/**
- * The initial position can be a move e.g. "1. e4" or "1... e5" or a specially recognized value such as 'begin', 'first', or 'end'.
- */
-export type InitialPosition = 'begin' | 'first' | 'end' | string;
-export const INITIAL_POSITION_YAML_NAME = 'initialPosition';
-export const INITIAL_POSITION_BEGIN: InitialPosition = 'begin';
-export const INITIAL_POSITION_END: InitialPosition = 'end';
-export const INITIAL_POSITION_FIRST: InitialPosition = 'first';
 
 // TODO:
 // 1) Allow to show the root position
@@ -85,7 +79,7 @@ export default class ChessStudyPlugin extends Plugin {
 						const chessStringOrStartPos =
 							chessStringTrimmed.length > 0 ? chessStringTrimmed : ROOT_FEN;
 
-						const fileContent: JgnContent = compile_pgn_or_fen(chessStringOrStartPos);
+						const fileContent: JgnStudy = compile_pgn_or_fen(chessStringOrStartPos);
 
 						this.#dataAdapter.createStudiesFolderIfNotExists();
 

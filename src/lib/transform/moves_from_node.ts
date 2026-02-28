@@ -1,8 +1,8 @@
 import { JgnMove, JgnVariation } from '../jgn/JgnMove';
-import { ChessStudyNode } from '../tree/ChessStudyNode';
+import { NeoMove } from '../tree/NeoMove';
 import { move_from_node_and_variations } from './move_from_node_and_variations';
 
-export function moves_from_node(node: ChessStudyNode | null): JgnMove[] {
+export function moves_from_node(node: NeoMove | null): JgnMove[] {
 	if (node) {
 		const following_moves = moves_from_node(node.left);
 		const variations = variations_from_node(node.right, node.id);
@@ -14,7 +14,7 @@ export function moves_from_node(node: ChessStudyNode | null): JgnMove[] {
 }
 
 function variations_from_node(
-	node: ChessStudyNode | null,
+	node: NeoMove | null,
 	parentMoveId: string,
 ): JgnVariation[] {
 	if (node) {

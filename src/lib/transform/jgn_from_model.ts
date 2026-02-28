@@ -1,9 +1,9 @@
-import { JgnContent } from '../jgn/JgnContent';
-import { ChessStudyModel } from '../tree/ChessStudyModel';
+import { JgnStudy } from '../jgn/JgnStudy';
+import { NeoStudy } from '../tree/NeoStudy';
 import { moves_from_node } from './moves_from_node';
 
-export function jgn_from_model(model: ChessStudyModel): JgnContent {
-	const fileContents: JgnContent = {
+export function jgn_from_model(model: NeoStudy): JgnStudy {
+	const fileContents: JgnStudy = {
 		comment: model.comment,
 		headers: model.headers,
 		rootFEN: model.rootFEN,

@@ -3,8 +3,8 @@ import { DataAdapter, normalizePath } from 'obsidian';
 import { ROOT_FEN } from '../chess-logic/ROOT_FEN';
 import { jgn_from_model } from '../transform/jgn_from_model';
 import { model_from_jgn } from '../transform/model_from_jgn';
-import { ChessStudyModel } from '../tree/ChessStudyModel';
-import { JgnContent } from './JgnContent';
+import { NeoStudy } from '../tree/NeoStudy';
+import { JgnStudy } from './JgnStudy';
 
 interface UnwantedMoveProperties {
 	before: string | undefined;
@@ -26,12 +26,12 @@ export class JgnLoader {
 		this.#studiesPath = studiesPath;
 	}
 
-	async save(model: ChessStudyModel, id?: string): Promise<string> {
+	async save(model: NeoStudy, id?: string): Promise<string> {
 		const jgn = jgn_from_model(model);
 		return this.saveFile(jgn, id);
 	}
 
-	async saveFile(jgn: JgnContent, id?: string): Promise<string> {
+	async saveFile(jgn: JgnStudy, id?: string): Promise<string> {
 		const chessStudyId = id || nanoid();
 		/*
 		console.lg(
@@ -50,12 +50,12 @@ export class JgnLoader {
 		return chessStudyId;
 	}
 
-	async load(id: string): Promise<ChessStudyModel> {
-		const jgnContent = await this.loadFile(id);
-		return model_from_jgn(jgnContent);
+	async load(id: string): Promise<NeoStudy> {
+		const jgnStudy = await this.loadFile(id);
+		return model_from_jgn(jgnStudy);
 	}
 
-	async loadFile(id: string): Promise<JgnContent> {
+	async loadFile(id: string): Promise<JgnStudy> {
 		/*
 		console.lg(
 			`Reading file from ${normalizePath(`${this.#studiesPath}/${id}.json`)}`,
@@ -66,7 +66,7 @@ export class JgnLoader {
 			normalizePath(`${this.#studiesPath}/${id}.json`),
 		);
 
-		const fileContent = JSON.parse(data) as JgnContent;
+		const fileContent = JSON.parse(data) as JgnStudy;
 
 		// Perform conversions based upon version or otherwise.
 		const moves = fileContent.moves;

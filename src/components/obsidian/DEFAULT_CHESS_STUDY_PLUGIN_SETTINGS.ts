@@ -1,4 +1,5 @@
-import { CHESS_STUDY_KIND_GAME, INITIAL_POSITION_BEGIN } from '../../main';
+import { CHESS_STUDY_KIND_GAME } from '../../lib/config/ChessStudyKind';
+import { INITIAL_POSITION_BEGIN } from '../../lib/config/InitialPosition';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
 
 /**

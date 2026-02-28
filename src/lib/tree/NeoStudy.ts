@@ -1,11 +1,11 @@
 import { JSONContent } from '@tiptap/react';
-import { ChessStudyNode } from './ChessStudyNode';
+import { NeoMove } from './NeoMove';
 
 /**
  * A version, headers, comment (top level), moves, and a rootFEN.
  * This interface defines the serialization structure and should not be changed.
  */
-export class ChessStudyModel {
+export class NeoStudy {
 	/**
 	 * The headers are obtained from chess.js, which does the parsing of PGN data.
 	 */
@@ -17,7 +17,7 @@ export class ChessStudyModel {
 	/**
 	 * The moves that follow from the root FEN.
 	 */
-	readonly root: ChessStudyNode | null;
+	readonly root: NeoMove | null;
 	/**
 	 * The starting position.
 	 */
@@ -26,7 +26,7 @@ export class ChessStudyModel {
 	constructor(
 		comment: JSONContent | null,
 		headers: Record<string, string>,
-		root: ChessStudyNode | null,
+		root: NeoMove | null,
 		rootFEN: string,
 	) {
 		this.comment = comment;

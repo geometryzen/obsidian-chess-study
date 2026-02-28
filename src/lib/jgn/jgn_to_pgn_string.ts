@@ -5,7 +5,7 @@ import {
 	nags_to_dollars,
 	NumericAnnotationGlyph,
 } from '../NumericAnnotationGlyphs';
-import { JgnContent } from './JgnContent';
+import { JgnStudy } from './JgnStudy';
 import { JgnMove } from './JgnMove';
 
 /**
@@ -85,7 +85,7 @@ function append_commands(base: string, move: JgnMove): string {
 /**
  * Converts the proprietary chess-study data to a PGN string in canonical format.
  */
-export function jgn_to_pgn_string(study: JgnContent): string {
+export function jgn_to_pgn_string(study: JgnStudy): string {
 	// console.lg(JSON.stringify(study, null, 2));
 	const root = new Chess(study.rootFEN);
 	const result = study.headers ? study.headers['Result'] : '*';

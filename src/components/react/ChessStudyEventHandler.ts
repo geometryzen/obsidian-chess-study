@@ -1,15 +1,15 @@
 import { Move } from 'chess.js';
 import { DrawShape } from 'chessground/draw';
-import { JgnContent } from '../../lib/jgn/JgnContent';
-import { ChessStudyModel } from '../../lib/tree/ChessStudyModel';
+import { JgnStudy } from '../../lib/jgn/JgnStudy';
+import { NeoStudy } from '../../lib/tree/NeoStudy';
 import { GameState, MoveToken } from './ChessStudy';
 
 export interface ChessStudyEventHandler {
 	setInitialState(
 		state: Pick<GameState, 'isNotationHidden'>,
 		currentMove: MoveToken | null,
-		model: ChessStudyModel,
-		study: JgnContent,
+		model: NeoStudy,
+		study: JgnStudy,
 	): void;
 	gotoNextMove(state: GameState): void;
 	gotoPrevMove(state: GameState): void;

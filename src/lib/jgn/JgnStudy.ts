@@ -5,7 +5,7 @@ import { JgnMove } from './JgnMove';
  * A version, headers, comment (top level), moves, and a rootFEN.
  * This interface defines the serialization structure and should not be changed.
  */
-export interface JgnContent {
+export interface JgnStudy {
 	/**
 	 * The headers are obtained from chess.js, which does the parsing of PGN data.
 	 */

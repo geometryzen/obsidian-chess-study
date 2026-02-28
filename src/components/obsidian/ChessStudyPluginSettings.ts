@@ -1,9 +1,6 @@
-import {
-	BoardColor,
-	BoardOrientation,
-	ChessStudyKind,
-	InitialPosition,
-} from '../../main';
+import { ChessStudyKind } from '../../lib/config/ChessStudyKind';
+import { InitialPosition } from '../../lib/config/InitialPosition';
+import { BoardColor, BoardOrientation } from '../../main';
 
 /**
  * Everything in the chessStudy YAML block except the chessStudId

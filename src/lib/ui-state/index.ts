@@ -50,7 +50,7 @@ export const displayRelativeMoveInHistory = (
 	const { offset, selectedMoveId } = options;
 
 	// Figure out where we are
-	const currentMove = state.currentMoveToken;
+	const currentMove = state.currentMove;
 
 	if (currentMove) {
 		const currentMoveId = currentMove.moveId;
@@ -109,7 +109,7 @@ export const updateView = (
 };
 
 export function getCurrentMove(state: Draft<GameState>): Draft<JgnMove> | null {
-	const currentMoveId = state.currentMoveToken?.moveId;
+	const currentMoveId = state.currentMove?.moveId;
 	const moves = state.study.moves;
 
 	if (currentMoveId) {
