@@ -21,7 +21,7 @@ import {
 	InitialPosition,
 } from './lib/config/InitialPosition';
 import { JgnStudy } from './lib/jgn/JgnStudy';
-import { JgnLoader } from './lib/jgn/JgnLoader';
+import { ChessStudyLoader } from './lib/obsidian/ChessStudyLoader';
 import { parse_user_config } from './lib/obsidian/parse_user_config';
 import './main.css';
 
@@ -37,7 +37,7 @@ export type BoardColor = 'green' | 'brown';
 
 export default class ChessStudyPlugin extends Plugin {
 	settings: ChessStudyPluginSettings;
-	#dataAdapter: JgnLoader;
+	#dataAdapter: ChessStudyLoader;
 	readonly #studiesPath = normalizePath(
 		`${this.app.vault.configDir}/plugins/${this.manifest.id}/studies/`,
 	);
@@ -50,7 +50,10 @@ export default class ChessStudyPlugin extends Plugin {
 		await this.loadSettings();
 
 		// Register Data Adapter
-		this.#dataAdapter = new JgnLoader(this.app.vault.adapter, this.#studiesPath);
+		this.#dataAdapter = new ChessStudyLoader(
+			this.app.vault.adapter,
+			this.#studiesPath,
+		);
 
 		await this.#dataAdapter.createStudiesFolderIfNotExists();
 

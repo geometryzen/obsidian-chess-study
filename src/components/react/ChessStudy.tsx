@@ -8,9 +8,9 @@ import { useCallback, useMemo, useState } from 'react';
 import { useImmerReducer } from 'use-immer';
 import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPluginSettings';
 import { InitialPosition } from '../../lib/config/InitialPosition';
-import { initial_move_from_study_moves } from '../../lib/jgn/initial_move_from_study_moves';
+import { initial_move_from_jgn_study } from '../../lib/jgn/initial_move_from_jgn_study';
 import { jgn_to_pgn_string } from '../../lib/jgn/jgn_to_pgn_string';
-import { JgnLoader } from '../../lib/jgn/JgnLoader';
+import { ChessStudyLoader } from '../../lib/obsidian/ChessStudyLoader';
 import { JgnMove } from '../../lib/jgn/JgnMove';
 import { JgnStudy } from '../../lib/jgn/JgnStudy';
 import {
@@ -33,7 +33,7 @@ import {
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
 import { model_from_jgn } from '../../lib/transform/model_from_jgn';
-import { initial_node_from_model_root } from '../../lib/tree/initial_node_from_model_root';
+import { initial_move_from_neo_study } from '../../lib/tree/initial_node_from_neo_study';
 import { NeoMove } from '../../lib/tree/NeoMove';
 import { NeoStudy } from '../../lib/tree/NeoStudy';
 import {
@@ -58,7 +58,8 @@ interface AppProps {
 	initialPos: InitialPosition;
 	config: ChessStudyAppConfig;
 	jgnStudy: JgnStudy;
-	jgnLoader: JgnLoader;
+	neoStudy: NeoStudy;
+	studyLoader: ChessStudyLoader;
 }
 
 export interface MoveToken {
@@ -129,8 +130,8 @@ export const ChessStudy = ({
 	config,
 	// This is destructuring with a rename?
 	// The thing on the left is what's coming in, on the right is the destructured name.
-	jgnStudy: jgnStudy,
-	jgnLoader,
+	jgnStudy,
+	studyLoader: jgnLoader,
 }: AppProps) => {
 	// Parse Obsidian / Code Block Settings
 	const {
@@ -185,8 +186,8 @@ export const ChessStudy = ({
 				break;
 			}
 			default: {
-				const desiredMove = initial_move_from_study_moves(
-					jgnStudy.moves,
+				const desiredMove = initial_move_from_jgn_study(
+					jgnStudy,
 					config.initialPosition,
 				);
 				if (desiredMove) {
@@ -207,7 +208,7 @@ export const ChessStudy = ({
 		}
 
 		return [chess, initialPlayer, initialMoveNumber];
-	}, [jgnStudy.moves, jgnStudy.rootFEN, config.initialPosition]);
+	}, [jgnStudy, config.initialPosition]);
 
 	/**
 	 * These names are quite good since we would like to use chess.js
@@ -226,7 +227,7 @@ export const ChessStudy = ({
 		/**
 		 *
 		 */
-		currentMove: initial_move_from_study_moves(jgnStudy.moves, initialPosition),
+		currentMove: initial_move_from_jgn_study(jgnStudy, initialPosition),
 		/**
 		 * The "legacy" data structure is in fact the serialization format - JSON Game Notation (proprietary) a.k.a. Jgn.
 		 */
@@ -234,8 +235,8 @@ export const ChessStudy = ({
 		/**
 		 *
 		 */
-		currentNode: initial_node_from_model_root(
-			model_from_jgn(jgnStudy).root,
+		currentNode: initial_move_from_neo_study(
+			model_from_jgn(jgnStudy),
 			initialPosition,
 		),
 		/**

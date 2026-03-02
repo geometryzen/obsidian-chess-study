@@ -4,7 +4,7 @@ import { ROOT_FEN } from '../chess-logic/ROOT_FEN';
 import { jgn_from_model } from '../transform/jgn_from_model';
 import { model_from_jgn } from '../transform/model_from_jgn';
 import { NeoStudy } from '../tree/NeoStudy';
-import { JgnStudy } from './JgnStudy';
+import { JgnStudy } from '../jgn/JgnStudy';
 
 interface UnwantedMoveProperties {
 	before: string | undefined;
@@ -14,7 +14,10 @@ interface UnwantedMoveProperties {
 	piece: string | undefined;
 }
 
-export class JgnLoader {
+/**
+ *
+ */
+export class ChessStudyLoader {
 	/**
 	 * The adapter is an Obsidian thing.
 	 */

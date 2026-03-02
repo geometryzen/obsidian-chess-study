@@ -5,10 +5,11 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { JgnLoader } from '../../lib/jgn/JgnLoader';
+import { ChessStudyLoader } from '../../lib/obsidian/ChessStudyLoader';
 import { JgnStudy } from '../../lib/jgn/JgnStudy';
 import { ChessStudy } from '../react/ChessStudy';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
+import { NeoStudy } from '../../lib/tree/NeoStudy';
 
 /**
  * This is not the Obsidian Plugin.
@@ -20,7 +21,8 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	app: App;
 	settings: ChessStudyPluginSettings;
 	readonly #jgnStudy: JgnStudy;
-	readonly #studyLoader: JgnLoader;
+	readonly #neoStudy: NeoStudy;
+	readonly #studyLoader: ChessStudyLoader;
 
 	/**
 	 * The constructor is called from the Obsidian Plugin onload method.
@@ -38,7 +40,7 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 		app: App,
 		settings: ChessStudyPluginSettings,
 		jgnStudy: JgnStudy,
-		studyLoader: JgnLoader,
+		studyLoader: ChessStudyLoader,
 	) {
 		super(containerEL);
 		this.source = source;
@@ -69,7 +71,8 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 					initialPos={config.initialPosition}
 					config={config}
 					jgnStudy={this.#jgnStudy}
-					jgnLoader={this.#studyLoader}
+					neoStudy={this.#neoStudy}
+					studyLoader={this.#studyLoader}
 				/>
 			</React.StrictMode>,
 		);

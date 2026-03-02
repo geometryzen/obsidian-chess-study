@@ -6,9 +6,10 @@ import {
 	InitialPosition,
 } from '../config/InitialPosition';
 import { JgnMove } from './JgnMove';
+import { JgnStudy } from './JgnStudy';
 
-export function initial_move_from_study_moves(
-	moves: JgnMove[],
+export function initial_move_from_jgn_study(
+	study: JgnStudy,
 	initialPosition: InitialPosition,
 ): JgnMove | null {
 	switch (initialPosition) {
@@ -16,12 +17,15 @@ export function initial_move_from_study_moves(
 			return null;
 		}
 		case INITIAL_POSITION_FIRST: {
+			const moves = study.moves;
 			return moves[0] ?? null;
 		}
 		case INITIAL_POSITION_END: {
+			const moves = study.moves;
 			return moves[moves.length - 1] ?? null;
 		}
 		default: {
+			const moves = study.moves;
 			// We are currently defaulting to the last move (legacy behavior)
 			const game = parse(initialPosition, { startRule: 'game' }) as ParseTree;
 			if (Array.isArray(game.moves)) {
