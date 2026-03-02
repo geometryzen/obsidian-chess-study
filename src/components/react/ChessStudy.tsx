@@ -10,7 +10,6 @@ import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPl
 import { InitialPosition } from '../../lib/config/InitialPosition';
 import { initial_move_from_jgn_study } from '../../lib/jgn/initial_move_from_jgn_study';
 import { jgn_to_pgn_string } from '../../lib/jgn/jgn_to_pgn_string';
-import { ChessStudyLoader } from '../../lib/obsidian/ChessStudyLoader';
 import { JgnMove } from '../../lib/jgn/JgnMove';
 import { JgnStudy } from '../../lib/jgn/JgnStudy';
 import {
@@ -28,6 +27,7 @@ import {
 	NAG_very_poor_move,
 	NumericAnnotationGlyph,
 } from '../../lib/NumericAnnotationGlyphs';
+import { ChessStudyLoader } from '../../lib/obsidian/ChessStudyLoader';
 import {
 	ChessStudyAppConfig,
 	parse_user_config,
@@ -131,7 +131,8 @@ export const ChessStudy = ({
 	// This is destructuring with a rename?
 	// The thing on the left is what's coming in, on the right is the destructured name.
 	jgnStudy,
-	studyLoader: jgnLoader,
+	neoStudy,
+	studyLoader,
 }: AppProps) => {
 	// Parse Obsidian / Code Block Settings
 	const {
@@ -203,12 +204,18 @@ export const ChessStudy = ({
 						}
 					}
 				}
-				// const desiredNode = initial_node_from_model_root(model, config.initialPosition)
+				const desiredNode = initial_move_from_neo_study(
+					neoStudy,
+					config.initialPosition,
+				);
+				if (desiredNode) {
+					// TODO
+				}
 			}
 		}
 
 		return [chess, initialPlayer, initialMoveNumber];
-	}, [jgnStudy, config.initialPosition]);
+	}, [jgnStudy, neoStudy, config.initialPosition]);
 
 	/**
 	 * These names are quite good since we would like to use chess.js
@@ -471,12 +478,12 @@ export const ChessStudy = ({
 
 	const onSaveButtonClick = useCallback(async () => {
 		try {
-			await jgnLoader.saveFile(gameState.study, chessStudyId);
+			await studyLoader.saveFile(gameState.study, chessStudyId);
 			new Notice('Save successfull!');
 		} catch (e) {
 			new Notice('Something went wrong during saving:', e);
 		}
-	}, [chessStudyId, jgnLoader, gameState.study]);
+	}, [chessStudyId, studyLoader, gameState.study]);
 
 	return (
 		<div className="chess-study">
