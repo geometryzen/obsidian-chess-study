@@ -42,7 +42,7 @@
 	"devDependencies": {
 		"@types/jest": "30.0.0",
 		"@mliebelt/pgn-types": "1.0.4",
-		"@types/node": "25.3.2",
+		"@types/node": "25.3.3",
 		"@types/react": "19.2.14",
 		"@types/react-dom": "19.2.3",
 		"@typescript-eslint/eslint-plugin": "5.59.6",
