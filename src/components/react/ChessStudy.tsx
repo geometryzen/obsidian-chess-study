@@ -32,7 +32,6 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { model_from_jgn } from '../../lib/transform/model_from_jgn';
 import { initial_move_from_neo_study } from '../../lib/tree/initial_node_from_neo_study';
 import { NeoMove } from '../../lib/tree/NeoMove';
 import { NeoStudy } from '../../lib/tree/NeoStudy';
@@ -242,18 +241,15 @@ export const ChessStudy = ({
 		/**
 		 * The "legacy" data structure is in fact the serialization format - JSON Game Notation (proprietary) a.k.a. Jgn.
 		 */
-		jgnStudy: jgnStudy,
+		jgnStudy,
 		/**
 		 *
 		 */
-		currentNode: initial_move_from_neo_study(
-			model_from_jgn(jgnStudy),
-			initialPosition,
-		),
+		currentNode: initial_move_from_neo_study(neoStudy, initialPosition),
 		/**
 		 * Placing this here to illustrate how the game state can migrate toward the tree model.
 		 */
-		neoStudy: model_from_jgn(jgnStudy),
+		neoStudy,
 		/**
 		 * In most use cases the notation is visible.
 		 * However, in the case of a puzzle, the notation is the solution, and may be hidden.
