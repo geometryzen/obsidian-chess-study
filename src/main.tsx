@@ -24,6 +24,7 @@ import { JgnStudy } from './lib/jgn/JgnStudy';
 import { ChessStudyLoader } from './lib/obsidian/ChessStudyLoader';
 import { parse_user_config } from './lib/obsidian/parse_user_config';
 import './main.css';
+import { NeoStudy } from './lib/tree/NeoStudy';
 
 type FEN = string;
 type PGN = string;
@@ -37,7 +38,7 @@ export type BoardColor = 'green' | 'brown';
 
 export default class ChessStudyPlugin extends Plugin {
 	settings: ChessStudyPluginSettings;
-	#dataAdapter: ChessStudyLoader;
+	#studyLoader: ChessStudyLoader;
 	readonly #studiesPath = normalizePath(
 		`${this.app.vault.configDir}/plugins/${this.manifest.id}/studies/`,
 	);
@@ -50,12 +51,12 @@ export default class ChessStudyPlugin extends Plugin {
 		await this.loadSettings();
 
 		// Register Data Adapter
-		this.#dataAdapter = new ChessStudyLoader(
+		this.#studyLoader = new ChessStudyLoader(
 			this.app.vault.adapter,
 			this.#studiesPath,
 		);
 
-		await this.#dataAdapter.createStudiesFolderIfNotExists();
+		await this.#studyLoader.createStudiesFolderIfNotExists();
 
 		// Add settings tab
 		this.addSettingTab(new ChessStudyPluginSettingsTab(this.app, this));
@@ -84,9 +85,9 @@ export default class ChessStudyPlugin extends Plugin {
 
 						const fileContent: JgnStudy = compile_pgn_or_fen(chessStringOrStartPos);
 
-						this.#dataAdapter.createStudiesFolderIfNotExists();
+						this.#studyLoader.createStudiesFolderIfNotExists();
 
-						const id = await this.#dataAdapter.saveFile(fileContent);
+						const id = await this.#studyLoader.saveJgnStudy(fileContent);
 
 						// TODO: It would be nice for the boardOrientation and viewComments to be in the UI as configuration options.
 						editor.replaceRange(
@@ -118,7 +119,10 @@ export default class ChessStudyPlugin extends Plugin {
 					);
 
 				try {
-					const data = await this.#dataAdapter.loadFile(chessStudyId);
+					const jgnStudy: JgnStudy =
+						await this.#studyLoader.loadJgnStudy(chessStudyId);
+					const neoStudy: NeoStudy =
+						await this.#studyLoader.loadNeoStudy(chessStudyId);
 
 					ctx.addChild(
 						new ChessStudyMarkdownRenderChild(
@@ -126,8 +130,9 @@ export default class ChessStudyPlugin extends Plugin {
 							source,
 							this.app,
 							this.settings,
-							data,
-							this.#dataAdapter,
+							jgnStudy,
+							neoStudy,
+							this.#studyLoader,
 						),
 					);
 				} catch (e) {

@@ -18,6 +18,9 @@ export function initial_move_from_neo_study(
 	study: NeoStudy,
 	initialPosition: InitialPosition,
 ): NeoMove | null {
+	if (!study) {
+		throw new Error('study must be defined.');
+	}
 	const root = study.root;
 	if (root) {
 		switch (initialPosition) {

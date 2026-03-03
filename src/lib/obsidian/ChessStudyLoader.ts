@@ -29,12 +29,12 @@ export class ChessStudyLoader {
 		this.#studiesPath = studiesPath;
 	}
 
-	async save(model: NeoStudy, id?: string): Promise<string> {
+	async saveNeoStudy(model: NeoStudy, id?: string): Promise<string> {
 		const jgn = jgn_from_model(model);
-		return this.saveFile(jgn, id);
+		return this.saveJgnStudy(jgn, id);
 	}
 
-	async saveFile(jgn: JgnStudy, id?: string): Promise<string> {
+	async saveJgnStudy(jgn: JgnStudy, id?: string): Promise<string> {
 		const chessStudyId = id || nanoid();
 		/*
 		console.lg(
@@ -53,12 +53,12 @@ export class ChessStudyLoader {
 		return chessStudyId;
 	}
 
-	async load(id: string): Promise<NeoStudy> {
-		const jgnStudy = await this.loadFile(id);
+	async loadNeoStudy(id: string): Promise<NeoStudy> {
+		const jgnStudy = await this.loadJgnStudy(id);
 		return model_from_jgn(jgnStudy);
 	}
 
-	async loadFile(id: string): Promise<JgnStudy> {
+	async loadJgnStudy(id: string): Promise<JgnStudy> {
 		/*
 		console.lg(
 			`Reading file from ${normalizePath(`${this.#studiesPath}/${id}.json`)}`,

@@ -204,12 +204,16 @@ export const ChessStudy = ({
 						}
 					}
 				}
-				const desiredNode = initial_move_from_neo_study(
-					neoStudy,
-					config.initialPosition,
-				);
-				if (desiredNode) {
-					// TODO
+				try {
+					const desiredNode = initial_move_from_neo_study(
+						neoStudy,
+						config.initialPosition,
+					);
+					if (desiredNode) {
+						// TODO
+					}
+				} catch (e) {
+					new Notice(`${e}`, 0);
 				}
 			}
 		}
@@ -478,7 +482,7 @@ export const ChessStudy = ({
 
 	const onSaveButtonClick = useCallback(async () => {
 		try {
-			await studyLoader.saveFile(gameState.study, chessStudyId);
+			await studyLoader.saveJgnStudy(gameState.study, chessStudyId);
 			new Notice('Save successfull!');
 		} catch (e) {
 			new Notice('Something went wrong during saving:', e);

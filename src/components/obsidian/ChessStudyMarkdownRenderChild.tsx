@@ -40,6 +40,7 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 		app: App,
 		settings: ChessStudyPluginSettings,
 		jgnStudy: JgnStudy,
+		neoStudy: NeoStudy,
 		studyLoader: ChessStudyLoader,
 	) {
 		super(containerEL);
@@ -47,6 +48,7 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 		this.app = app;
 		this.settings = settings;
 		this.#jgnStudy = jgnStudy;
+		this.#neoStudy = neoStudy;
 		this.#studyLoader = studyLoader;
 	}
 
