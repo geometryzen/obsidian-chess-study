@@ -10,7 +10,7 @@ import 'chessground/assets/chessground.cburnett.css';
 import '../assets/board/green.css';
 import { ChessStudyPluginSettings } from './components/obsidian/ChessStudyPluginSettings';
 import { DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS } from './components/obsidian/DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS';
-import { compile_pgn_or_fen } from './lib/chess-logic';
+import { compile_pgn_or_fen } from './lib/parsing/compile_pgn_or_fen';
 import { ROOT_FEN } from './lib/chess-logic/ROOT_FEN';
 import {
 	CHESS_STUDY_KIND_YAML_NAME,
@@ -83,11 +83,11 @@ export default class ChessStudyPlugin extends Plugin {
 						const chessStringOrStartPos =
 							chessStringTrimmed.length > 0 ? chessStringTrimmed : ROOT_FEN;
 
-						const fileContent: JgnStudy = compile_pgn_or_fen(chessStringOrStartPos);
+						const jgnStudy: JgnStudy = compile_pgn_or_fen(chessStringOrStartPos);
 
 						this.#studyLoader.createStudiesFolderIfNotExists();
 
-						const id = await this.#studyLoader.saveJgnStudy(fileContent);
+						const id = await this.#studyLoader.saveJgnStudy(jgnStudy);
 
 						// TODO: It would be nice for the boardOrientation and viewComments to be in the UI as configuration options.
 						editor.replaceRange(

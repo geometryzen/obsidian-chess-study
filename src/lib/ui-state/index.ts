@@ -2,8 +2,8 @@ import { Chess } from 'chess.js';
 import { Api as ChessgroundApi } from 'chessground/api';
 import { Draft } from 'immer';
 import { GameState, MoveToken } from '../../components/react/ChessStudy';
-import { legalMoves } from '../chess-logic';
-import { turnColor } from '../chess-logic/turnColor';
+import { legal_moves } from '../chess-logic/legal_moves';
+import { turn_color_white_or_black } from '../chess-logic/turn_color_white_or_black';
 import { JgnMove } from '../jgn/JgnMove';
 import { find_move_index_from_move_id } from './find_move_index_from_move_id';
 import { get_move_from_offset } from './get_move_from_offset';
@@ -58,14 +58,18 @@ export const displayRelativeMoveInHistory = (
 		// If we pass a moveId, find out where that is and offset from there, otherwise take current moveId
 		const baseMoveId = selectedMoveId || currentMoveId;
 
-		moveToDisplay = get_move_from_offset(state.study.moves, baseMoveId, offset);
+		moveToDisplay = get_move_from_offset(
+			state.jgnStudy.moves,
+			baseMoveId,
+			offset,
+		);
 	} else {
 		if (offset < 0) {
-			moveToDisplay = state.study.moves[state.study.moves.length - 1];
+			moveToDisplay = state.jgnStudy.moves[state.jgnStudy.moves.length - 1];
 		} else {
 			// An offset of +1 always means that the user wants to go "Forward".
 			// There will be no selected move.
-			moveToDisplay = state.study.moves[0];
+			moveToDisplay = state.jgnStudy.moves[0];
 		}
 	}
 
@@ -73,8 +77,8 @@ export const displayRelativeMoveInHistory = (
 		updateView(chessView, setChessLogic, moveToDisplay.after);
 		return moveToDisplay;
 	} else {
-		const chess = state.study.rootFEN
-			? new Chess(state.study.rootFEN)
+		const chess = state.jgnStudy.rootFEN
+			? new Chess(state.jgnStudy.rootFEN)
 			: new Chess();
 		updateView(chessView, setChessLogic, chess.fen());
 		return null;
@@ -99,10 +103,10 @@ export const updateView = (
 		check: chess.isCheck(),
 		movable: {
 			free: false,
-			color: turnColor(chess),
-			dests: legalMoves(chess),
+			color: turn_color_white_or_black(chess),
+			dests: legal_moves(chess),
 		},
-		turnColor: turnColor(chess),
+		turnColor: turn_color_white_or_black(chess),
 	});
 
 	setChessLogic(chess);
@@ -110,7 +114,7 @@ export const updateView = (
 
 export function getCurrentMove(state: Draft<GameState>): Draft<JgnMove> | null {
 	const currentMoveId = state.currentMove?.moveId;
-	const moves = state.study.moves;
+	const moves = state.jgnStudy.moves;
 
 	if (currentMoveId) {
 		const { indexLocation: variant, moveIndex } = find_move_index_from_move_id(

@@ -1,5 +1,5 @@
 import { Chess } from 'chess.js';
 
-export function turnColor(chess: Chess): 'white' | 'black' {
+export function turn_color_white_or_black(chess: Chess): 'white' | 'black' {
 	return chess.turn() === 'w' ? 'white' : 'black';
 }

@@ -80,7 +80,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 */
 	gotoMove(state: GameState, moveId: string): void {
 		if (!this.#chessView) return;
-		const move = getMoveById(state.study.moves, moveId);
+		const move = getMoveById(state.jgnStudy.moves, moveId);
 		updateView(this.#chessView, this.#setChessLogic, move.after);
 		state.currentMove = move;
 	}
@@ -91,7 +91,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 * @param m The played move that comes from the user.
 	 */
 	playMove(state: GameState, m: Move): void {
-		const moves = state.study.moves;
+		const moves = state.jgnStudy.moves;
 
 		if (state.currentMove) {
 			const currentMoveId = state.currentMove.moveId;

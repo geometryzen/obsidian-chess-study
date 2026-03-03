@@ -6,8 +6,9 @@ import { DrawShape } from 'chessground/draw';
 import { Key, MoveMetadata } from 'chessground/types';
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
-import { playOtherSide, legalMoves } from '../../lib/chess-logic';
-import { turnColor } from '../../lib/chess-logic/turnColor';
+import { legal_moves } from '../../lib/chess-logic/legal_moves';
+import { make_move_handler } from '../../lib/chess-logic/make_move_handler';
+import { turn_color_white_or_black } from '../../lib/chess-logic/turn_color_white_or_black';
 
 /**
  * Strictly speaking, these are the React properties of our Chessground wrapper.
@@ -50,8 +51,8 @@ export const ChessgroundWrapper = React.memo(
 					// disableContextMenu: true,
 					movable: {
 						free: false,
-						color: turnColor(chess),
-						dests: legalMoves(chess),
+						color: turn_color_white_or_black(chess),
+						dests: legal_moves(chess),
 					},
 					highlight: {
 						check: true,
@@ -62,7 +63,7 @@ export const ChessgroundWrapper = React.memo(
 							setShapes(shapes);
 						},
 					},
-					turnColor: turnColor(chess),
+					turnColor: turn_color_white_or_black(chess),
 					...config,
 				});
 				setApi(board);
@@ -78,7 +79,7 @@ export const ChessgroundWrapper = React.memo(
 					events: {
 						// Hook up the Chessground UI changes to our App State
 						after: (orig: Key, dest: Key, _metadata: MoveMetadata) => {
-							const handler = playOtherSide(api, chess);
+							const handler = make_move_handler(api, chess);
 							// This name assumes a particular usage.
 							const move: Move = handler(orig, dest);
 							onMove(move);

@@ -77,7 +77,7 @@ export interface GameState {
 	 * This part is what goes in the file.
 	 * It is a similar to a PGN in content except
 	 */
-	study: JgnStudy;
+	jgnStudy: JgnStudy;
 	/**
 	 *
 	 */
@@ -85,7 +85,7 @@ export interface GameState {
 	/**
 	 *
 	 */
-	model: NeoStudy;
+	neoStudy: NeoStudy;
 	/**
 	 * Determines whether the game notation is visible or not.
 	 */
@@ -101,8 +101,8 @@ function comment_from_game_state(gameState: GameState): JSONContent | null {
 		? gameState.currentMove.comment
 			? gameState.currentMove.comment
 			: null
-		: gameState.study.comment
-			? gameState.study.comment
+		: gameState.jgnStudy.comment
+			? gameState.jgnStudy.comment
 			: null;
 }
 
@@ -242,7 +242,7 @@ export const ChessStudy = ({
 		/**
 		 * The "legacy" data structure is in fact the serialization format - JSON Game Notation (proprietary) a.k.a. Jgn.
 		 */
-		study: jgnStudy,
+		jgnStudy: jgnStudy,
 		/**
 		 *
 		 */
@@ -253,7 +253,7 @@ export const ChessStudy = ({
 		/**
 		 * Placing this here to illustrate how the game state can migrate toward the tree model.
 		 */
-		model: model_from_jgn(jgnStudy),
+		neoStudy: model_from_jgn(jgnStudy),
 		/**
 		 * In most use cases the notation is visible.
 		 * However, in the case of a puzzle, the notation is the solution, and may be hidden.
@@ -268,8 +268,8 @@ export const ChessStudy = ({
 	handler.setInitialState(
 		initialState,
 		initialState.currentMove,
-		initialState.model,
-		initialState.study,
+		initialState.neoStudy,
+		initialState.jgnStudy,
 	);
 
 	// Why are we using use-immer instead of React's useReducer hook?
@@ -278,7 +278,7 @@ export const ChessStudy = ({
 	const [gameState, dispatch] = useImmerReducer<GameState, GameEvent>(
 		// The first argument is the reducer function
 		(state: GameState, event: GameEvent) => {
-			const hasNoMoves = state.study.moves.length === 0;
+			const hasNoMoves = state.jgnStudy.moves.length === 0;
 			switch (event.type) {
 				case 'GOTO_NEXT_MOVE': {
 					handler.gotoNextMove(state);
@@ -291,7 +291,7 @@ export const ChessStudy = ({
 				case 'REMOVE_LAST_MOVE': {
 					if (!chessView || hasNoMoves) return state;
 
-					const moves = state.study.moves;
+					const moves = state.jgnStudy.moves;
 
 					const currentMoveId = state.currentMove?.moveId;
 
@@ -385,7 +385,7 @@ export const ChessStudy = ({
 						// Caution: The issue may be that we have changed the comment of the current move.
 						state.currentMove = move;
 					} else {
-						state.study.comment = event.comment;
+						state.jgnStudy.comment = event.comment;
 					}
 
 					return state;
@@ -482,12 +482,14 @@ export const ChessStudy = ({
 
 	const onSaveButtonClick = useCallback(async () => {
 		try {
-			await studyLoader.saveJgnStudy(gameState.study, chessStudyId);
+			// We are writing twice, Neo BEFORE Jgn, until such time as the NeoStudy is the canonical study.
+			await studyLoader.saveNeoStudy(gameState.neoStudy, chessStudyId);
+			await studyLoader.saveJgnStudy(gameState.jgnStudy, chessStudyId);
 			new Notice('Save successfull!');
 		} catch (e) {
 			new Notice('Something went wrong during saving:', e);
 		}
-	}, [chessStudyId, studyLoader, gameState.study]);
+	}, [chessStudyId, studyLoader, gameState.jgnStudy, gameState.neoStudy]);
 
 	return (
 		<div className="chess-study">
@@ -512,7 +514,7 @@ export const ChessStudy = ({
 				{(chessStudyKind as string) !== 'foo' && (
 					<div className="pgn-container">
 						<PgnViewer
-							history={gameState.study.moves}
+							history={gameState.jgnStudy.moves}
 							currentMoveId={gameState.currentMove?.moveId ?? null}
 							initialPlayer={initialPlayer}
 							initialMoveNumber={initialMoveNumber}
@@ -541,13 +543,13 @@ export const ChessStudy = ({
 							}}
 							onCopyPgnButtonClick={() => {
 								try {
-									const pgn_string = jgn_to_pgn_string(gameState.study);
+									const pgn_string = jgn_to_pgn_string(gameState.jgnStudy);
 									// console.lg('pgn', pgn_string);
 									navigator.clipboard.writeText(pgn_string);
 									new Notice('Copied PGN to clipboard!');
 								} catch (e) {
 									console.warn(e);
-									console.warn(JSON.stringify(gameState.study, null, 2));
+									console.warn(JSON.stringify(gameState.jgnStudy, null, 2));
 									new Notice('Could not copy PGN to clipboard:', e);
 								}
 							}}

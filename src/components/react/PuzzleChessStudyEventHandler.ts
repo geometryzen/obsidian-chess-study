@@ -46,7 +46,7 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	playMove(state: GameState, m: Move): void {
 		if (!this.#chessView) return;
 
-		const moves = state.study.moves;
+		const moves = state.jgnStudy.moves;
 
 		if (state.currentMove) {
 			const currentMoveId = state.currentMove.moveId;
@@ -105,7 +105,7 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 				// If there are no moves, then this is not a puzzle!
 				// Update the view to revert the position.
 				// There is no change in state.
-				updateView(this.#chessView, this.#setChessLogic, state.study.rootFEN);
+				updateView(this.#chessView, this.#setChessLogic, state.jgnStudy.rootFEN);
 				// state.currentMove = move;
 			} else {
 				// Do nothing for now.
@@ -125,7 +125,7 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 					// It's not the correct move
 					// There is no current move so we are at the beginning of the game.
 					// Additionally, the move made did not match the first so we revert to the root position.
-					updateView(this.#chessView, this.#setChessLogic, state.study.rootFEN);
+					updateView(this.#chessView, this.#setChessLogic, state.jgnStudy.rootFEN);
 				}
 			}
 		}

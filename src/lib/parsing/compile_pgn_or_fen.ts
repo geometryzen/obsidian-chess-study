@@ -7,70 +7,13 @@ import {
 } from '@tiptap/extension-paragraph'; // Import necessary extensions
 import Text from '@tiptap/extension-text'; // Import necessary extensions
 import { generateJSON, JSONContent } from '@tiptap/react';
-import { Chess, PieceSymbol, QUEEN, Square, SQUARES } from 'chess.js';
-import { Api } from 'chessground/api';
-import { Config } from 'chessground/config';
+import { Chess, PieceSymbol } from 'chess.js';
 import { nanoid } from 'nanoid';
 import { getChessDataFormat } from '../fen-or-pgn';
-import { NAG_null, NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
-import { JgnStudy } from '../jgn/JgnStudy';
 import { JgnMove, JgnVariation } from '../jgn/JgnMove';
-import { ROOT_FEN } from './ROOT_FEN';
-import { turnColor } from './turnColor';
-
-/**
- * Gets the set of legal moves for the current position.
- *
- * @see https://github.com/ornicar/chessground-examples
- */
-export function legalMoves(chess: Chess): Map<Square, Square[]> {
-	const dests = new Map();
-	SQUARES.forEach((s) => {
-		const ms = chess.moves({ square: s, verbose: true });
-		if (ms.length)
-			dests.set(
-				s,
-				ms.map((m) => m.to),
-			);
-	});
-	return dests;
-}
-
-/**
- * Returns a function that updates the chess model and view based on the move
- *
- * @see https://github.com/ornicar/chessground-examples
- */
-export function playOtherSide(view: Api, chess: Chess) {
-	return (from: string, to: string) => {
-		const move = chess.move({ from, to, promotion: QUEEN });
-
-		const viewConfig: Partial<Config> = {
-			// I'm not sure what thi does! You can comment it out and not much changes.
-			// turnColor: turnColor(chess),
-			movable: {
-				// Only allow moves by whoevers turn it is.
-				color: turnColor(chess),
-				// Only allow legal moves.
-				dests: legalMoves(chess),
-			},
-			// this highlights the checked king in red.
-			check: chess.isCheck(),
-		};
-
-		if (move.isEnPassant() || move.promotion) {
-			// Handle En Passant && Promote to Queen by default
-			view.set({
-				fen: chess.fen(),
-				...viewConfig,
-			});
-		} else {
-			view.set(viewConfig);
-		}
-
-		return move;
-	};
-}
+import { JgnStudy } from '../jgn/JgnStudy';
+import { NAG_null, NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
+import { ROOT_FEN } from '../chess-logic/ROOT_FEN';
 
 /**
  * Convert chess.js to our proprietary format.
@@ -441,12 +384,12 @@ function pgn_moves_to_chess_study_moves(
 	return moves;
 }
 
-export function compile_fen(fen: string): JgnStudy {
+function compile_fen(fen: string): JgnStudy {
 	const chess = new Chess(fen);
 	return chess_to_study(chess, 'FEN', fen);
 }
 
-export function compile_pgn(pgn: string): JgnStudy {
+function compile_pgn(pgn: string): JgnStudy {
 	const game = parse(pgn, { startRule: 'game' }) as ParseTree;
 	// console.lg(JSON.stringify(game, null, 2));
 	// The messages contain statements about the parsing.
