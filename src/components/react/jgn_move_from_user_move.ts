@@ -2,7 +2,7 @@ import { Move } from 'chess.js';
 import { nanoid } from 'nanoid';
 import { JgnMove } from '../../lib/jgn/JgnMove';
 
-export function chess_study_move_from_user_move(m: Move): JgnMove {
+export function jgn_move_from_user_move(m: Move): JgnMove {
 	const move: JgnMove = {
 		moveId: nanoid(),
 		variants: [],

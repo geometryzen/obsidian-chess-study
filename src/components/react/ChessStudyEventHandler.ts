@@ -8,8 +8,8 @@ export interface ChessStudyEventHandler {
 	setInitialState(
 		state: Pick<GameState, 'isNotationHidden'>,
 		currentMove: MoveToken | null,
-		model: NeoStudy,
-		study: JgnStudy,
+		neoStudy: NeoStudy,
+		jgnStudy: JgnStudy,
 	): void;
 	gotoNextMove(state: GameState): void;
 	gotoPrevMove(state: GameState): void;

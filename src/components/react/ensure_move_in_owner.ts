@@ -1,7 +1,7 @@
 import { Move } from 'chess.js';
 import { JgnMove } from '../../lib/jgn/JgnMove';
 import { find_variation_index_with_first_move } from '../../lib/ui-state/find_variation_index_with_first_move';
-import { chess_study_move_from_user_move } from './chess_study_move_from_user_move';
+import { jgn_move_from_user_move } from './jgn_move_from_user_move';
 
 /**
  * Ensures that the played move exists in the specified scope move.
@@ -25,7 +25,7 @@ export function ensure_move_in_scope(m: Move, ownerMove: JgnMove): JgnMove {
 			return ownerMove.variants[variationIndex].moves[0];
 		} else {
 			// The move does not exist in any existing variation so we create a new variation
-			const move = chess_study_move_from_user_move(m);
+			const move = jgn_move_from_user_move(m);
 			ownerMove.variants.push({
 				parentMoveId: ownerMove.moveId,
 				moves: [move],

@@ -11,7 +11,7 @@ import {
 	updateView,
 } from '../../lib/ui-state';
 import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
-import { chess_study_move_from_user_move } from './chess_study_move_from_user_move';
+import { jgn_move_from_user_move } from './jgn_move_from_user_move';
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { ensure_move_in_scope } from './ensure_move_in_owner';
@@ -32,8 +32,8 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	setInitialState(
 		state: Pick<GameState, 'isNotationHidden'>,
 		currentMove: MoveToken,
-		model: NeoStudy,
-		study: JgnStudy,
+		neoStudy: NeoStudy,
+		jgnStudy: JgnStudy,
 	): void {
 		state.isNotationHidden = false;
 		if (!this.#chessView) return;
@@ -111,7 +111,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 
 				// Only push if its the last move in the variant because depth can only be 1
 				if (isLastMove) {
-					const variantMove = chess_study_move_from_user_move(m);
+					const variantMove = jgn_move_from_user_move(m);
 					variantMoves.push(variantMove);
 
 					const tempChess = new ChessJs(m.after);
@@ -143,7 +143,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				if (is_index_last_in_array(moveIndex, moves)) {
 					// If the current move is the last move then the played move
 					// should be added as a Main Line move.
-					const move = chess_study_move_from_user_move(m);
+					const move = jgn_move_from_user_move(m);
 					moves.push(move);
 
 					state.currentMove = move;
@@ -158,7 +158,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 			// If there are moves in the game then
 			// TODO: This is probably where we should check the moves and proceed accordingly.
 			if (moves.length === 0) {
-				const move = chess_study_move_from_user_move(m);
+				const move = jgn_move_from_user_move(m);
 				moves.push(move);
 				state.currentMove = move;
 			} else {
