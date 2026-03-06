@@ -80,7 +80,10 @@ export interface GameState {
 	/**
 	 *
 	 */
-	currentNode: Pick<Readonly<NeoMove>, 'comment' | 'id' | 'shapes'> | null;
+	currentNode: Pick<
+		NeoMove,
+		'comment' | 'id' | 'shapes' | 'left' | 'right'
+	> | null;
 	/**
 	 *
 	 */

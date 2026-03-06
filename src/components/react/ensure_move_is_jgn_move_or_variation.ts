@@ -7,27 +7,30 @@ import { jgn_move_from_user_move } from './jgn_move_from_user_move';
  * Ensures that the played move exists in the specified scope move.
  *
  * @param m the played move
- * @param ownerMove the move that will own the played move.
+ * @param jgnMove the move that will own the played move.
  * @returns the current move.
  */
-export function ensure_move_in_scope(m: Move, ownerMove: JgnMove): JgnMove {
-	if (ownerMove.san === m.san) {
-		return ownerMove;
+export function ensure_move_is_jgn_move_or_variation(
+	m: Move,
+	jgnMove: JgnMove,
+): JgnMove {
+	if (jgnMove.san === m.san) {
+		return jgnMove;
 	} else {
 		// The played move is not the same as the Main Line move.
 		// If a variation exists that starts with the playedMove, then go into that variation.
 		// Otherwise, create a new variation with the played move as the first move
 		const variationIndex = find_variation_index_with_first_move(
-			ownerMove.variants,
+			jgnMove.variants,
 			m.san,
 		);
 		if (variationIndex !== -1) {
-			return ownerMove.variants[variationIndex].moves[0];
+			return jgnMove.variants[variationIndex].moves[0];
 		} else {
 			// The move does not exist in any existing variation so we create a new variation
 			const move = jgn_move_from_user_move(m);
-			ownerMove.variants.push({
-				parentMoveId: ownerMove.moveId,
+			jgnMove.variants.push({
+				parentMoveId: jgnMove.moveId,
 				moves: [move],
 			});
 			return move;

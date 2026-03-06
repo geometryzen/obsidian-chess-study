@@ -17,7 +17,7 @@ export class NeoStudy {
 	/**
 	 * The moves that follow from the root FEN.
 	 */
-	readonly root: NeoMove | null;
+	root: NeoMove | null;
 	/**
 	 * The starting position.
 	 */

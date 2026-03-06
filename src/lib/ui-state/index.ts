@@ -8,26 +8,6 @@ import { JgnMove } from '../jgn/JgnMove';
 import { find_move_index_from_move_id } from './find_move_index_from_move_id';
 import { get_move_from_offset } from './get_move_from_offset';
 
-export const getMoveById = (moves: JgnMove[], moveId: string) => {
-	const { indexLocation: variant, moveIndex } = find_move_index_from_move_id(
-		moves,
-		moveId,
-	);
-	// Are we in a variant? Are we not? Decide which move to display
-
-	if (variant) {
-		const variantMoves =
-			moves[variant.mainLineMoveIndex].variants[variant.variationIndex].moves;
-
-		if (typeof variantMoves[moveIndex] !== 'undefined') {
-			return variantMoves[moveIndex];
-		}
-
-		return moves[variant.mainLineMoveIndex];
-	}
-	return moves[moveIndex];
-};
-
 /**
  * TODO: refactor the function so
  * @param state

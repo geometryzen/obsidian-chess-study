@@ -1,20 +1,24 @@
 import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
-import { is_index_last_in_array } from '../../lib/lang/is_index_last_in_array';
-import { JgnStudy } from '../../lib/jgn/JgnStudy';
 import { JgnMove } from '../../lib/jgn/JgnMove';
+import { JgnStudy } from '../../lib/jgn/JgnStudy';
+import { is_index_last_in_array } from '../../lib/lang/is_index_last_in_array';
+import { NeoMove } from '../../lib/tree/NeoMove';
 import { NeoStudy } from '../../lib/tree/NeoStudy';
-import {
-	displayRelativeMoveInHistory,
-	getMoveById,
-	updateView,
-} from '../../lib/ui-state';
+import { displayRelativeMoveInHistory, updateView } from '../../lib/ui-state';
 import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
-import { jgn_move_from_user_move } from './jgn_move_from_user_move';
+import { get_jgn_move_by_id } from '../../lib/ui-state/get_jgn_move_by_id';
+// import { get_neo_move_by_id } from '../../lib/ui-state/get_neo_move_by_id';
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
-import { ensure_move_in_scope } from './ensure_move_in_owner';
+import { ensure_move_is_jgn_move_or_variation } from './ensure_move_is_jgn_move_or_variation';
+import { ensure_move_is_neo_move_or_variation } from './ensure_move_is_neo_move_or_variation';
+import { first_jgn_move } from './first_jgn_move';
+import { first_neo_move } from './first_neo_move';
+import { jgn_move_from_user_move } from './jgn_move_from_user_move';
+import { neo_move_from_user_move } from './neo_move_from_user_move';
+import { rightmost_neo_node } from './rightmost_neo_node';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
@@ -80,9 +84,19 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 */
 	gotoMove(state: GameState, moveId: string): void {
 		if (!this.#chessView) return;
-		const move = getMoveById(state.jgnStudy.moves, moveId);
-		updateView(this.#chessView, this.#setChessLogic, move.after);
-		state.currentMove = move;
+		// FIXME
+		/*
+		{
+			const neoMove: NeoMove = get_neo_move_by_id(state.neoStudy, moveId);
+			updateView(this.#chessView, this.#setChessLogic, neoMove.after);
+			state.currentNode = neoMove;
+		}
+		*/
+		{
+			const jgnMove: JgnMove = get_jgn_move_by_id(state.jgnStudy, moveId);
+			updateView(this.#chessView, this.#setChessLogic, jgnMove.after);
+			state.currentMove = jgnMove;
+		}
 	}
 	/**
 	 * @override
@@ -149,7 +163,10 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					state.currentMove = move;
 				} else {
 					// The current move is not the last in the Main Line.
-					state.currentMove = ensure_move_in_scope(m, moves[moveIndex + 1]);
+					state.currentMove = ensure_move_is_jgn_move_or_variation(
+						m,
+						moves[moveIndex + 1],
+					);
 				}
 			}
 		} else {
@@ -162,12 +179,62 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				moves.push(move);
 				state.currentMove = move;
 			} else {
-				// There are Main Line moves and yet there is no curent move.
+				// There are Main Line moves and yet there is no current move.
 				// So we must be positioned before the start of the first move.
 				// This is the move to which the played move belongs.
-				state.currentMove = ensure_move_in_scope(m, moves[0]);
+				const first_move = first_jgn_move(state.jgnStudy);
+				state.currentMove = ensure_move_is_jgn_move_or_variation(m, first_move);
 			}
 		}
+		const root = state.neoStudy.root;
+		if (state.currentNode) {
+			const left = state.currentNode.left;
+			if (left) {
+				// There is a following Main Line move.
+				if (left.san === m.san) {
+					state.currentNode = left;
+					return;
+				} else {
+					let right = state.currentNode.right;
+					while (right) {
+						if (right.san === m.san) {
+							state.currentNode = right;
+							return;
+						}
+						right = right.right;
+					}
+				}
+				// The move will be added as a variation of the following
+				const move = neo_move_from_user_move(m, null, null);
+				const parent = rightmost_neo_node(left);
+				parent.right = move;
+			} else {
+				// There is no following Main Line move.
+				// Look in the variations.
+				let right = state.currentNode.right;
+				while (right) {
+					if (right.san === m.san) {
+						state.currentNode = right;
+						return;
+					}
+					right = right.right;
+				}
+				// The move will be added as the next Main Line move
+				const move = neo_move_from_user_move(m, null, null);
+				state.currentNode.left = move;
+				state.currentNode = move;
+			}
+		} else {
+			if (root === null) {
+				const move = neo_move_from_user_move(m, null, null);
+				state.neoStudy.root = move;
+				state.currentNode = move;
+			} else {
+				const first_move = first_neo_move(state.neoStudy) as NeoMove;
+				state.currentNode = ensure_move_is_neo_move_or_variation(m, first_move);
+			}
+		}
+		console.log(JSON.stringify(state.neoStudy.root, null, 2));
 	}
 	/**
 	 * @override

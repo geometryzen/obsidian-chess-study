@@ -18,11 +18,11 @@ export class NeoMove {
 	/**
 	 * The left leg of the tree is the next move.
 	 */
-	readonly left: NeoMove | null;
+	left: NeoMove | null;
 	/**
 	 * The right leg of the tree is the next variation.
 	 */
-	readonly right: NeoMove | null;
+	right: NeoMove | null;
 	constructor(
 		after: string,
 		clock: string | undefined,
