@@ -1,11 +1,11 @@
 import { JgnMove, JgnVariation } from '../jgn/JgnMove';
-import { NeoMove } from '../tree/NeoMove';
+import { NeoMove } from '../neo/NeoMove';
 import { move_from_node_and_variations } from './move_from_node_and_variations';
 
 export function moves_from_node(node: NeoMove | null): JgnMove[] {
 	if (node) {
 		const following_moves = moves_from_node(node.left);
-		const variations = variations_from_node(node.right, node.id);
+		const variations = variations_from_node(node.right, node.moveId);
 		const move = move_from_node_and_variations(node, variations);
 		return [move, ...following_moves];
 	} else {

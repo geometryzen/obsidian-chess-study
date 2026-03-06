@@ -9,7 +9,7 @@ export class NeoMove {
 	readonly comment: JSONContent | null;
 	readonly evaluation: number | undefined;
 	readonly from: string;
-	readonly id: string;
+	readonly moveId: string;
 	readonly nags: NumericAnnotationGlyph[];
 	readonly promotion: 'b' | 'p' | 'n' | 'r' | 'q' | 'k' | undefined;
 	readonly san: string;
@@ -45,7 +45,7 @@ export class NeoMove {
 		this.comment = comment;
 		this.evaluation = evaluation;
 		this.from = from;
-		this.id = id;
+		this.moveId = id;
 		this.nags = nags;
 		this.promotion = promotion;
 		this.san = san;

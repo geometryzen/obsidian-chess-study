@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
-import { NeoMove } from '../lib/tree/NeoMove';
-import { bfsGeneratorRL } from '../lib/tree/bfsGeneratorRL';
+import { NeoMove } from '../lib/neo/NeoMove';
+import { bfsGeneratorRL } from '../lib/neo/bfsGeneratorRL';
 
 describe('bfsGenerator', () => {
 	test('1. e4', () => {

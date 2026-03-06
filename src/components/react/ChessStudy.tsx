@@ -8,10 +8,16 @@ import { useCallback, useMemo, useState } from 'react';
 import { useImmerReducer } from 'use-immer';
 import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPluginSettings';
 import { InitialPosition } from '../../lib/config/InitialPosition';
+import { find_move_index_from_move_id } from '../../lib/jgn/find_move_index_from_move_id';
+import { first_jgn_move } from '../../lib/jgn/first_jgn_move';
+import { get_jgn_main_line } from '../../lib/jgn/get_jgn_main_line';
 import { initial_move_from_jgn_study } from '../../lib/jgn/initial_move_from_jgn_study';
 import { jgn_to_pgn_string } from '../../lib/jgn/jgn_to_pgn_string';
-import { JgnMove } from '../../lib/jgn/JgnMove';
 import { JgnStudy } from '../../lib/jgn/JgnStudy';
+import { first_neo_move } from '../../lib/neo/first_neo_move';
+import { get_neo_main_line } from '../../lib/neo/get_neo_main_line';
+import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
+import { NeoStudy } from '../../lib/neo/NeoStudy';
 import {
 	annotate_move_blunder,
 	annotate_move_correct,
@@ -32,20 +38,22 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import { initial_move_from_neo_study } from '../../lib/tree/initial_node_from_neo_study';
-import { NeoMove } from '../../lib/tree/NeoMove';
-import { NeoStudy } from '../../lib/tree/NeoStudy';
 import {
 	displayRelativeMoveInHistory,
 	getCurrentMove,
 } from '../../lib/ui-state';
-import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { CommentSection } from './CommentSection';
 import { createChessStudyEventHandler } from './createChessStudyEventHandler';
 import { PgnViewer } from './PgnViewer';
 export type ChessStudyConfig = ChessgroundProps;
+
+/**
+ * Determines which data model to use as canonical.
+ * This is scaffolding until we transition fully to 'neo'.
+ */
+const MASTER: 'jgn' | 'neo' = 'jgn' as 'jgn' | 'neo';
 
 interface AppProps {
 	/**
@@ -68,22 +76,16 @@ export interface MoveToken {
 }
 
 export interface GameState {
+	master: 'jgn' | 'neo';
 	/**
-	 *
+	 * The same data structure whether 'jgn' or 'neo'
 	 */
-	currentMove: Pick<Readonly<JgnMove>, 'comment' | 'moveId' | 'shapes'> | null;
+	currentMove: MoveToken | null;
 	/**
 	 * This part is what goes in the file.
 	 * It is a similar to a PGN in content except
 	 */
 	jgnStudy: JgnStudy;
-	/**
-	 *
-	 */
-	currentNode: Pick<
-		NeoMove,
-		'comment' | 'id' | 'shapes' | 'left' | 'right'
-	> | null;
 	/**
 	 *
 	 */
@@ -98,14 +100,29 @@ export interface GameState {
 	isViewOnly: boolean;
 }
 
-function comment_from_game_state(gameState: GameState): JSONContent | null {
-	return gameState.currentMove
-		? gameState.currentMove.comment
-			? gameState.currentMove.comment
-			: null
-		: gameState.jgnStudy.comment
-			? gameState.jgnStudy.comment
-			: null;
+function comment_from_game_state(state: GameState): JSONContent | null {
+	switch (state.master) {
+		case 'neo': {
+			return state.currentMove
+				? state.currentMove.comment
+					? state.currentMove.comment
+					: null
+				: state.neoStudy.comment
+					? state.neoStudy.comment
+					: null;
+			break;
+		}
+		case 'jgn': {
+			return state.currentMove
+				? state.currentMove.comment
+					? state.currentMove.comment
+					: null
+				: state.jgnStudy.comment
+					? state.jgnStudy.comment
+					: null;
+			break;
+		}
+	}
 }
 
 export type GameEvent =
@@ -164,23 +181,54 @@ export const ChessStudy = ({
 
 		switch (config.initialPosition) {
 			case 'end': {
-				jgnStudy.moves.forEach((move) => {
-					chess.move({
-						from: move.from,
-						to: move.to,
-						promotion: move.promotion,
-					});
-				});
+				switch (MASTER) {
+					case 'jgn': {
+						get_jgn_main_line(jgnStudy).forEach((move) => {
+							chess.move({
+								from: move.from,
+								to: move.to,
+								promotion: move.promotion,
+							});
+						});
+						break;
+					}
+					case 'neo': {
+						get_neo_main_line(neoStudy).forEach((move) => {
+							chess.move({
+								from: move.from,
+								to: move.to,
+								promotion: move.promotion,
+							});
+						});
+						break;
+					}
+				}
 				break;
 			}
 			case 'first': {
-				const move = jgnStudy.moves[0];
-				if (move) {
-					chess.move({
-						from: move.from,
-						to: move.to,
-						promotion: move.promotion,
-					});
+				switch (MASTER) {
+					case 'jgn': {
+						const move = first_jgn_move(jgnStudy);
+						if (move) {
+							chess.move({
+								from: move.from,
+								to: move.to,
+								promotion: move.promotion,
+							});
+						}
+						break;
+					}
+					case 'neo': {
+						const move = first_neo_move(neoStudy);
+						if (move) {
+							chess.move({
+								from: move.from,
+								to: move.to,
+								promotion: move.promotion,
+							});
+						}
+						break;
+					}
 				}
 				break;
 			}
@@ -189,6 +237,7 @@ export const ChessStudy = ({
 				break;
 			}
 			default: {
+				// TODO: switch on MASTER
 				const desiredMove = initial_move_from_jgn_study(
 					jgnStudy,
 					config.initialPosition,
@@ -235,20 +284,28 @@ export const ChessStudy = ({
 		setChessLogic,
 	);
 
+	function initial_move() {
+		switch (MASTER) {
+			case 'jgn': {
+				return initial_move_from_jgn_study(jgnStudy, initialPosition);
+			}
+			case 'neo': {
+				return initial_move_from_neo_study(neoStudy, initialPosition);
+			}
+		}
+	}
+
 	// Because of strict rendering, the initialState is created when the chessView
 	const initialState: GameState = {
+		master: MASTER,
 		/**
 		 *
 		 */
-		currentMove: initial_move_from_jgn_study(jgnStudy, initialPosition),
+		currentMove: initial_move(),
 		/**
 		 * The "legacy" data structure is in fact the serialization format - JSON Game Notation (proprietary) a.k.a. Jgn.
 		 */
 		jgnStudy,
-		/**
-		 *
-		 */
-		currentNode: initial_move_from_neo_study(neoStudy, initialPosition),
 		/**
 		 * Placing this here to illustrate how the game state can migrate toward the tree model.
 		 */

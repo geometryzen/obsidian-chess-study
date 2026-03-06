@@ -1,7 +1,7 @@
 import { JgnStudy } from '../jgn/JgnStudy';
 import { JgnMove, JgnVariation } from '../jgn/JgnMove';
-import { NeoStudy } from '../tree/NeoStudy';
-import { NeoMove } from '../tree/NeoMove';
+import { NeoStudy } from '../neo/NeoStudy';
+import { NeoMove } from '../neo/NeoMove';
 import { head_and_remaining } from './head_and_remaining';
 import { node_from_move_and_links } from './node_from_move_and_links';
 

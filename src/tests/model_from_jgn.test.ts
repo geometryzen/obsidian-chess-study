@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { JgnStudy } from '../lib/jgn/JgnStudy';
 import { JgnMove, JgnVariation } from '../lib/jgn/JgnMove';
 import { model_from_jgn } from '../lib/transform/model_from_jgn';
-import { NeoMove } from '../lib/tree/NeoMove';
+import { NeoMove } from '../lib/neo/NeoMove';
 
 describe('model_from_jgn', () => {
 	test('headers', () => {
@@ -62,7 +62,7 @@ describe('model_from_jgn', () => {
 		expect(root.evaluation).toBe(move.evaluation);
 		expect(root.from).toBe(move.from);
 		// Do we need to preseve the move identifier?
-		expect(root.id).toBe(move.moveId);
+		expect(root.moveId).toBe(move.moveId);
 		expect(root.nags).toBe(move.nags);
 		expect(root.promotion).toBe(move.promotion);
 		expect(root.san).toBe(move.san);
@@ -121,7 +121,7 @@ describe('model_from_jgn', () => {
 		expect(root.evaluation).toBe(white_move.evaluation);
 		expect(root.from).toBe(white_move.from);
 		// Do we need to preseve the move identifier?
-		expect(root.id).toBe(white_move.moveId);
+		expect(root.moveId).toBe(white_move.moveId);
 		expect(root.nags).toBe(white_move.nags);
 		expect(root.promotion).toBe(white_move.promotion);
 		expect(root.san).toBe(white_move.san);
@@ -137,7 +137,7 @@ describe('model_from_jgn', () => {
 		expect(left.evaluation).toBe(black_move.evaluation);
 		expect(left.from).toBe(black_move.from);
 		// Do we need to preseve the move identifier?
-		expect(left.id).toBe(black_move.moveId);
+		expect(left.moveId).toBe(black_move.moveId);
 		expect(left.nags).toBe(black_move.nags);
 		expect(left.promotion).toBe(black_move.promotion);
 		expect(left.san).toBe(black_move.san);
@@ -201,7 +201,7 @@ describe('model_from_jgn', () => {
 		expect(root.evaluation).toBe(e4_move.evaluation);
 		expect(root.from).toBe(e4_move.from);
 		// Do we need to preseve the move identifier?
-		expect(root.id).toBe(e4_move.moveId);
+		expect(root.moveId).toBe(e4_move.moveId);
 		expect(root.nags).toBe(e4_move.nags);
 		expect(root.promotion).toBe(e4_move.promotion);
 		expect(root.san).toBe(e4_move.san);
@@ -218,7 +218,7 @@ describe('model_from_jgn', () => {
 		expect(right.evaluation).toBe(d4_move.evaluation);
 		expect(right.from).toBe(d4_move.from);
 		// Do we need to preseve the move identifier?
-		expect(right.id).toBe(d4_move.moveId);
+		expect(right.moveId).toBe(d4_move.moveId);
 		expect(right.nags).toBe(d4_move.nags);
 		expect(right.promotion).toBe(d4_move.promotion);
 		expect(right.san).toBe(d4_move.san);
@@ -300,7 +300,7 @@ describe('model_from_jgn', () => {
 		expect(e4_node.evaluation).toBe(e4_move.evaluation);
 		expect(e4_node.from).toBe(e4_move.from);
 		// Do we need to preseve the move identifier?
-		expect(e4_node.id).toBe(e4_move.moveId);
+		expect(e4_node.moveId).toBe(e4_move.moveId);
 		expect(e4_node.nags).toBe(e4_move.nags);
 		expect(e4_node.promotion).toBe(e4_move.promotion);
 		expect(e4_node.san).toBe(e4_move.san);
@@ -317,7 +317,7 @@ describe('model_from_jgn', () => {
 		expect(d4_node.evaluation).toBe(d4_move.evaluation);
 		expect(d4_node.from).toBe(d4_move.from);
 		// Do we need to preseve the move identifier?
-		expect(d4_node.id).toBe(d4_move.moveId);
+		expect(d4_node.moveId).toBe(d4_move.moveId);
 		expect(d4_node.nags).toBe(d4_move.nags);
 		expect(d4_node.promotion).toBe(d4_move.promotion);
 		expect(d4_node.san).toBe(d4_move.san);

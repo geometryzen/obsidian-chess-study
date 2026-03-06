@@ -1,5 +1,5 @@
 import { JgnMove } from '../jgn/JgnMove';
-import { NeoMove } from '../tree/NeoMove';
+import { NeoMove } from '../neo/NeoMove';
 
 export function node_from_move_and_links(
 	move: Pick<

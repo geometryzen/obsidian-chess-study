@@ -3,7 +3,7 @@ import { DataAdapter, normalizePath } from 'obsidian';
 import { ROOT_FEN } from '../chess-logic/ROOT_FEN';
 import { jgn_from_model } from '../transform/jgn_from_model';
 import { model_from_jgn } from '../transform/model_from_jgn';
-import { NeoStudy } from '../tree/NeoStudy';
+import { NeoStudy } from '../neo/NeoStudy';
 import { JgnStudy } from '../jgn/JgnStudy';
 
 interface UnwantedMoveProperties {

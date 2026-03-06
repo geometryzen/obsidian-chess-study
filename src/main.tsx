@@ -24,7 +24,7 @@ import { JgnStudy } from './lib/jgn/JgnStudy';
 import { ChessStudyLoader } from './lib/obsidian/ChessStudyLoader';
 import { parse_user_config } from './lib/obsidian/parse_user_config';
 import './main.css';
-import { NeoStudy } from './lib/tree/NeoStudy';
+import { NeoStudy } from './lib/neo/NeoStudy';
 
 type FEN = string;
 type PGN = string;

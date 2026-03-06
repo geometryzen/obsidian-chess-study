@@ -1,5 +1,5 @@
 import { JgnStudy } from '../jgn/JgnStudy';
-import { NeoStudy } from '../tree/NeoStudy';
+import { NeoStudy } from '../neo/NeoStudy';
 import { moves_from_node } from './moves_from_node';
 
 export function jgn_from_model(model: NeoStudy): JgnStudy {

@@ -1,5 +1,5 @@
 import { JgnMove, JgnVariation } from '../jgn/JgnMove';
-import { NeoMove } from '../tree/NeoMove';
+import { NeoMove } from '../neo/NeoMove';
 
 export function move_from_node_and_variations(
 	node: Pick<
@@ -8,7 +8,7 @@ export function move_from_node_and_variations(
 		| 'color'
 		| 'comment'
 		| 'from'
-		| 'id'
+		| 'moveId'
 		| 'nags'
 		| 'promotion'
 		| 'san'
@@ -24,7 +24,7 @@ export function move_from_node_and_variations(
 		color: node.color,
 		comment: node.comment,
 		from: node.from,
-		moveId: node.id,
+		moveId: node.moveId,
 		nags: node.nags,
 		promotion: node.promotion,
 		san: node.san,

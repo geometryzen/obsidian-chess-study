@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
-import { NeoMove } from '../lib/tree/NeoMove';
-import { dfsGeneratorRL } from '../lib/tree/dfsGeneratorRL';
-import { get_move_prev } from '../lib/tree/get_move_prev';
+import { NeoMove } from '../lib/neo/NeoMove';
+import { dfsGeneratorRL } from '../lib/neo/dfsGeneratorRL';
+import { get_move_prev } from '../lib/neo/get_move_prev';
 
 describe('get_move_prev', () => {
 	test('variations', () => {

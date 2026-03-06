@@ -1,7 +1,19 @@
-import { JgnMove, JgnVariation } from '../jgn/JgnMove';
+import { JgnMove, JgnVariation } from './JgnMove';
+import { JgnStudy } from './JgnStudy';
 import { find_move_index_from_move_id } from './find_move_index_from_move_id';
 
-export function get_move_from_offset(
+export function get_jgn_move_from_offset(
+	study: JgnStudy,
+	moveId: string,
+	offset: 1 | -1,
+) {
+	return get_move_from_offset(study.moves, moveId, offset);
+}
+
+/**
+ * Recursive helper function.
+ */
+function get_move_from_offset(
 	moves: JgnMove[],
 	moveId: string,
 	offset: 1 | -1,

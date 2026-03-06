@@ -4,8 +4,8 @@ import { nanoid } from 'nanoid';
 import { NumericAnnotationGlyph } from '../lib/NumericAnnotationGlyphs';
 import { JgnStudy } from '../lib/jgn/JgnStudy';
 import { jgn_from_model } from '../lib/transform/jgn_from_model';
-import { NeoStudy } from '../lib/tree/NeoStudy';
-import { NeoMove } from '../lib/tree/NeoMove';
+import { NeoStudy } from '../lib/neo/NeoStudy';
+import { NeoMove } from '../lib/neo/NeoMove';
 
 describe('jgn_from_model', () => {
 	test('headers', () => {

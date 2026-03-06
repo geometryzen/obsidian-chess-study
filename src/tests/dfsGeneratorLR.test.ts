@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
-import { NeoMove } from '../lib/tree/NeoMove';
-import { dfsGeneratorLR } from '../lib/tree/dfsGeneratorLR';
+import { NeoMove } from '../lib/neo/NeoMove';
+import { dfsGeneratorLR } from '../lib/neo/dfsGeneratorLR';
 
 describe('dfsGenerator', () => {
 	test('1. e4', () => {

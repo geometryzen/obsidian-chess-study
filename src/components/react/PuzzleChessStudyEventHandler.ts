@@ -1,7 +1,7 @@
 import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { updateView } from '../../lib/ui-state';
-import { find_move_index_from_move_id } from '../../lib/ui-state/find_move_index_from_move_id';
+import { find_move_index_from_move_id } from '../../lib/jgn/find_move_index_from_move_id';
 import { GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { DrawShape } from 'chessground/draw';

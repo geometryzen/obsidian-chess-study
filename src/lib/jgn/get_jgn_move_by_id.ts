@@ -1,6 +1,6 @@
-import { JgnMove } from '../jgn/JgnMove';
-import { JgnStudy } from '../jgn/JgnStudy';
 import { find_move_index_from_move_id } from './find_move_index_from_move_id';
+import { JgnMove } from './JgnMove';
+import { JgnStudy } from './JgnStudy';
 
 export function get_jgn_move_by_id(study: JgnStudy, moveId: string): JgnMove {
 	const moves = study.moves;

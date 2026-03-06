@@ -3,7 +3,7 @@ import { Move } from 'chess.js';
 import { DrawShape } from 'chessground/draw';
 import { nanoid } from 'nanoid';
 import { NumericAnnotationGlyph } from '../../lib/NumericAnnotationGlyphs';
-import { NeoMove } from '../../lib/tree/NeoMove';
+import { NeoMove } from '../../lib/neo/NeoMove';
 
 export function neo_move_from_user_move(
 	m: Move,

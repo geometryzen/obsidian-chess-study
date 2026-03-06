@@ -1,12 +1,12 @@
-import { NeoMove } from '../tree/NeoMove';
-import { NeoStudy } from '../tree/NeoStudy';
+import { NeoMove } from './NeoMove';
+import { NeoStudy } from './NeoStudy';
 
 export function get_neo_move_by_id(study: NeoStudy, moveId: string): NeoMove {
 	if (study.root) {
 		const moves: NeoMove[] = [study.root];
 		while (moves.length > 0) {
 			const move = moves.pop() as NeoMove;
-			if (move.id === moveId) {
+			if (move.moveId === moveId) {
 				return move;
 			} else {
 				if (move.left) {

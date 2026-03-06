@@ -9,7 +9,7 @@ import { ChessStudyLoader } from '../../lib/obsidian/ChessStudyLoader';
 import { JgnStudy } from '../../lib/jgn/JgnStudy';
 import { ChessStudy } from '../react/ChessStudy';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
-import { NeoStudy } from '../../lib/tree/NeoStudy';
+import { NeoStudy } from '../../lib/neo/NeoStudy';
 
 /**
  * This is not the Obsidian Plugin.
