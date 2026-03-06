@@ -1,8 +1,8 @@
 import { nanoid } from 'nanoid';
 import { DataAdapter, normalizePath } from 'obsidian';
 import { ROOT_FEN } from '../chess-logic/ROOT_FEN';
-import { jgn_from_model } from '../transform/jgn_from_model';
-import { model_from_jgn } from '../transform/model_from_jgn';
+import { jgn_from_neo } from '../transform/jgn_from_neo';
+import { neo_from_jgn } from '../transform/neo_from_jgn';
 import { NeoStudy } from '../neo/NeoStudy';
 import { JgnStudy } from '../jgn/JgnStudy';
 
@@ -30,7 +30,7 @@ export class ChessStudyLoader {
 	}
 
 	async saveNeoStudy(model: NeoStudy, id?: string): Promise<string> {
-		const jgn = jgn_from_model(model);
+		const jgn = jgn_from_neo(model);
 		return this.saveJgnStudy(jgn, id);
 	}
 
@@ -55,7 +55,7 @@ export class ChessStudyLoader {
 
 	async loadNeoStudy(id: string): Promise<NeoStudy> {
 		const jgnStudy = await this.loadJgnStudy(id);
-		return model_from_jgn(jgnStudy);
+		return neo_from_jgn(jgnStudy);
 	}
 
 	async loadJgnStudy(id: string): Promise<JgnStudy> {

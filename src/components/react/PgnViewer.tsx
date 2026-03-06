@@ -31,7 +31,8 @@ export const VariantsContainer = ({
 
 export const PgnViewer = React.memo((props: PgnViewerProps) => {
 	const {
-		history,
+		jgnMoves,
+		// neoMoves,
 		currentMoveId,
 		initialPlayer,
 		initialMoveNumber,
@@ -44,10 +45,9 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 	// Notice that chunkArray does not give quite the result you might expect for the first pair when the initial player is Black.
 	// The first element in such a case contains a single move which is really Black's, but it is in the first position.
 	// This requires us
-	const main_move_pairs = useMemo(
-		() => chunkArray(history, 2, initialPlayer === 'b'),
-		[initialPlayer, history],
-	);
+	const main_move_pairs = useMemo(() => {
+		return chunkArray(jgnMoves, 2, initialPlayer === 'b');
+	}, [initialPlayer, jgnMoves]);
 
 	return (
 		<div className="height-width-100">

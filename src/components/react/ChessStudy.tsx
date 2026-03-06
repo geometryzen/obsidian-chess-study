@@ -14,8 +14,11 @@ import { get_jgn_main_line } from '../../lib/jgn/get_jgn_main_line';
 import { initial_move_from_jgn_study } from '../../lib/jgn/initial_move_from_jgn_study';
 import { jgn_to_pgn_string } from '../../lib/jgn/jgn_to_pgn_string';
 import { JgnStudy } from '../../lib/jgn/JgnStudy';
+import { find_parent } from '../../lib/neo/find_parent';
 import { first_neo_move } from '../../lib/neo/first_neo_move';
 import { get_neo_main_line } from '../../lib/neo/get_neo_main_line';
+import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
+import { has_neo_move_by_id } from '../../lib/neo/has_neo_move_by_id';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
 import { NeoStudy } from '../../lib/neo/NeoStudy';
 import {
@@ -38,14 +41,17 @@ import {
 	ChessStudyAppConfig,
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
-import {
-	displayRelativeMoveInHistory,
-	getCurrentMove,
-} from '../../lib/ui-state';
+import { jgn_from_neo } from '../../lib/transform/jgn_from_neo';
+import { neo_from_jgn } from '../../lib/transform/neo_from_jgn';
+import { displayRelativeMoveInHistory } from '../../lib/ui-state/display_relative_move';
+import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { CommentSection } from './CommentSection';
 import { createChessStudyEventHandler } from './createChessStudyEventHandler';
+import { get_current_jgn_move } from './get_current_jgn_move';
+import { get_current_neo_move } from './get_current_neo_move';
+import { has_no_moves } from './has_no_moves';
 import { PgnViewer } from './PgnViewer';
 export type ChessStudyConfig = ChessgroundProps;
 
@@ -334,7 +340,6 @@ export const ChessStudy = ({
 	const [gameState, dispatch] = useImmerReducer<GameState, GameEvent>(
 		// The first argument is the reducer function
 		(state: GameState, event: GameEvent) => {
-			const hasNoMoves = state.jgnStudy.moves.length === 0;
 			switch (event.type) {
 				case 'GOTO_NEXT_MOVE': {
 					handler.gotoNextMove(state);
@@ -345,68 +350,102 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'REMOVE_LAST_MOVE': {
-					if (!chessView || hasNoMoves) return state;
-
-					const moves = state.jgnStudy.moves;
-
-					const currentMoveId = state.currentMove?.moveId;
-
-					if (currentMoveId) {
-						const { indexLocation, moveIndex } = find_move_index_from_move_id(
-							moves,
-							currentMoveId,
-						);
-
-						if (indexLocation) {
-							// The current move belongs to a variation, not the Main Line.
-							const parent = moves[indexLocation.mainLineMoveIndex];
-							const variantMoves = parent.variants[indexLocation.variationIndex].moves;
-
-							const isLastMove = moveIndex === variantMoves.length - 1;
-
-							if (isLastMove) {
-								state.currentMove = displayRelativeMoveInHistory(
-									state,
-									chessView,
-									setChessLogic,
-									{
-										offset: -1,
-										selectedMoveId: currentMoveId,
-									},
+					if (!chessView || has_no_moves(state)) return state;
+					switch (state.master) {
+						case 'jgn': {
+							if (state.currentMove) {
+								const moveId = state.currentMove.moveId;
+								const moves = state.jgnStudy.moves;
+								const { indexLocation, moveIndex } = find_move_index_from_move_id(
+									moves,
+									moveId,
 								);
-							}
 
-							variantMoves.pop();
-							if (variantMoves.length === 0) {
-								parent.variants.splice(indexLocation.variationIndex, 1);
-							}
+								if (indexLocation) {
+									// The current move belongs to a variation, not the Main Line.
+									const parent = moves[indexLocation.mainLineMoveIndex];
+									const variantMoves =
+										parent.variants[indexLocation.variationIndex].moves;
 
-							if (isLastMove) {
-								state.currentMove =
-									variantMoves.length > 0
-										? variantMoves[variantMoves.length - 1]
-										: moves[indexLocation.mainLineMoveIndex];
-							}
-						} else {
-							const isLastMove = moveIndex === moves.length - 1;
+									const isLastMove = moveIndex === variantMoves.length - 1;
 
-							if (isLastMove) {
-								state.currentMove = displayRelativeMoveInHistory(
-									state,
-									chessView,
-									setChessLogic,
-									{
-										offset: -1,
-										selectedMoveId: currentMoveId,
-									},
-								);
-							}
+									if (isLastMove) {
+										state.currentMove = displayRelativeMoveInHistory(
+											state,
+											chessView,
+											setChessLogic,
+											{
+												offset: -1,
+												selectedMoveId: moveId,
+											},
+										);
+									}
 
-							moves.pop();
+									variantMoves.pop();
+									if (variantMoves.length === 0) {
+										parent.variants.splice(indexLocation.variationIndex, 1);
+									}
 
-							if (isLastMove) {
-								state.currentMove = moves.length > 0 ? moves[moves.length - 1] : null;
+									if (isLastMove) {
+										state.currentMove =
+											variantMoves.length > 0
+												? variantMoves[variantMoves.length - 1]
+												: moves[indexLocation.mainLineMoveIndex];
+									}
+								} else {
+									const isLastMove = moveIndex === moves.length - 1;
+
+									if (isLastMove) {
+										state.currentMove = displayRelativeMoveInHistory(
+											state,
+											chessView,
+											setChessLogic,
+											{
+												offset: -1,
+												selectedMoveId: moveId,
+											},
+										);
+									}
+
+									moves.pop();
+
+									if (isLastMove) {
+										state.currentMove = moves.length > 0 ? moves[moves.length - 1] : null;
+									}
+								}
 							}
+							state.neoStudy = neo_from_jgn(state.jgnStudy);
+							break;
+						}
+						case 'neo': {
+							if (state.currentMove) {
+								const moveId = state.currentMove.moveId;
+								// For some reason we get two events so we must be idempotent.
+								if (has_neo_move_by_id(state.neoStudy, moveId)) {
+									const target = get_neo_move_by_id(state.neoStudy, moveId);
+									const parent = find_parent(state.neoStudy.root, target);
+									if (parent) {
+										if (parent.left === target) {
+											parent.left = target.right;
+										} else {
+											parent.right = target.right;
+										}
+										state.currentMove = parent;
+										update_view_and_logic(chessView, setChessLogic, parent.after);
+									} else {
+										// We must be deleting thr root node
+										state.neoStudy.root = null;
+										state.currentMove = null;
+										update_view_and_logic(
+											chessView,
+											setChessLogic,
+											state.neoStudy.rootFEN,
+										);
+									}
+									state.jgnStudy = jgn_from_neo(state.neoStudy);
+								}
+							}
+							break;
 						}
 					}
 
@@ -417,31 +456,62 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'SYNC_SHAPES': {
-					if (!chessView || hasNoMoves) return state;
-
-					const move = getCurrentMove(state);
-
-					if (move) {
-						move.shapes = event.shapes;
-						// Isn't this redundant? Didn't we just get the current move?
-						// Caution: The issue may be that we have changed the comment of the current move.
-						state.currentMove = move;
+					if (!chessView || has_no_moves(state)) return state;
+					switch (state.master) {
+						case 'jgn': {
+							const move = get_current_jgn_move(state);
+							if (move) {
+								move.shapes = event.shapes;
+								// Isn't this redundant? Didn't we just get the current move?
+								// Caution: The issue may be that we have changed the comment of the current move.
+								state.currentMove = move;
+								state.neoStudy = neo_from_jgn(state.jgnStudy);
+							}
+							break;
+						}
+						case 'neo': {
+							const move = get_current_neo_move(state);
+							if (move) {
+								move.shapes = event.shapes;
+								// Isn't this redundant? Didn't we just get the current move?
+								// Caution: The issue may be that we have changed the comment of the current move.
+								state.currentMove = move;
+								state.jgnStudy = jgn_from_neo(state.neoStudy);
+							}
+							break;
+						}
 					}
-
 					return state;
 				}
 				case 'SYNC_COMMENT': {
-					if (!chessView || hasNoMoves) return state;
-
-					const move = getCurrentMove(state);
-
-					if (move) {
-						move.comment = event.comment;
-						// Isn't this redundant? Didn't we just get the current move?
-						// Caution: The issue may be that we have changed the comment of the current move.
-						state.currentMove = move;
-					} else {
-						state.jgnStudy.comment = event.comment;
+					if (!chessView || has_no_moves(state)) return state;
+					switch (state.master) {
+						case 'jgn': {
+							const move = get_current_jgn_move(state);
+							if (move) {
+								move.comment = event.comment;
+								// Isn't this redundant? Didn't we just get the current move?
+								// Caution: The issue may be that we have changed the comment of the current move.
+								state.currentMove = move;
+							} else {
+								state.jgnStudy.comment = event.comment;
+							}
+							state.neoStudy = neo_from_jgn(state.jgnStudy);
+							break;
+						}
+						case 'neo': {
+							const move = get_current_neo_move(state);
+							if (move) {
+								move.comment = event.comment;
+								// Isn't this redundant? Didn't we just get the current move?
+								// Caution: The issue may be that we have changed the comment of the current move.
+								state.currentMove = move;
+							} else {
+								state.neoStudy.comment = event.comment;
+							}
+							state.jgnStudy = jgn_from_neo(state.neoStudy);
+							break;
+						}
 					}
 
 					return state;
@@ -451,8 +521,7 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'ANNOTATE_MOVE': {
-					const move = getCurrentMove(state);
-
+					const move = get_current_neo_move(state);
 					if (move) {
 						switch (event.glyph) {
 							case NAG_null: {
@@ -481,46 +550,92 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'EVALUATE_MOVE': {
-					const move = getCurrentMove(state);
-
-					if (move) {
-						switch (event.direction) {
-							case 1: {
-								move.nags = increase_move_evaluation(move.nags);
-								break;
+					switch (state.master) {
+						case 'jgn': {
+							const move = get_current_jgn_move(state);
+							if (move) {
+								switch (event.direction) {
+									case 1: {
+										move.nags = increase_move_evaluation(move.nags);
+										break;
+									}
+									case -1: {
+										move.nags = decrease_move_evaluation(move.nags);
+										break;
+									}
+									default: {
+										new Notice(`${move.san} ${event.direction}`);
+									}
+								}
+								state.neoStudy = neo_from_jgn(state.jgnStudy);
 							}
-							case -1: {
-								move.nags = decrease_move_evaluation(move.nags);
-								break;
-							}
-							default: {
-								new Notice(`${move.san} ${event.direction}`);
-							}
+							break;
 						}
-					} else {
-						// Do nothing
+						case 'neo': {
+							const move = get_current_neo_move(state);
+							if (move) {
+								switch (event.direction) {
+									case 1: {
+										move.nags = increase_move_evaluation(move.nags);
+										break;
+									}
+									case -1: {
+										move.nags = decrease_move_evaluation(move.nags);
+										break;
+									}
+									default: {
+										new Notice(`${move.san} ${event.direction}`);
+									}
+								}
+								state.jgnStudy = jgn_from_neo(state.neoStudy);
+							}
+							break;
+						}
 					}
 					return state;
 				}
 				case 'EVALUATE_POSITION': {
-					const move = getCurrentMove(state);
-
-					if (move) {
-						switch (event.direction) {
-							case 1: {
-								move.nags = increase_position_evaluation(move.nags);
-								break;
+					switch (state.master) {
+						case 'jgn': {
+							const move = get_current_jgn_move(state);
+							if (move) {
+								switch (event.direction) {
+									case 1: {
+										move.nags = increase_position_evaluation(move.nags);
+										break;
+									}
+									case -1: {
+										move.nags = decrease_position_evaluation(move.nags);
+										break;
+									}
+									default: {
+										new Notice(`${move.san} ${event.direction}`);
+									}
+								}
+								state.neoStudy = neo_from_jgn(state.jgnStudy);
 							}
-							case -1: {
-								move.nags = decrease_position_evaluation(move.nags);
-								break;
-							}
-							default: {
-								new Notice(`${move.san} ${event.direction}`);
-							}
+							break;
 						}
-					} else {
-						// Do nothing
+						case 'neo': {
+							const move = get_current_neo_move(state);
+							if (move) {
+								switch (event.direction) {
+									case 1: {
+										move.nags = increase_position_evaluation(move.nags);
+										break;
+									}
+									case -1: {
+										move.nags = decrease_position_evaluation(move.nags);
+										break;
+									}
+									default: {
+										new Notice(`${move.san} ${event.direction}`);
+									}
+								}
+								state.jgnStudy = jgn_from_neo(state.neoStudy);
+							}
+							break;
+						}
 					}
 					return state;
 				}
@@ -539,13 +654,27 @@ export const ChessStudy = ({
 	const onSaveButtonClick = useCallback(async () => {
 		try {
 			// We are writing twice, Neo BEFORE Jgn, until such time as the NeoStudy is the canonical study.
-			await studyLoader.saveNeoStudy(gameState.neoStudy, chessStudyId);
-			await studyLoader.saveJgnStudy(gameState.jgnStudy, chessStudyId);
+			switch (gameState.master) {
+				case 'jgn': {
+					await studyLoader.saveJgnStudy(gameState.jgnStudy, chessStudyId);
+					break;
+				}
+				case 'neo': {
+					await studyLoader.saveNeoStudy(gameState.neoStudy, chessStudyId);
+					break;
+				}
+			}
 			new Notice('Save successfull!');
 		} catch (e) {
-			new Notice('Something went wrong during saving:', e);
+			new Notice(`Something went wrong during saving: Cause: ${e}`, 0);
 		}
-	}, [chessStudyId, studyLoader, gameState.jgnStudy, gameState.neoStudy]);
+	}, [
+		chessStudyId,
+		studyLoader,
+		gameState.jgnStudy,
+		gameState.neoStudy,
+		gameState.master,
+	]);
 
 	return (
 		<div className="chess-study">
@@ -570,7 +699,7 @@ export const ChessStudy = ({
 				{(chessStudyKind as string) !== 'foo' && (
 					<div className="pgn-container">
 						<PgnViewer
-							history={gameState.jgnStudy.moves}
+							jgnMoves={gameState.jgnStudy.moves}
 							currentMoveId={gameState.currentMove?.moveId ?? null}
 							initialPlayer={initialPlayer}
 							initialMoveNumber={initialMoveNumber}

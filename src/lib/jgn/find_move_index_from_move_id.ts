@@ -1,5 +1,5 @@
 import { JgnMove } from './JgnMove';
-import { MoveIndex } from '../ui-state/MoveIndex';
+import { MoveIndex } from './MoveIndex';
 
 /**
  *

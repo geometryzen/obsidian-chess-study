@@ -5,11 +5,11 @@ import { NeoMove } from '../neo/NeoMove';
 import { head_and_remaining } from './head_and_remaining';
 import { node_from_move_and_links } from './node_from_move_and_links';
 
-export function model_from_jgn(fileContent: JgnStudy): NeoStudy {
-	const comment = fileContent.comment;
-	const headers = fileContent.headers;
-	const root: NeoMove | null = node_from_jgn_moves(fileContent.moves);
-	const rootFEN = fileContent.rootFEN;
+export function neo_from_jgn(jgnStudy: JgnStudy): NeoStudy {
+	const comment = jgnStudy.comment;
+	const headers = jgnStudy.headers;
+	const root: NeoMove | null = node_from_jgn_moves(jgnStudy.moves);
+	const rootFEN = jgnStudy.rootFEN;
 	return new NeoStudy(comment, headers, root, rootFEN);
 }
 

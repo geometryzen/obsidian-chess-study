@@ -5,7 +5,8 @@ import { ControlProps } from './ControlsProps';
  * Notice that by design, the PgnViewerProps extends ControlProps to pass the properties through.
  */
 export interface PgnViewerProps extends ControlProps {
-	history: JgnMove[];
+	jgnMoves: JgnMove[];
+	// neoMoves: NeoMove | null;
 	currentMoveId: string | null;
 	/**
 	 * The player to move in the initial position.

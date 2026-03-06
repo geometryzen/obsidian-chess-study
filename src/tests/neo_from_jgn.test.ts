@@ -2,10 +2,10 @@ import { describe, expect, test } from '@jest/globals';
 import { nanoid } from 'nanoid';
 import { JgnStudy } from '../lib/jgn/JgnStudy';
 import { JgnMove, JgnVariation } from '../lib/jgn/JgnMove';
-import { model_from_jgn } from '../lib/transform/model_from_jgn';
+import { neo_from_jgn } from '../lib/transform/neo_from_jgn';
 import { NeoMove } from '../lib/neo/NeoMove';
 
-describe('model_from_jgn', () => {
+describe('neo_from_jgn', () => {
 	test('headers', () => {
 		const json: JgnStudy = {
 			headers: {},
@@ -21,7 +21,7 @@ describe('model_from_jgn', () => {
 		json.headers['Black'] = '?';
 		json.headers['Result'] = '*';
 
-		const model = model_from_jgn(json);
+		const model = neo_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -49,7 +49,7 @@ describe('model_from_jgn', () => {
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
-		const model = model_from_jgn(json);
+		const model = neo_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -107,7 +107,7 @@ describe('model_from_jgn', () => {
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
-		const model = model_from_jgn(json);
+		const model = neo_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -187,7 +187,7 @@ describe('model_from_jgn', () => {
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
-		const model = model_from_jgn(json);
+		const model = neo_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);
@@ -286,7 +286,7 @@ describe('model_from_jgn', () => {
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
 
-		const model = model_from_jgn(json);
+		const model = neo_from_jgn(json);
 
 		expect(model.comment).toBe(json.comment);
 		expect(model.headers).toBe(json.headers);

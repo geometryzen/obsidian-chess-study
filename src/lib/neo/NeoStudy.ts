@@ -13,7 +13,7 @@ export class NeoStudy {
 	/**
 	 * The top-level comment.
 	 */
-	readonly comment: JSONContent | null;
+	comment: JSONContent | null;
 	/**
 	 * The moves that follow from the root FEN.
 	 */

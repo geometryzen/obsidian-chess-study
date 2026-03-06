@@ -17,6 +17,8 @@ export function get_neo_move_by_id(study: NeoStudy, moveId: string): NeoMove {
 				}
 			}
 		}
+		throw new Error(`move with id ${moveId} must exist in the study.`);
+	} else {
+		throw new Error('study must have a root.');
 	}
-	throw new Error(`moveId ${moveId} must exist in study`);
 }

@@ -1,10 +1,11 @@
 import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
-import { updateView } from '../../lib/ui-state';
 import { find_move_index_from_move_id } from '../../lib/jgn/find_move_index_from_move_id';
 import { GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { DrawShape } from 'chessground/draw';
+import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
+import { Notice } from 'obsidian';
 
 export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
@@ -45,88 +46,127 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	 */
 	playMove(state: GameState, m: Move): void {
 		if (!this.#chessView) return;
+		switch (state.master) {
+			case 'jgn': {
+				const moves = state.jgnStudy.moves;
+				if (state.currentMove) {
+					const currentMoveId = state.currentMove.moveId;
+					const currentMoveIndex = moves.findIndex(
+						(move) => move.moveId === currentMoveId,
+					);
 
-		const moves = state.jgnStudy.moves;
+					// How does moveIndex differ from currentMoveIndex?
+					// I believe it is the same, assuming we don't have variants.
+					const { indexLocation: variant, moveIndex } = find_move_index_from_move_id(
+						moves,
+						currentMoveId,
+					);
+					// console.lg('currentMoveIndex', currentMoveIndex);
+					// console.lg('moveIndex', moveIndex);
 
-		if (state.currentMove) {
-			const currentMoveId = state.currentMove.moveId;
-			const currentMoveIndex = moves.findIndex(
-				(move) => move.moveId === currentMoveId,
-			);
+					if (variant) {
+						// handle Variation
+						// This may be a future feature.
+					} else {
+						// handle Main Line
+						const isLastMove = currentMoveIndex === moves.length - 1;
 
-			// How does moveIndex differ from currentMoveIndex?
-			// I believe it is the same, assuming we don't have variants.
-			const { indexLocation: variant, moveIndex } = find_move_index_from_move_id(
-				moves,
-				currentMoveId,
-			);
-			// console.lg('currentMoveIndex', currentMoveIndex);
-			// console.lg('moveIndex', moveIndex);
-
-			if (variant) {
-				// handle Variation
-				// This may be a future feature.
-			} else {
-				// handle Main Line
-				const isLastMove = currentMoveIndex === moves.length - 1;
-
-				if (isLastMove) {
-					// The user is trying to move the opponent's piece!
-					updateView(this.#chessView, this.#setChessLogic, moves[moveIndex].after);
-				} else {
-					// check if the next move is the same move
-					const nextMove = moves[moveIndex + 1];
-
-					if (nextMove.san === m.san) {
-						const replyMove = moves[moveIndex + 2];
-						if (replyMove) {
-							updateView(this.#chessView, this.#setChessLogic, replyMove.after);
-							state.currentMove = replyMove;
+						if (isLastMove) {
+							// The user is trying to move the opponent's piece!
+							update_view_and_logic(
+								this.#chessView,
+								this.#setChessLogic,
+								moves[moveIndex].after,
+							);
 						} else {
-							updateView(this.#chessView, this.#setChessLogic, nextMove.after);
-							state.currentMove = nextMove;
-							state.isNotationHidden = false;
-						}
-					} else {
-						// There is a current move.
-						// A move was made that did not match the puzzle.
-						// Revert to the position after the current move.
-						updateView(this.#chessView, this.#setChessLogic, moves[moveIndex].after);
-					}
-				}
-			}
-		} else {
-			// There is no current move.
-			// This means we are positioned at the beginning of the game.
-			// If there are no moves in the game then add it as the first move.
-			// If there are moves in the game then
-			// TODO: This is probably where we should check the moves and proceed accordingly.
-			if (moves.length === 0) {
-				// If there are no moves, then this is not a puzzle!
-				// Update the view to revert the position.
-				// There is no change in state.
-				updateView(this.#chessView, this.#setChessLogic, state.jgnStudy.rootFEN);
-				// state.currentMove = move;
-			} else {
-				// Do nothing for now.
-				// The problem with doing nothing is that the move will be displayed
-				const firstMove = moves[0];
+							// check if the next move is the same move
+							const nextMove = moves[moveIndex + 1];
 
-				if (firstMove.san === m.san) {
-					const replyMove = moves[1];
-					if (replyMove) {
-						updateView(this.#chessView, this.#setChessLogic, replyMove.after);
-						state.currentMove = replyMove;
-					} else {
-						updateView(this.#chessView, this.#setChessLogic, firstMove.after);
-						state.currentMove = firstMove;
+							if (nextMove.san === m.san) {
+								const replyMove = moves[moveIndex + 2];
+								if (replyMove) {
+									update_view_and_logic(
+										this.#chessView,
+										this.#setChessLogic,
+										replyMove.after,
+									);
+									state.currentMove = replyMove;
+								} else {
+									update_view_and_logic(
+										this.#chessView,
+										this.#setChessLogic,
+										nextMove.after,
+									);
+									state.currentMove = nextMove;
+									state.isNotationHidden = false;
+								}
+							} else {
+								// There is a current move.
+								// A move was made that did not match the puzzle.
+								// Revert to the position after the current move.
+								update_view_and_logic(
+									this.#chessView,
+									this.#setChessLogic,
+									moves[moveIndex].after,
+								);
+							}
+						}
 					}
 				} else {
-					// It's not the correct move
-					// There is no current move so we are at the beginning of the game.
-					// Additionally, the move made did not match the first so we revert to the root position.
-					updateView(this.#chessView, this.#setChessLogic, state.jgnStudy.rootFEN);
+					// There is no current move.
+					// This means we are positioned at the beginning of the game.
+					// If there are no moves in the game then add it as the first move.
+					// If there are moves in the game then
+					// TODO: This is probably where we should check the moves and proceed accordingly.
+					if (moves.length === 0) {
+						// If there are no moves, then this is not a puzzle!
+						// Update the view to revert the position.
+						// There is no change in state.
+						update_view_and_logic(
+							this.#chessView,
+							this.#setChessLogic,
+							state.jgnStudy.rootFEN,
+						);
+						// state.currentMove = move;
+					} else {
+						// Do nothing for now.
+						// The problem with doing nothing is that the move will be displayed
+						const firstMove = moves[0];
+
+						if (firstMove.san === m.san) {
+							const replyMove = moves[1];
+							if (replyMove) {
+								update_view_and_logic(
+									this.#chessView,
+									this.#setChessLogic,
+									replyMove.after,
+								);
+								state.currentMove = replyMove;
+							} else {
+								update_view_and_logic(
+									this.#chessView,
+									this.#setChessLogic,
+									firstMove.after,
+								);
+								state.currentMove = firstMove;
+							}
+						} else {
+							// It's not the correct move
+							// There is no current move so we are at the beginning of the game.
+							// Additionally, the move made did not match the first so we revert to the root position.
+							update_view_and_logic(
+								this.#chessView,
+								this.#setChessLogic,
+								state.jgnStudy.rootFEN,
+							);
+						}
+					}
 				}
+				break;
+			}
+			case 'neo': {
+				new Notice('TODO: PuzzleChessStudy.playMove');
+				break;
 			}
 		}
 	}

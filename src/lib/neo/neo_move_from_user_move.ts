@@ -2,8 +2,8 @@ import { JSONContent } from '@tiptap/react';
 import { Move } from 'chess.js';
 import { DrawShape } from 'chessground/draw';
 import { nanoid } from 'nanoid';
-import { NumericAnnotationGlyph } from '../../lib/NumericAnnotationGlyphs';
-import { NeoMove } from '../../lib/neo/NeoMove';
+import { NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
+import { NeoMove } from './NeoMove';
 
 export function neo_move_from_user_move(
 	m: Move,

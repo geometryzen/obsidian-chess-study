@@ -6,14 +6,14 @@ export class NeoMove {
 	readonly after: string;
 	readonly clock: string | undefined;
 	readonly color: 'w' | 'b';
-	readonly comment: JSONContent | null;
+	comment: JSONContent | null;
 	readonly evaluation: number | undefined;
 	readonly from: string;
 	readonly moveId: string;
-	readonly nags: NumericAnnotationGlyph[];
+	nags: NumericAnnotationGlyph[];
 	readonly promotion: 'b' | 'p' | 'n' | 'r' | 'q' | 'k' | undefined;
 	readonly san: string;
-	readonly shapes: DrawShape[];
+	shapes: DrawShape[];
 	readonly to: string;
 	/**
 	 * The left leg of the tree is the next move.

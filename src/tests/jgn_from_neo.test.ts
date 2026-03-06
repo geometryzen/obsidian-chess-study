@@ -3,11 +3,11 @@ import { DrawShape } from 'chessground/draw';
 import { nanoid } from 'nanoid';
 import { NumericAnnotationGlyph } from '../lib/NumericAnnotationGlyphs';
 import { JgnStudy } from '../lib/jgn/JgnStudy';
-import { jgn_from_model } from '../lib/transform/jgn_from_model';
+import { jgn_from_neo } from '../lib/transform/jgn_from_neo';
 import { NeoStudy } from '../lib/neo/NeoStudy';
 import { NeoMove } from '../lib/neo/NeoMove';
 
-describe('jgn_from_model', () => {
+describe('jgn_from_neo', () => {
 	test('headers', () => {
 		const headers: Record<string, string> = {};
 		headers['Event'] = '?';
@@ -24,7 +24,7 @@ describe('jgn_from_model', () => {
 			null,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: JgnStudy = jgn_from_model(model);
+		const json: JgnStudy = jgn_from_neo(model);
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
 		expect(json.moves).toStrictEqual([]);
@@ -77,7 +77,7 @@ describe('jgn_from_model', () => {
 			root,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: JgnStudy = jgn_from_model(model);
+		const json: JgnStudy = jgn_from_neo(model);
 
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
@@ -178,7 +178,7 @@ describe('jgn_from_model', () => {
 			white_node,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const json: JgnStudy = jgn_from_model(model);
+		const json: JgnStudy = jgn_from_neo(model);
 
 		expect(json.comment).toBe(model.comment);
 		expect(json.headers).toBe(model.headers);
@@ -288,7 +288,7 @@ describe('jgn_from_model', () => {
 			e4_node,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		);
-		const jgn: JgnStudy = jgn_from_model(model);
+		const jgn: JgnStudy = jgn_from_neo(model);
 
 		expect(jgn.comment).toBe(model.comment);
 		expect(jgn.headers).toBe(model.headers);

@@ -1,5 +1,5 @@
 import { Move } from 'chess.js';
-import { NeoMove } from '../../lib/neo/NeoMove';
+import { NeoMove } from './NeoMove';
 import { neo_move_from_user_move } from './neo_move_from_user_move';
 
 /**

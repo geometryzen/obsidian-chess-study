@@ -1,6 +1,6 @@
 import { Move } from 'chess.js';
-import { JgnMove } from '../../lib/jgn/JgnMove';
-import { find_variation_index_with_first_move } from '../../lib/ui-state/find_variation_index_with_first_move';
+import { JgnMove } from './JgnMove';
+import { find_variation_index_with_first_move } from './find_variation_index_with_first_move';
 import { jgn_move_from_user_move } from './jgn_move_from_user_move';
 
 /**
