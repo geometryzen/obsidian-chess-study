@@ -11,9 +11,9 @@ export interface ChessStudyEventHandler {
 		neoStudy: NeoStudy,
 		jgnStudy: JgnStudy,
 	): void;
-	gotoNextMove(state: GameState): void;
+	gotoNextMove(state: Readonly<GameState>): MoveToken | null;
 	gotoPrevMove(state: GameState): void;
-	gotoMove(state: GameState, moveId: string): void;
+	gotoMove(state: Readonly<GameState>, moveId: string): MoveToken | null;
 	/**
 	 * TODO: Rename because it is confusing that the move has already been played in the user interface?
 	 */

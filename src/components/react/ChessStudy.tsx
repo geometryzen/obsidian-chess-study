@@ -42,6 +42,7 @@ import {
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
 import { jgn_from_neo } from '../../lib/transform/jgn_from_neo';
+import { moves_from_node } from '../../lib/transform/moves_from_node';
 import { neo_from_jgn } from '../../lib/transform/neo_from_jgn';
 import { displayRelativeMoveInHistory } from '../../lib/ui-state/display_relative_move';
 import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
@@ -59,7 +60,7 @@ export type ChessStudyConfig = ChessgroundProps;
  * Determines which data model to use as canonical.
  * This is scaffolding until we transition fully to 'neo'.
  */
-const MASTER: 'jgn' | 'neo' = 'jgn' as 'jgn' | 'neo';
+const MASTER: 'jgn' | 'neo' = 'neo' as 'jgn' | 'neo';
 
 interface AppProps {
 	/**
@@ -133,7 +134,7 @@ function comment_from_game_state(state: GameState): JSONContent | null {
 
 export type GameEvent =
 	| { type: 'PLAY_MOVE'; move: Move }
-	| { type: 'REMOVE_LAST_MOVE' }
+	| { type: 'DELETE_MOVE'; moveId: string }
 	| { type: 'GOTO_BEGIN_POSITION' }
 	| { type: 'GOTO_NEXT_MOVE' }
 	| { type: 'GOTO_PREV_MOVE' }
@@ -333,6 +334,11 @@ export const ChessStudy = ({
 		initialState.neoStudy,
 		initialState.jgnStudy,
 	);
+	/*
+	const reducer: ImmerReducer<GameState, GameEvent> = (state, event) => {
+
+	}
+	*/
 
 	// Why are we using use-immer instead of React's useReducer hook?
 	// The purpose is to have immutable state and the immer librray helps with the handling.
@@ -342,14 +348,14 @@ export const ChessStudy = ({
 		(state: GameState, event: GameEvent) => {
 			switch (event.type) {
 				case 'GOTO_NEXT_MOVE': {
-					handler.gotoNextMove(state);
-					return state;
+					state.currentMove = handler.gotoNextMove(state);
+					break;
 				}
 				case 'GOTO_PREV_MOVE': {
 					handler.gotoPrevMove(state);
-					return state;
+					break;
 				}
-				case 'REMOVE_LAST_MOVE': {
+				case 'DELETE_MOVE': {
 					if (!chessView || has_no_moves(state)) return state;
 					switch (state.master) {
 						case 'jgn': {
@@ -419,41 +425,48 @@ export const ChessStudy = ({
 						}
 						case 'neo': {
 							if (state.currentMove) {
-								const moveId = state.currentMove.moveId;
+								// const moveId = state.currentMove.moveId;
 								// For some reason we get two events so we must be idempotent.
-								if (has_neo_move_by_id(state.neoStudy, moveId)) {
-									const target = get_neo_move_by_id(state.neoStudy, moveId);
-									const parent = find_parent(state.neoStudy.root, target);
-									if (parent) {
-										if (parent.left === target) {
-											parent.left = target.right;
+								if (has_neo_move_by_id(state.neoStudy, event.moveId)) {
+									try {
+										const target = get_neo_move_by_id(state.neoStudy, event.moveId);
+										const parent = find_parent(state.neoStudy.root, target);
+										if (parent) {
+											if (parent.left === target) {
+												parent.left = target.right;
+											} else {
+												parent.right = target.right;
+											}
+											state.currentMove = parent;
+											update_view_and_logic(chessView, setChessLogic, parent.after);
 										} else {
-											parent.right = target.right;
+											// We must be deleting the root node
+											state.neoStudy.root = null;
+											state.currentMove = null;
+											update_view_and_logic(
+												chessView,
+												setChessLogic,
+												state.neoStudy.rootFEN,
+											);
 										}
-										state.currentMove = parent;
-										update_view_and_logic(chessView, setChessLogic, parent.after);
-									} else {
-										// We must be deleting thr root node
-										state.neoStudy.root = null;
-										state.currentMove = null;
-										update_view_and_logic(
-											chessView,
-											setChessLogic,
-											state.neoStudy.rootFEN,
-										);
+									} finally {
+										state.jgnStudy.moves = jgn_from_neo(state.neoStudy).moves;
+										state.jgnStudy.moves = moves_from_node(state.neoStudy.root);
 									}
-									state.jgnStudy = jgn_from_neo(state.neoStudy);
+								} else {
+									// console.lg('Ignoring the event because the node no longer exists');
 								}
+							} else {
+								// console.lg('There is no current move');
 							}
 							break;
 						}
 					}
-
-					return state;
+					break;
 				}
 				case 'GOTO_MOVE': {
-					handler.gotoMove(state, event.moveId);
-					return state;
+					state.currentMove = handler.gotoMove(state, event.moveId);
+					break;
 				}
 				case 'SYNC_SHAPES': {
 					if (!chessView || has_no_moves(state)) return state;
@@ -739,7 +752,14 @@ export const ChessStudy = ({
 								}
 							}}
 							onSaveButtonClick={onSaveButtonClick}
-							onDeleteButtonClick={() => dispatch({ type: 'REMOVE_LAST_MOVE' })}
+							onDeleteButtonClick={(moveId) => {
+								if (gameState.currentMove) {
+									dispatch({
+										type: 'DELETE_MOVE',
+										moveId,
+									});
+								}
+							}}
 							onAnnotateMoveCorrect={() =>
 								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_null })
 							}
@@ -766,14 +786,14 @@ export const ChessStudy = ({
 							}
 							onSearchDatabase={() => {
 								try {
-									new Notice("I'm afraid I can't do that Dave??");
+									new Notice("I'm afraid I can't do that Dave!");
 								} catch (e) {
 									new Notice('Something is rotten in Denmark:', e);
 								}
 							}}
 							onSettingsButtonClick={() => {
 								try {
-									new Notice("I'm afraid I can't do that Dave??");
+									new Notice("I'm afraid I can't do that Dave!");
 								} catch (e) {
 									new Notice('Something is rotten in Denmark:', e);
 								}

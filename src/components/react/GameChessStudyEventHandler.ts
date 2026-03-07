@@ -8,14 +8,12 @@ import { is_index_last_in_array } from '../../lib/lang/is_index_last_in_array';
 import { NeoMove } from '../../lib/neo/NeoMove';
 import { NeoStudy } from '../../lib/neo/NeoStudy';
 import { displayRelativeMoveInHistory } from '../../lib/ui-state/display_relative_move';
-// import { get_neo_move_by_id } from '../../lib/ui-state/get_neo_move_by_id';
 import { ensure_move_is_jgn_move_or_variation } from '../../lib/jgn/ensure_move_is_jgn_move_or_variation';
 import { first_jgn_move } from '../../lib/jgn/first_jgn_move';
 import { get_jgn_move_by_id } from '../../lib/jgn/get_jgn_move_by_id';
 import { jgn_move_from_user_move } from '../../lib/jgn/jgn_move_from_user_move';
 import { ensure_move_is_neo_move_or_variation } from '../../lib/neo/ensure_move_is_neo_move_or_variation';
 import { first_neo_move } from '../../lib/neo/first_neo_move';
-import { get_neo_main_line } from '../../lib/neo/get_neo_main_line';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
 import { neo_move_from_user_move } from '../../lib/neo/neo_move_from_user_move';
 import { jgn_from_neo } from '../../lib/transform/jgn_from_neo';
@@ -24,7 +22,6 @@ import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic'
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { rightmost_neo_node } from './rightmost_neo_node';
-import { get_jgn_main_line } from '../../lib/jgn/get_jgn_main_line';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
@@ -56,10 +53,10 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoNextMove(state: GameState): void {
-		if (!this.#chessView) return;
-
-		state.currentMove = displayRelativeMoveInHistory(
+	gotoNextMove(state: Readonly<GameState>): MoveToken | null {
+		if (!this.#chessView) return null;
+		// We mutate the state so it cannot be readonly
+		return displayRelativeMoveInHistory(
 			state,
 			this.#chessView,
 			this.#setChessLogic,
@@ -88,21 +85,19 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoMove(state: GameState, moveId: string): void {
-		if (!this.#chessView) return;
+	gotoMove(state: Readonly<GameState>, moveId: string): MoveToken | null {
+		if (!this.#chessView) return null;
 
 		switch (state.master) {
 			case 'neo': {
 				const neoMove: NeoMove = get_neo_move_by_id(state.neoStudy, moveId);
 				update_view_and_logic(this.#chessView, this.#setChessLogic, neoMove.after);
-				state.currentMove = neoMove;
-				break;
+				return neoMove;
 			}
 			case 'jgn': {
 				const jgnMove: JgnMove = get_jgn_move_by_id(state.jgnStudy, moveId);
 				update_view_and_logic(this.#chessView, this.#setChessLogic, jgnMove.after);
-				state.currentMove = jgnMove;
-				break;
+				return jgnMove;
 			}
 		}
 	}
@@ -115,38 +110,39 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	playMove(state: GameState, m: Move): void {
 		switch (state.master) {
 			case 'jgn': {
-				const moves = state.jgnStudy.moves;
-				if (state.currentMove) {
-					const currentMoveId = state.currentMove.moveId;
+				try {
+					const moves = state.jgnStudy.moves;
+					if (state.currentMove) {
+						const currentMoveId = state.currentMove.moveId;
 
-					const { indexLocation, moveIndex } = find_move_index_from_move_id(
-						moves,
-						currentMoveId,
-					);
+						const { indexLocation, moveIndex } = find_move_index_from_move_id(
+							moves,
+							currentMoveId,
+						);
 
-					if (indexLocation) {
-						// The current move belongs to a variation (not the Main Line).
-						const mainLineMove: JgnMove = moves[indexLocation.mainLineMoveIndex];
-						const variantMoves =
-							mainLineMove.variants[indexLocation.variationIndex].moves;
+						if (indexLocation) {
+							// The current move belongs to a variation (not the Main Line).
+							const mainLineMove: JgnMove = moves[indexLocation.mainLineMoveIndex];
+							const variantMoves =
+								mainLineMove.variants[indexLocation.variationIndex].moves;
 
-						const isLastMove = moveIndex === variantMoves.length - 1;
+							const isLastMove = moveIndex === variantMoves.length - 1;
 
-						// Only push if its the last move in the variant because depth can only be 1
-						if (isLastMove) {
-							const variantMove = jgn_move_from_user_move(m);
-							variantMoves.push(variantMove);
+							// Only push if its the last move in the variant because depth can only be 1
+							if (isLastMove) {
+								const variantMove = jgn_move_from_user_move(m);
+								variantMoves.push(variantMove);
 
-							const tempChess = new ChessJs(m.after);
+								const tempChess = new ChessJs(m.after);
 
-							state.currentMove = variantMove;
+								state.currentMove = variantMove;
 
-							this.#chessView?.set({
-								fen: m.after,
-								check: tempChess.isCheck(),
-							});
-						} else {
-							/*
+								this.#chessView?.set({
+									fen: m.after,
+									check: tempChess.isCheck(),
+								});
+							} else {
+								/*
 							const vml = find_move_index_from_move_id(variantMoves, state.currentMove.moveId)
 							if (is_index_last_in_array(vml.moveIndex, variantMoves)) {
 								// If the current move is the last move then the played move
@@ -160,61 +156,76 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 								state.currentMove = ensure_move_in_scope(m, variantMoves[vml.moveIndex + 1]);
 							}
 							*/
+							}
+						} else {
+							// The current move belongs to the Main Line.
+							if (is_index_last_in_array(moveIndex, moves)) {
+								// If the current move is the last move then the played move
+								// should be added as a Main Line move.
+								const move = jgn_move_from_user_move(m);
+								moves.push(move);
+
+								state.currentMove = move;
+							} else {
+								// The current move is not the last in the Main Line.
+								state.currentMove = ensure_move_is_jgn_move_or_variation(
+									m,
+									moves[moveIndex + 1],
+								);
+							}
 						}
 					} else {
-						// The current move belongs to the Main Line.
-						if (is_index_last_in_array(moveIndex, moves)) {
-							// If the current move is the last move then the played move
-							// should be added as a Main Line move.
+						// This means we are positioned at the beginning of the game.
+						// If there are no moves in the game then add it as the first move.
+						// If there are moves in the game then
+						// TODO: This is probably where we should check the moves and proceed accordingly.
+						if (moves.length === 0) {
 							const move = jgn_move_from_user_move(m);
 							moves.push(move);
-
 							state.currentMove = move;
 						} else {
-							// The current move is not the last in the Main Line.
-							state.currentMove = ensure_move_is_jgn_move_or_variation(
-								m,
-								moves[moveIndex + 1],
-							);
+							// There are Main Line moves and yet there is no current move.
+							// So we must be positioned before the start of the first move.
+							// This is the move to which the played move belongs.
+							const first_move = first_jgn_move(state.jgnStudy) as JgnMove;
+							state.currentMove = ensure_move_is_jgn_move_or_variation(m, first_move);
 						}
 					}
-				} else {
-					// This means we are positioned at the beginning of the game.
-					// If there are no moves in the game then add it as the first move.
-					// If there are moves in the game then
-					// TODO: This is probably where we should check the moves and proceed accordingly.
-					if (moves.length === 0) {
-						const move = jgn_move_from_user_move(m);
-						moves.push(move);
-						state.currentMove = move;
-					} else {
-						// There are Main Line moves and yet there is no current move.
-						// So we must be positioned before the start of the first move.
-						// This is the move to which the played move belongs.
-						const first_move = first_jgn_move(state.jgnStudy) as JgnMove;
-						state.currentMove = ensure_move_is_jgn_move_or_variation(m, first_move);
-					}
+				} finally {
+					state.neoStudy = neo_from_jgn(state.jgnStudy);
 				}
-				state.neoStudy = neo_from_jgn(state.jgnStudy);
 				break;
 			}
 			case 'neo': {
-				const root = state.neoStudy.root;
-				if (state.currentMove) {
-					const left = get_neo_move_by_id(
-						state.neoStudy,
-						state.currentMove.moveId,
-					).left;
-					if (left) {
-						// There is a following Main Line move.
-						if (left.san === m.san) {
-							state.currentMove = left;
-							return;
+				try {
+					const root = state.neoStudy.root;
+					if (state.currentMove) {
+						const currentMove = state.currentMove;
+						const moveId = currentMove.moveId;
+						const move = get_neo_move_by_id(state.neoStudy, moveId);
+						const left = move.left;
+						if (left) {
+							// There is a following Main Line move.
+							if (left.san === m.san) {
+								state.currentMove = left;
+								return;
+							} else {
+								let right = move.right;
+								while (right) {
+									if (right.san === m.san) {
+										state.currentMove = right;
+										return;
+									}
+									right = right.right;
+								}
+							}
+							// The move will be added as a variation of the following
+							const parent = rightmost_neo_node(left);
+							parent.right = neo_move_from_user_move(m, null, null);
 						} else {
-							let right = get_neo_move_by_id(
-								state.neoStudy,
-								state.currentMove.moveId,
-							).right;
+							// There is no following Main Line move.
+							// Look in the variations.
+							let right = move.right;
 							while (right) {
 								if (right.san === m.san) {
 									state.currentMove = right;
@@ -222,45 +233,29 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 								}
 								right = right.right;
 							}
+							// The move will be added as the next Main Line move
+							const new_move = neo_move_from_user_move(m, null, null);
+							const target = get_neo_move_by_id(
+								state.neoStudy,
+								state.currentMove.moveId,
+							);
+							target.left = new_move;
+							state.currentMove = new_move;
 						}
-						// The move will be added as a variation of the following
-						const move = neo_move_from_user_move(m, null, null);
-						const parent = rightmost_neo_node(left);
-						parent.right = move;
 					} else {
-						// There is no following Main Line move.
-						// Look in the variations.
-						let right = get_neo_move_by_id(
-							state.neoStudy,
-							state.currentMove.moveId,
-						).right;
-						while (right) {
-							if (right.san === m.san) {
-								state.currentMove = right;
-								return;
-							}
-							right = right.right;
+						if (root === null) {
+							const move = neo_move_from_user_move(m, null, null);
+							state.neoStudy.root = move;
+							state.currentMove = move;
+						} else {
+							const first_move = first_neo_move(state.neoStudy) as NeoMove;
+							state.currentMove = ensure_move_is_neo_move_or_variation(m, first_move);
 						}
-						// The move will be added as the next Main Line move
-						const move = neo_move_from_user_move(m, null, null);
-						const target = get_neo_move_by_id(
-							state.neoStudy,
-							state.currentMove.moveId,
-						);
-						target.left = move;
-						state.currentMove = move;
 					}
-				} else {
-					if (root === null) {
-						const move = neo_move_from_user_move(m, null, null);
-						state.neoStudy.root = move;
-						state.currentMove = move;
-					} else {
-						const first_move = first_neo_move(state.neoStudy) as NeoMove;
-						state.currentMove = ensure_move_is_neo_move_or_variation(m, first_move);
-					}
+				} finally {
+					state.jgnStudy = jgn_from_neo(state.neoStudy);
 				}
-				state.jgnStudy = jgn_from_neo(state.neoStudy);
+				break;
 			}
 		}
 	}

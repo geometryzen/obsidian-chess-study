@@ -69,10 +69,10 @@ export class ChessStudyLoader {
 			normalizePath(`${this.#studiesPath}/${id}.json`),
 		);
 
-		const fileContent = JSON.parse(data) as JgnStudy;
+		const jgnStudy = JSON.parse(data) as JgnStudy;
 
 		// Perform conversions based upon version or otherwise.
-		const moves = fileContent.moves;
+		const moves = jgnStudy.moves;
 		for (let i = 0; i < moves.length; i++) {
 			const move = moves[i];
 			if (!Array.isArray(move.nags)) {
@@ -98,11 +98,11 @@ export class ChessStudyLoader {
 		}
 
 		// Make sure data is compatible with version 0.0.1.
-		if (!fileContent.rootFEN) {
-			return { ...fileContent, rootFEN: ROOT_FEN };
+		if (!jgnStudy.rootFEN) {
+			return { ...jgnStudy, rootFEN: ROOT_FEN };
 		}
 
-		return fileContent;
+		return jgnStudy;
 	}
 
 	async createStudiesFolderIfNotExists() {

@@ -5,6 +5,7 @@ export interface ControlProps {
 	disableNavigation: boolean;
 	readOnly: boolean;
 	chessStudyKind: ChessStudyKind;
+	currentMoveId: string | null;
 	onBeginButtonClick: () => void;
 	onBackButtonClick: () => void;
 	onForwardButtonClick: () => void;
@@ -12,7 +13,7 @@ export interface ControlProps {
 	onCopyFenButtonClick: () => void;
 	onCopyPgnButtonClick: () => void;
 	onSaveButtonClick: () => void;
-	onDeleteButtonClick: () => void;
+	onDeleteButtonClick: (moveId: string) => void;
 	onAnnotateMoveCorrect: () => void;
 	onAnnotateMoveInaccurate: () => void;
 	onAnnotateMoveMistake: () => void;

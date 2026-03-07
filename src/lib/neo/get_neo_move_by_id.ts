@@ -1,7 +1,10 @@
 import { NeoMove } from './NeoMove';
 import { NeoStudy } from './NeoStudy';
 
-export function get_neo_move_by_id(study: NeoStudy, moveId: string): NeoMove {
+export function get_neo_move_by_id(
+	study: Readonly<NeoStudy>,
+	moveId: string,
+): NeoMove {
 	if (study.root) {
 		const moves: NeoMove[] = [study.root];
 		while (moves.length > 0) {

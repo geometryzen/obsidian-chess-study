@@ -1,7 +1,7 @@
 import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { find_move_index_from_move_id } from '../../lib/jgn/find_move_index_from_move_id';
-import { GameState } from './ChessStudy';
+import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { DrawShape } from 'chessground/draw';
 import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
@@ -26,8 +26,9 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoNextMove(state: GameState): void {
+	gotoNextMove(state: Readonly<GameState>): MoveToken | null {
 		// Do nothing
+		return null;
 	}
 	/**
 	 * @override
@@ -38,8 +39,9 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoMove(state: GameState, moveId: string): void {
+	gotoMove(state: Readonly<GameState>, moveId: string): MoveToken | null {
 		// Do nothing
+		return null;
 	}
 	/**
 	 * @override

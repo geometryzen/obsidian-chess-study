@@ -86,10 +86,10 @@ export const Controls = (props: ControlProps) => {
 						<Save color="purple" strokeWidth={'2px'} />
 					</button>
 				)}
-				{props.readOnly ? null : (
+				{typeof props.currentMoveId === 'string' && props.readOnly ? null : (
 					<button
 						title="Delete Current Move"
-						onClick={() => props.onDeleteButtonClick()}
+						onClick={() => props.onDeleteButtonClick(props.currentMoveId as string)}
 					>
 						<Delete color="purple" strokeWidth={'2px'} />
 					</button>

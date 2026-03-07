@@ -1,6 +1,5 @@
 import { Chess } from 'chess.js';
 import { Api as ChessgroundApi } from 'chessground/api';
-import { Draft } from 'immer';
 import { GameState, MoveToken } from '../../components/react/ChessStudy';
 import { first_jgn_move } from '../jgn/first_jgn_move';
 import { get_jgn_move_from_offset } from '../jgn/get_jgn_move_from_offset';
@@ -21,7 +20,7 @@ import { update_view_and_logic } from './update_view_and_logic';
  * @returns
  */
 export const displayRelativeMoveInHistory = (
-	state: Readonly<Draft<GameState>>,
+	state: Readonly<GameState>,
 	chessView: ChessgroundApi,
 	setChessLogic: React.Dispatch<React.SetStateAction<Chess>>,
 	options: { offset: 1 | -1; selectedMoveId: string | null },

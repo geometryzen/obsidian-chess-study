@@ -64,6 +64,20 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 			this.source,
 		);
 		// is there any reason why we have to pass in the source?
+		// the StrictMode can cause events to be sent twice.
+		// FIXME. Do I need to
+		this.root.render(
+			<ChessStudy
+				source={this.source}
+				app={this.app}
+				pluginSettings={this.settings}
+				initialPos={config.initialPosition}
+				config={config}
+				jgnStudy={this.#jgnStudy}
+				neoStudy={this.#neoStudy}
+				studyLoader={this.#studyLoader}
+			/>,
+			/*
 		this.root.render(
 			<React.StrictMode>
 				<ChessStudy
@@ -77,6 +91,7 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 					studyLoader={this.#studyLoader}
 				/>
 			</React.StrictMode>,
+		*/
 		);
 	}
 

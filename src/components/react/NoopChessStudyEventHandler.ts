@@ -1,5 +1,5 @@
 import { Move } from 'chess.js';
-import { GameState } from './ChessStudy';
+import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { DrawShape } from 'chessground/draw';
 
@@ -13,8 +13,9 @@ export class NoopChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoNextMove(state: GameState): void {
+	gotoNextMove(state: Readonly<GameState>): MoveToken | null {
 		// Do nothing
+		return null;
 	}
 	/**
 	 * @override
@@ -25,8 +26,9 @@ export class NoopChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoMove(state: GameState, moveId: string): void {
+	gotoMove(state: Readonly<GameState>, moveId: string): MoveToken | null {
 		// Do nothing
+		return null;
 	}
 	/**
 	 * @override
