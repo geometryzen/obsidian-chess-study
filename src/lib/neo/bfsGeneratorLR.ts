@@ -9,6 +9,7 @@ class TreeNode<T> {
 }
 */
 
+import { Queue } from '../lang/Queue';
 import { NeoMove } from './NeoMove';
 
 /**
@@ -23,20 +24,22 @@ export function* bfsGeneratorLR(
 		return;
 	}
 
-	const queue: NeoMove[] = [root];
+	const queue = new Queue<NeoMove>();
+	queue.enqueue(root);
+	//const queue: NeoMove[] = [root];
 
-	while (queue.length > 0) {
+	while (!queue.isEmpty()) {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const current = queue.shift()!;
+		const current = queue.dequeue()!;
 
 		yield current;
 
 		if (current.left) {
-			queue.push(current.left);
+			queue.enqueue(current.left);
 		}
 
 		if (current.right) {
-			queue.push(current.right);
+			queue.enqueue(current.right);
 		}
 	}
 }
