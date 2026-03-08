@@ -26,20 +26,18 @@ export function* bfsGeneratorLR(
 
 	const queue = new Queue<NeoMove>();
 	queue.enqueue(root);
-	//const queue: NeoMove[] = [root];
 
 	while (!queue.isEmpty()) {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const current = queue.dequeue()!;
+		const current = queue.pop();
 
 		yield current;
 
 		if (current.left) {
-			queue.enqueue(current.left);
+			queue.push(current.left);
 		}
 
 		if (current.right) {
-			queue.enqueue(current.right);
+			queue.push(current.right);
 		}
 	}
 }

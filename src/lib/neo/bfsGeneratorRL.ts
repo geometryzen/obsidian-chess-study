@@ -9,6 +9,7 @@ class TreeNode<T> {
 }
 */
 
+import { Queue } from '../lang/Queue';
 import { NeoMove } from './NeoMove';
 
 /**
@@ -23,11 +24,11 @@ export function* bfsGeneratorRL(
 		return;
 	}
 
-	const queue: NeoMove[] = [root];
+	const queue = new Queue<NeoMove>();
+	queue.enqueue(root);
 
-	while (queue.length > 0) {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const current = queue.shift()!;
+	while (!queue.isEmpty()) {
+		const current = queue.pop();
 
 		yield current;
 

@@ -1,23 +1,25 @@
 import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
-import { find_move_index_from_move_id } from '../../lib/jgn/find_move_index_from_move_id';
-import { JgnMove } from '../../lib/jgn/JgnMove';
-import { JgnStudy } from '../../lib/jgn/JgnStudy';
-import { is_index_last_in_array } from '../../lib/lang/is_index_last_in_array';
-import { NeoMove } from '../../lib/neo/NeoMove';
-import { NeoStudy } from '../../lib/neo/NeoStudy';
-import { displayRelativeMoveInHistory } from '../../lib/ui-state/display_relative_move';
 import { ensure_move_is_jgn_move_or_variation } from '../../lib/jgn/ensure_move_is_jgn_move_or_variation';
+import { find_move_index_from_move_id } from '../../lib/jgn/find_move_index_from_move_id';
 import { first_jgn_move } from '../../lib/jgn/first_jgn_move';
 import { get_jgn_move_by_id } from '../../lib/jgn/get_jgn_move_by_id';
 import { jgn_move_from_user_move } from '../../lib/jgn/jgn_move_from_user_move';
+import { JgnMove } from '../../lib/jgn/JgnMove';
+import { JgnStudy } from '../../lib/jgn/JgnStudy';
+import { is_index_last_in_array } from '../../lib/lang/is_index_last_in_array';
+import { deserializePreOrder } from '../../lib/neo/deserializePreOrder';
 import { ensure_move_is_neo_move_or_variation } from '../../lib/neo/ensure_move_is_neo_move_or_variation';
 import { first_neo_move } from '../../lib/neo/first_neo_move';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
 import { neo_move_from_user_move } from '../../lib/neo/neo_move_from_user_move';
+import { NeoMove } from '../../lib/neo/NeoMove';
+import { NeoStudy } from '../../lib/neo/NeoStudy';
+import { serializePreOrder } from '../../lib/neo/serializePreOrder';
 import { jgn_from_neo } from '../../lib/transform/jgn_from_neo';
 import { neo_from_jgn } from '../../lib/transform/neo_from_jgn';
+import { displayRelativeMoveInHistory } from '../../lib/ui-state/display_relative_move';
 import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
@@ -253,6 +255,13 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						}
 					}
 				} finally {
+					if (state.neoStudy.root) {
+						// This is an aggressive hack to try to demonstrate that useMemo is a problem
+						// if we mutate the tree such that a change is not detected.
+						state.neoStudy.root = deserializePreOrder(
+							serializePreOrder(state.neoStudy.root),
+						);
+					}
 					state.jgnStudy = jgn_from_neo(state.neoStudy);
 				}
 				break;

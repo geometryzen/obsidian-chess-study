@@ -53,14 +53,17 @@ import { createChessStudyEventHandler } from './createChessStudyEventHandler';
 import { get_current_jgn_move } from './get_current_jgn_move';
 import { get_current_neo_move } from './get_current_neo_move';
 import { has_no_moves } from './has_no_moves';
-import { PgnViewer } from './PgnViewer';
+import { JgnMovesViewer } from './JgnMovesViewer';
+import { NeoMovesViewer } from './NeoMovesViewer';
+import { serializePreOrder } from '../../lib/neo/serializePreOrder';
+import { deserializePreOrder } from '../../lib/neo/deserializePreOrder';
 export type ChessStudyConfig = ChessgroundProps;
 
 /**
  * Determines which data model to use as canonical.
  * This is scaffolding until we transition fully to 'neo'.
  */
-const MASTER: 'jgn' | 'neo' = 'neo' as 'jgn' | 'neo';
+const MASTER: 'jgn' | 'neo' = 'jgn' as 'jgn' | 'neo';
 
 interface AppProps {
 	/**
@@ -450,6 +453,13 @@ export const ChessStudy = ({
 											);
 										}
 									} finally {
+										if (state.neoStudy.root) {
+											// This is an aggressive hack to try to demonstrate that useMemo is a problem
+											// if we mutate the tree such that a change is not detected.
+											state.neoStudy.root = deserializePreOrder(
+												serializePreOrder(state.neoStudy.root),
+											);
+										}
 										state.jgnStudy.moves = jgn_from_neo(state.neoStudy).moves;
 										state.jgnStudy.moves = moves_from_node(state.neoStudy.root);
 									}
@@ -709,10 +719,102 @@ export const ChessStudy = ({
 						shapes={handler.shapes(gameState)}
 					/>
 				</div>
-				{(chessStudyKind as string) !== 'foo' && (
+				{gameState.master === 'jgn' && (
 					<div className="pgn-container">
-						<PgnViewer
+						<JgnMovesViewer
 							jgnMoves={gameState.jgnStudy.moves}
+							currentMoveId={gameState.currentMove?.moveId ?? null}
+							initialPlayer={initialPlayer}
+							initialMoveNumber={initialMoveNumber}
+							isVisible={!gameState.isNotationHidden}
+							onMoveItemClick={(moveId: string) =>
+								dispatch({
+									type: 'GOTO_MOVE',
+									moveId: moveId,
+								})
+							}
+							disableCopy={disableCopy}
+							disableNavigation={disableNavigation}
+							readOnly={readOnly}
+							chessStudyKind={chessStudyKind}
+							onBeginButtonClick={() => dispatch({ type: 'GOTO_BEGIN_POSITION' })}
+							onBackButtonClick={() => dispatch({ type: 'GOTO_PREV_MOVE' })}
+							onForwardButtonClick={() => dispatch({ type: 'GOTO_NEXT_MOVE' })}
+							onEndButtonClick={() => dispatch({ type: 'GOTO_END_POSITION' })}
+							onCopyFenButtonClick={() => {
+								try {
+									navigator.clipboard.writeText(chessLogic.fen());
+									new Notice('Copied FEN to clipboard!');
+								} catch (e) {
+									new Notice('Could not copy FEN to clipboard:', e);
+								}
+							}}
+							onCopyPgnButtonClick={() => {
+								try {
+									const pgn_string = jgn_to_pgn_string(gameState.jgnStudy);
+									// console.lg('pgn', pgn_string);
+									navigator.clipboard.writeText(pgn_string);
+									new Notice('Copied PGN to clipboard!');
+								} catch (e) {
+									console.warn(e);
+									console.warn(JSON.stringify(gameState.jgnStudy, null, 2));
+									new Notice('Could not copy PGN to clipboard:', e);
+								}
+							}}
+							onSaveButtonClick={onSaveButtonClick}
+							onDeleteButtonClick={(moveId) => {
+								if (gameState.currentMove) {
+									dispatch({
+										type: 'DELETE_MOVE',
+										moveId,
+									});
+								}
+							}}
+							onAnnotateMoveCorrect={() =>
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_null })
+							}
+							onAnnotateMoveInaccurate={() =>
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_questionable_move })
+							}
+							onAnnotateMoveMistake={() =>
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_poor_move })
+							}
+							onAnnotateMoveBlunder={() =>
+								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_very_poor_move })
+							}
+							onIncreaseMoveAnnotation={() =>
+								dispatch({ type: 'EVALUATE_MOVE', direction: +1 })
+							}
+							onDecreaseMoveAnnotation={() =>
+								dispatch({ type: 'EVALUATE_MOVE', direction: -1 })
+							}
+							onIncreasePositionEvaluation={() =>
+								dispatch({ type: 'EVALUATE_POSITION', direction: +1 })
+							}
+							onDecreasePositionEvaluation={() =>
+								dispatch({ type: 'EVALUATE_POSITION', direction: -1 })
+							}
+							onSearchDatabase={() => {
+								try {
+									new Notice("I'm afraid I can't do that Dave!");
+								} catch (e) {
+									new Notice('Something is rotten in Denmark:', e);
+								}
+							}}
+							onSettingsButtonClick={() => {
+								try {
+									new Notice("I'm afraid I can't do that Dave!");
+								} catch (e) {
+									new Notice('Something is rotten in Denmark:', e);
+								}
+							}}
+						/>
+					</div>
+				)}
+				{gameState.master === 'neo' && (
+					<div className="pgn-container">
+						<NeoMovesViewer
+							study={gameState.neoStudy}
 							currentMoveId={gameState.currentMove?.moveId ?? null}
 							initialPlayer={initialPlayer}
 							initialMoveNumber={initialMoveNumber}

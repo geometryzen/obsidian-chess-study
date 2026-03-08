@@ -19,8 +19,7 @@ export class Queue<T> {
 	isEmpty(): boolean {
 		return this.front === null;
 	}
-
-	enqueue(x: T): void {
+	push(x: T): void {
 		const newNode = new QNode(x);
 		if (this.rear === null) {
 			this.front = this.rear = newNode;
@@ -29,9 +28,25 @@ export class Queue<T> {
 		this.rear.next = newNode;
 		this.rear = newNode;
 	}
-
 	dequeue(): T | null {
-		if (this.front === null) return null;
+		if (this.front === null) {
+			return null;
+		}
+
+		const temp = this.front;
+		this.front = this.front.next;
+
+		if (this.front === null) this.rear = null;
+
+		return temp.data;
+	}
+	enqueue(x: T): void {
+		this.push(x);
+	}
+	pop(): T {
+		if (this.front === null) {
+			throw new Error('pop() must only be called when the Queue is not empty.');
+		}
 
 		const temp = this.front;
 		this.front = this.front.next;

@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { chunkArray } from '../../lib/lang/chunkArray';
 import { Controls } from './Controls';
 import { MoveItem, VariantMoveItem } from './MoveItem';
-import { PgnViewerProps } from './PgnViewerProps';
+import { JgnMovesViewerProps } from './JgnMovesViewerProps';
 
 export const VariantMoveItemContainer = ({
 	children,
@@ -29,7 +29,7 @@ export const VariantsContainer = ({
 	return <div className="variants-container">{children}</div>;
 };
 
-export const PgnViewer = React.memo((props: PgnViewerProps) => {
+export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 	const {
 		jgnMoves,
 		// neoMoves,
@@ -257,4 +257,4 @@ export const PgnViewer = React.memo((props: PgnViewerProps) => {
 	);
 });
 
-PgnViewer.displayName = 'PgnViewer';
+JgnMovesViewer.displayName = 'PgnMovesViewer';
