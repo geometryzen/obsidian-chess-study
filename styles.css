@@ -393,6 +393,7 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 .chess-study .move-item {
 	padding-left: 8px;
 	user-select: none;
+	font-weight: normal;
 }
 .chess-study .move-item:hover {
 	background-color: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l)));
@@ -406,6 +407,12 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 		calc(var(--accent-l) - 10%)
 	);
 	color: var(--text-on-accent);
+	font-weight: bold;
+}
+.chess-study .move-item.ancestor {
+	font-weight: bold;
+}
+.chess-study .move-item.mainline {
 	font-weight: bold;
 }
 .chess-study .variants-container {

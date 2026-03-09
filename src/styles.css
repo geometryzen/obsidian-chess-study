@@ -408,6 +408,15 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 	color: var(--text-on-accent);
 	font-weight: bold;
 }
+.chess-study .move-item.ancestor {
+	background-color: hsl(
+		var(--accent-h),
+		var(--accent-s),
+		calc(var(--accent-l) - 10%)
+	);
+	color: var(--text-on-accent);
+	font-weight: bold;
+}
 .chess-study .variants-container {
 	grid-column: span 3 / auto;
 	display: flex;

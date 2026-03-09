@@ -109,6 +109,7 @@
 .chess-study .move-item {
 	padding-left: 8px;
 	user-select: none;
+	font-weight: normal;
 }
 
 .chess-study .move-item:hover {
@@ -124,6 +125,14 @@
 		calc(var(--accent-l) - 10%)
 	);
 	color: var(--text-on-accent);
+	font-weight: bold;
+}
+
+.chess-study .move-item.ancestor {
+	font-weight: bold;
+}
+
+.chess-study .move-item.mainline {
 	font-weight: bold;
 }
 

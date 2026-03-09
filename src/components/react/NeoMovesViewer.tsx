@@ -7,8 +7,10 @@ import { Controls } from './Controls';
 import { MoveItem } from './MoveItem';
 import { NeoMovesViewerProps } from './NeoMovesViewerProps';
 // import { get_move_next } from '../../lib/neo/get_move_next';
-import { get_variation_next } from '../../lib/neo/get_variation_next';
 import { get_move_next } from '../../lib/neo/get_move_next';
+import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
+import { get_variation_next } from '../../lib/neo/get_variation_next';
+import { is_main_line, is_prior_move } from '../../lib/neo/is_parent';
 
 export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	const {
@@ -28,10 +30,19 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	// If I mutate a part or the tree that is lower than the root then the root itself does no change.
 	// The problem is not really useMemo but the mutation of the tree.
 	// I think useImmerReducer may be problematic.
-	const rows_and_data = useMemo(() => {
-		const data: { [id: string]: number } = {};
+	const { data, rows } = useMemo(() => {
+		const currentMove = currentMoveId
+			? get_neo_move_by_id(study, currentMoveId)
+			: null;
+		const data: {
+			[id: string]: { moveNumber: number; ancestor: boolean; mainline: boolean };
+		} = {};
 		if (study.root) {
-			data[study.root.moveId] = initialMoveNumber;
+			data[study.root.moveId] = {
+				moveNumber: initialMoveNumber,
+				ancestor: is_prior_move(study.root, study.root, currentMove),
+				mainline: is_main_line(study.root, currentMove),
+			};
 		}
 		const nodes = dfsGeneratorRL(study.root);
 		const rows: { key: string; white: NeoMove | null; black: NeoMove | null }[] =
@@ -56,33 +67,40 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 					rows.push({ key: node.moveId, white: null, black: node });
 				}
 			}
+			const ancestor = is_prior_move(study.root, node, currentMove);
+			const mainline = is_main_line(node, currentMove);
 			const parent = find_parent(study.root, node);
 			if (parent) {
-				const parentIndex: number = data[parent.moveId];
+				const parent_move_number: number = data[parent.moveId].moveNumber;
 				if (get_variation_next(parent) === node) {
-					data[node.moveId] = parentIndex;
+					data[node.moveId] = { moveNumber: parent_move_number, ancestor, mainline };
 				} else {
-					data[node.moveId] = node.color === 'w' ? parentIndex + 1 : parentIndex;
+					data[node.moveId] =
+						node.color === 'w'
+							? { moveNumber: parent_move_number + 1, ancestor, mainline }
+							: { moveNumber: parent_move_number, ancestor, mainline };
 				}
 			}
 		}
 		return { data, rows };
-	}, [initialMoveNumber, study.root]);
+	}, [study, initialMoveNumber, currentMoveId]);
 	return (
 		<div className="height-width-100">
 			{isVisible && (
 				<div className="move-item-section">
 					<div className="move-item-container">
-						{rows_and_data.rows.map(({ key, white, black }, index) => {
+						{rows.map(({ key, white, black }, index) => {
 							return (
 								<React.Fragment key={key}>
 									<p className="move-indicator center">
-										{`${rows_and_data.data[white ? white.moveId : black ? black.moveId : 0]}`}
+										{`${data[white ? white.moveId : (black as NeoMove).moveId].moveNumber}`}
 									</p>
 									<MoveItem
 										san={white ? white.san : '...'}
 										nags={white ? white.nags : []}
 										isCurrentMove={white ? white.moveId === currentMoveId : false}
+										ancestor={white ? data[white.moveId].ancestor : false}
+										mainline={white ? data[white.moveId].mainline : false}
 										onMoveItemClick={
 											white ? () => onMoveItemClick(white.moveId) : () => {}
 										}
@@ -91,6 +109,8 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 										san={black ? black.san : '...'}
 										nags={black ? black.nags : []}
 										isCurrentMove={black ? black.moveId === currentMoveId : false}
+										ancestor={black ? data[black.moveId].ancestor : false}
+										mainline={black ? data[black.moveId].mainline : false}
 										onMoveItemClick={
 											black ? () => onMoveItemClick(black.moveId) : () => {}
 										}

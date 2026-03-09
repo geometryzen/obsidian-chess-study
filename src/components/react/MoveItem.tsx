@@ -4,11 +4,15 @@ import { move_text } from './move_text';
 
 export const MoveItem = ({
 	isCurrentMove,
+	ancestor,
+	mainline,
 	san,
 	nags,
 	onMoveItemClick,
 }: {
 	isCurrentMove: boolean;
+	ancestor: boolean;
+	mainline: boolean;
 	san: string;
 	nags: NumericAnnotationGlyph[];
 	onMoveItemClick: () => void;
@@ -27,7 +31,7 @@ export const MoveItem = ({
 
 	return (
 		<p
-			className={`move-item ${(isCurrentMove && 'active') || ''} vertical-align`}
+			className={`move-item ${(isCurrentMove && 'active') || ''} vertical-align ${(ancestor && 'ancestor') || ''} ${(mainline && 'mainline') || ''}`}
 			ref={ref}
 			onClick={(e) => {
 				e.stopPropagation();

@@ -82,6 +82,8 @@ export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 													san={'...'}
 													nags={[]}
 													isCurrentMove={false}
+													ancestor={false}
+													mainline={false}
 													onMoveItemClick={() => {}}
 												/>
 											)
@@ -90,6 +92,8 @@ export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 										san={white_main_move.san}
 										nags={white_main_move.nags}
 										isCurrentMove={white_main_move.moveId === currentMoveId}
+										ancestor={false}
+										mainline={false}
 										onMoveItemClick={() => onMoveItemClick(white_main_move.moveId)}
 									/>
 									{!!white_main_move?.variants.length && (
@@ -98,6 +102,8 @@ export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 												san={'...'}
 												nags={[]}
 												isCurrentMove={false}
+												ancestor={false}
+												mainline={false}
 												onMoveItemClick={() => {}}
 											/>
 											<VariantsContainer>
@@ -166,6 +172,8 @@ export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 												san={'...'}
 												nags={[]}
 												isCurrentMove={false}
+												ancestor={false}
+												mainline={false}
 												onMoveItemClick={() => {}}
 											/>
 										</React.Fragment>
@@ -175,6 +183,8 @@ export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 											san={black_main_move.san}
 											nags={black_main_move.nags}
 											isCurrentMove={black_main_move.moveId === currentMoveId}
+											ancestor={false}
+											mainline={false}
 											onMoveItemClick={() => onMoveItemClick(black_main_move.moveId)}
 										/>
 									)}
