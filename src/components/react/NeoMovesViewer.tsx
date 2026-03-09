@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { dfsGeneratorRL } from '../../lib/neo/dfsGeneratorRL';
+import { find_parent } from '../../lib/neo/find_parent';
 import { NeoMove } from '../../lib/neo/NeoMove';
 import { Controls } from './Controls';
 import { MoveItem } from './MoveItem';
 import { NeoMovesViewerProps } from './NeoMovesViewerProps';
-import { find_parent } from '../../lib/neo/find_parent';
 // import { get_move_next } from '../../lib/neo/get_move_next';
 import { get_variation_next } from '../../lib/neo/get_variation_next';
+import { get_move_next } from '../../lib/neo/get_move_next';
 
 export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	const {
@@ -27,15 +28,34 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	// If I mutate a part or the tree that is lower than the root then the root itself does no change.
 	// The problem is not really useMemo but the mutation of the tree.
 	// I think useImmerReducer may be problematic.
-	const moves_and_data = useMemo(() => {
+	const rows_and_data = useMemo(() => {
 		const data: { [id: string]: number } = {};
 		if (study.root) {
 			data[study.root.moveId] = initialMoveNumber;
 		}
 		const nodes = dfsGeneratorRL(study.root);
-		const moves: NeoMove[] = [];
+		const rows: { key: string; white: NeoMove | null; black: NeoMove | null }[] =
+			[];
 		for (const node of nodes) {
-			moves.push(node);
+			if (node.color === 'w') {
+				rows.push({ key: node.moveId, white: node, black: null });
+			} else {
+				if (rows.length > 0) {
+					const previous_row = rows[rows.length - 1];
+					if (previous_row.white) {
+						const white = previous_row.white;
+						if (get_move_next(white) === node) {
+							previous_row.black = node;
+						} else {
+							rows.push({ key: node.moveId, white: null, black: node });
+						}
+					} else {
+						rows.push({ key: node.moveId, white: null, black: node });
+					}
+				} else {
+					rows.push({ key: node.moveId, white: null, black: node });
+				}
+			}
 			const parent = find_parent(study.root, node);
 			if (parent) {
 				const parentIndex: number = data[parent.moveId];
@@ -46,58 +66,33 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 				}
 			}
 		}
-		return { data, moves };
+		return { data, rows };
 	}, [initialMoveNumber, study.root]);
-	/*
-	const data: { [id: string]: number } = {};
-	if (study.root) {
-		data[study.root.moveId] = initialMoveNumber;
-	}
-	const nodes = dfsGeneratorRL(study.root);
-	const moves: NeoMove[] = [];
-	for (const node of nodes) {
-		moves.push(node);
-		const parent = find_parent(study.root, node);
-		if (parent) {
-			const parentIndex: number = data[parent.moveId];
-			if (get_variation_next(parent) === node) {
-				data[node.moveId] = parentIndex;
-			} else {
-				data[node.moveId] = node.color === 'w' ? parentIndex + 1 : parentIndex;
-			}
-		}
-	}
-	const moves_and_data = { moves, data };
-	*/
 	return (
 		<div className="height-width-100">
 			{isVisible && (
 				<div className="move-item-section">
 					<div className="move-item-container">
-						{moves_and_data.moves.map((move, index) => {
+						{rows_and_data.rows.map(({ key, white, black }, index) => {
 							return (
-								<React.Fragment key={move.moveId}>
+								<React.Fragment key={key}>
 									<p className="move-indicator center">
-										{`${moves_and_data.data[move.moveId]}`}
+										{`${rows_and_data.data[white ? white.moveId : black ? black.moveId : 0]}`}
 									</p>
 									<MoveItem
-										san={move.color === 'w' ? move.san : '...'}
-										nags={move.color === 'w' ? move.nags : []}
-										isCurrentMove={
-											move.color === 'w' ? move.moveId === currentMoveId : false
-										}
+										san={white ? white.san : '...'}
+										nags={white ? white.nags : []}
+										isCurrentMove={white ? white.moveId === currentMoveId : false}
 										onMoveItemClick={
-											move.color === 'w' ? () => onMoveItemClick(move.moveId) : () => {}
+											white ? () => onMoveItemClick(white.moveId) : () => {}
 										}
 									/>
 									<MoveItem
-										san={move.color === 'b' ? move.san : '...'}
-										nags={move.color === 'b' ? move.nags : []}
-										isCurrentMove={
-											move.color === 'b' ? move.moveId === currentMoveId : false
-										}
+										san={black ? black.san : '...'}
+										nags={black ? black.nags : []}
+										isCurrentMove={black ? black.moveId === currentMoveId : false}
 										onMoveItemClick={
-											move.color === 'b' ? () => onMoveItemClick(move.moveId) : () => {}
+											black ? () => onMoveItemClick(black.moveId) : () => {}
 										}
 									/>
 								</React.Fragment>

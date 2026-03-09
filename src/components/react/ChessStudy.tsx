@@ -63,7 +63,7 @@ export type ChessStudyConfig = ChessgroundProps;
  * Determines which data model to use as canonical.
  * This is scaffolding until we transition fully to 'neo'.
  */
-const MASTER: 'jgn' | 'neo' = 'jgn' as 'jgn' | 'neo';
+const MASTER: 'jgn' | 'neo' = 'neo' as 'jgn' | 'neo';
 
 interface AppProps {
 	/**
