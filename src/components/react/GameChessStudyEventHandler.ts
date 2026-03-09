@@ -24,6 +24,7 @@ import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic'
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { rightmost_neo_node } from './rightmost_neo_node';
+import { get_move_next } from '../../lib/neo/get_move_next';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
@@ -202,14 +203,13 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				try {
 					const root = state.neoStudy.root;
 					if (state.currentMove) {
-						const currentMove = state.currentMove;
-						const moveId = currentMove.moveId;
-						const move = get_neo_move_by_id(state.neoStudy, moveId);
-						const left = move.left;
-						if (left) {
+						// Dereference the currentMove. In future we might grab it directly.
+						const move = get_neo_move_by_id(state.neoStudy, state.currentMove.moveId);
+						const next_move = get_move_next(move);
+						if (next_move) {
 							// There is a following Main Line move.
-							if (left.san === m.san) {
-								state.currentMove = left;
+							if (next_move.san === m.san) {
+								state.currentMove = next_move;
 								return;
 							} else {
 								let right = move.right;
@@ -221,9 +221,10 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 									right = right.right;
 								}
 							}
-							// The move will be added as a variation of the following
-							const parent = rightmost_neo_node(left);
+							// The move will be added as a variation of the next move.
+							const parent = rightmost_neo_node(next_move);
 							parent.right = neo_move_from_user_move(m, null, null);
+							state.currentMove = parent.right;
 						} else {
 							// There is no following Main Line move.
 							// Look in the variations.
@@ -256,10 +257,16 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					}
 				} finally {
 					if (state.neoStudy.root) {
+						console.log('serialize and deserialize');
 						// This is an aggressive hack to try to demonstrate that useMemo is a problem
 						// if we mutate the tree such that a change is not detected.
-						state.neoStudy.root = deserializePreOrder(
-							serializePreOrder(state.neoStudy.root),
+						const root = deserializePreOrder(serializePreOrder(state.neoStudy.root));
+						const study = state.neoStudy;
+						state.neoStudy = new NeoStudy(
+							study.comment,
+							study.headers,
+							root,
+							study.rootFEN,
 						);
 					}
 					state.jgnStudy = jgn_from_neo(state.neoStudy);

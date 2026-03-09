@@ -31,6 +31,7 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	// The problem is not really useMemo but the mutation of the tree.
 	// I think useImmerReducer may be problematic.
 	const { data, rows } = useMemo(() => {
+		console.log('useMemo called.');
 		const currentMove = currentMoveId
 			? get_neo_move_by_id(study, currentMoveId)
 			: null;

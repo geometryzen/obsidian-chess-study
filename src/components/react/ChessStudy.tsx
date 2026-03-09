@@ -471,10 +471,18 @@ export const ChessStudy = ({
 										if (state.neoStudy.root) {
 											// This is an aggressive hack to try to demonstrate that useMemo is a problem
 											// if we mutate the tree such that a change is not detected.
-											state.neoStudy.root = deserializePreOrder(
+											const root = deserializePreOrder(
 												serializePreOrder(state.neoStudy.root),
 											);
+											const study = state.neoStudy;
+											state.neoStudy = new NeoStudy(
+												study.comment,
+												study.headers,
+												root,
+												study.rootFEN,
+											);
 										}
+										// TODO: This is not really enough. We have to go further.
 										state.jgnStudy.moves = jgn_from_neo(state.neoStudy).moves;
 										state.jgnStudy.moves = moves_from_node(state.neoStudy.root);
 									}
