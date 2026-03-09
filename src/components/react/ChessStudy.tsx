@@ -63,7 +63,7 @@ export type ChessStudyConfig = ChessgroundProps;
  * Determines which data model to use as canonical.
  * This is scaffolding until we transition fully to 'neo'.
  */
-const MASTER: 'jgn' | 'neo' = 'jgn' as 'jgn' | 'neo';
+const MASTER: 'jgn' | 'neo' = 'neo' as 'jgn' | 'neo';
 
 interface AppProps {
 	/**
@@ -247,34 +247,49 @@ export const ChessStudy = ({
 				break;
 			}
 			default: {
-				// TODO: switch on MASTER
-				const desiredMove = initial_move_from_jgn_study(
-					jgnStudy,
-					config.initialPosition,
-				);
-				if (desiredMove) {
-					for (let i = 0; i < jgnStudy.moves.length; i++) {
-						const move = jgnStudy.moves[i];
-						chess.move({
-							from: move.from,
-							to: move.to,
-							promotion: move.promotion,
-						});
-						if (desiredMove.moveId === move.moveId) {
-							break;
+				switch (MASTER) {
+					case 'jgn': {
+						const desiredMove = initial_move_from_jgn_study(
+							jgnStudy,
+							config.initialPosition,
+						);
+						if (desiredMove) {
+							const moves = jgnStudy.moves;
+							for (let i = 0; i < moves.length; i++) {
+								const move = moves[i];
+								chess.move({
+									from: move.from,
+									to: move.to,
+									promotion: move.promotion,
+								});
+								if (desiredMove.moveId === move.moveId) {
+									break;
+								}
+							}
 						}
+						break;
 					}
-				}
-				try {
-					const desiredNode = initial_move_from_neo_study(
-						neoStudy,
-						config.initialPosition,
-					);
-					if (desiredNode) {
-						// TODO
+					case 'neo': {
+						const desiredMove = initial_move_from_neo_study(
+							neoStudy,
+							config.initialPosition,
+						);
+						if (desiredMove) {
+							const moves = get_neo_main_line(neoStudy);
+							for (let i = 0; i < moves.length; i++) {
+								const move = moves[i];
+								chess.move({
+									from: move.from,
+									to: move.to,
+									promotion: move.promotion,
+								});
+								if (desiredMove.moveId === move.moveId) {
+									break;
+								}
+							}
+						}
+						break;
 					}
-				} catch (e) {
-					new Notice(`${e}`, 0);
 				}
 			}
 		}
