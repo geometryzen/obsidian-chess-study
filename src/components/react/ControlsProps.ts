@@ -24,4 +24,6 @@ export interface ControlProps {
 	onDecreasePositionEvaluation: () => void;
 	onSettingsButtonClick: () => void;
 	onSearchDatabase: () => void;
+	onPromoteLine: () => void;
+	onDemoteLine: () => void;
 }

@@ -16,7 +16,7 @@ function serializePreOrderRecursive(
 
 // function to serialize a tree.
 export function serializePreOrder(
-	root: NeoMove,
+	root: NeoMove | null,
 ): (Omit<NeoMove, 'left' | 'right'> | null)[] {
 	const moves: (Omit<NeoMove, 'left' | 'right'> | null)[] = [];
 	serializePreOrderRecursive(root, moves);

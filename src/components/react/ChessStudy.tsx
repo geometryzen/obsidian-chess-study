@@ -57,6 +57,8 @@ import { JgnMovesViewer } from './JgnMovesViewer';
 import { NeoMovesViewer } from './NeoMovesViewer';
 import { serializePreOrder } from '../../lib/neo/serializePreOrder';
 import { deserializePreOrder } from '../../lib/neo/deserializePreOrder';
+import { get_variation_next } from '../../lib/neo/get_variation_next';
+import { get_variation_prev } from '../../lib/neo/get_variation_prev';
 export type ChessStudyConfig = ChessgroundProps;
 
 /**
@@ -146,6 +148,8 @@ export type GameEvent =
 	| { type: 'ANNOTATE_MOVE'; glyph: NumericAnnotationGlyph }
 	| { type: 'EVALUATE_MOVE'; direction: 1 | -1 }
 	| { type: 'EVALUATE_POSITION'; direction: 1 | -1 }
+	| { type: 'PROMOTE_LINE' }
+	| { type: 'DEMOTE_LINE' }
 	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
 
@@ -685,6 +689,99 @@ export const ChessStudy = ({
 					}
 					return state;
 				}
+				case 'PROMOTE_LINE': {
+					switch (state.master) {
+						case 'jgn': {
+							// Do nothing
+							break;
+						}
+						case 'neo': {
+							const move = get_current_neo_move(state);
+							if (move) {
+								const other = get_variation_prev(state.neoStudy.root, move);
+								if (other) {
+									const uber = find_parent(state.neoStudy.root, other);
+									if (uber) {
+										other.right = move.right;
+										if (uber.right === other) {
+											uber.right = move;
+										} else {
+											uber.left = move;
+										}
+										move.right = other;
+									} else {
+										// The other was the root, now the root will be the move.
+										other.right = move.right;
+										move.right = other;
+										state.neoStudy.root = move;
+									}
+									// TODO: Can we do this more efficiently or at least DRY the code?
+									const root = deserializePreOrder(
+										serializePreOrder(state.neoStudy.root),
+									);
+									const study = state.neoStudy;
+									state.neoStudy = new NeoStudy(
+										study.comment,
+										study.headers,
+										root,
+										study.rootFEN,
+									);
+								} else {
+									// You can't promote a move if it does not have a superior variation.
+								}
+								state.jgnStudy = jgn_from_neo(state.neoStudy);
+							}
+							break;
+						}
+					}
+					return state;
+				}
+				case 'DEMOTE_LINE': {
+					switch (state.master) {
+						case 'jgn': {
+							// Do nothing
+							break;
+						}
+						case 'neo': {
+							const move = get_current_neo_move(state);
+							if (move) {
+								const other = get_variation_next(move);
+								if (other) {
+									const uber = find_parent(state.neoStudy.root, move);
+									if (uber) {
+										move.right = other.right;
+										if (uber.right === move) {
+											uber.right = other;
+										} else {
+											uber.left = other;
+										}
+										other.right = move;
+									} else {
+										// The move was the root, now the root will be the other.
+										move.right = other.right;
+										other.right = move;
+										state.neoStudy.root = other;
+									}
+									const root = deserializePreOrder(
+										serializePreOrder(state.neoStudy.root),
+									);
+									const study = state.neoStudy;
+									state.neoStudy = new NeoStudy(
+										study.comment,
+										study.headers,
+										root,
+										study.rootFEN,
+									);
+								} else {
+									// You can't demote a move if it already the highest.
+								}
+								state.jgnStudy = jgn_from_neo(state.neoStudy);
+							}
+							break;
+						}
+					}
+					return state;
+				}
 				default: {
 					break;
 				}
@@ -817,6 +914,8 @@ export const ChessStudy = ({
 							onDecreasePositionEvaluation={() =>
 								dispatch({ type: 'EVALUATE_POSITION', direction: -1 })
 							}
+							onPromoteLine={() => dispatch({ type: 'PROMOTE_LINE' })}
+							onDemoteLine={() => dispatch({ type: 'DEMOTE_LINE' })}
 							onSearchDatabase={() => {
 								try {
 									new Notice("I'm afraid I can't do that Dave!");
@@ -909,6 +1008,8 @@ export const ChessStudy = ({
 							onDecreasePositionEvaluation={() =>
 								dispatch({ type: 'EVALUATE_POSITION', direction: -1 })
 							}
+							onPromoteLine={() => dispatch({ type: 'PROMOTE_LINE' })}
+							onDemoteLine={() => dispatch({ type: 'DEMOTE_LINE' })}
 							onSearchDatabase={() => {
 								try {
 									new Notice("I'm afraid I can't do that Dave!");

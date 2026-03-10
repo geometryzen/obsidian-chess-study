@@ -6,11 +6,11 @@ import {
 	Camera,
 	ClipboardMinus,
 	ClipboardPlus,
-	DatabaseSearch,
 	Delete,
 	Film,
 	Save,
-	Settings,
+	ThumbsDown,
+	ThumbsUp,
 } from 'lucide-react';
 import * as React from 'react';
 import { ControlProps } from './ControlsProps';
@@ -27,11 +27,19 @@ export const Controls = (props: ControlProps) => {
 						<button title="Forward" onClick={() => props.onForwardButtonClick()}>
 							<ArrowBigRight strokeWidth={'2px'} />
 						</button>
-						<button title="Search Database" onClick={() => props.onSearchDatabase()}>
-							<DatabaseSearch strokeWidth={'2px'} />
+						<button
+							title="Promote Line"
+							disabled={false}
+							onClick={() => props.onPromoteLine()}
+						>
+							<ThumbsUp strokeWidth={'2px'} />
 						</button>
-						<button title="Settings" onClick={() => props.onSettingsButtonClick()}>
-							<Settings strokeWidth={'2px'} />
+						<button
+							title="Demote Line"
+							disabled={false}
+							onClick={() => props.onDemoteLine()}
+						>
+							<ThumbsDown strokeWidth={'2px'} />
 						</button>
 					</React.Fragment>
 				)}
