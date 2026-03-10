@@ -206,7 +206,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						const move = get_neo_move_by_id(state.neoStudy, state.currentMove.moveId);
 						const next_move = get_move_next(move);
 						if (next_move) {
-							console.log('There is a following Main Line move.');
+							// console.lg('There is a following Main Line move.');
 							if (next_move.san === m.san) {
 								state.currentMove = next_move;
 								return;
@@ -225,7 +225,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 							parent.right = neo_move_from_user_move(m, null, null);
 							state.currentMove = parent.right;
 						} else {
-							console.log('There is no following Main Line move.');
+							// console.lg('There is no following Main Line move.');
 							// Look in the variations.
 							let right = move.right;
 							while (right) {
@@ -245,21 +245,21 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 							state.currentMove = new_move;
 						}
 					} else {
-						console.log('There is no current move');
+						// console.lg('There is no current move');
 						if (state.neoStudy.root === null) {
-							console.log('The root is null');
+							// console.lg('The root is null');
 							const move = neo_move_from_user_move(m, null, null);
 							state.neoStudy.root = move;
 							state.currentMove = move;
 						} else {
-							console.log('The root is defined');
+							// console.lg('The root is defined');
 							const first_move = first_neo_move(state.neoStudy) as NeoMove;
 							state.currentMove = ensure_move_is_neo_move_or_variation(m, first_move);
 						}
 					}
 				} finally {
 					if (state.neoStudy.root) {
-						console.log('serialize and deserialize');
+						// console.lg('serialize and deserialize');
 						// This is an aggressive hack to try to demonstrate that useMemo is a problem
 						// if we mutate the tree such that a change is not detected.
 						const root = deserializePreOrder(serializePreOrder(state.neoStudy.root));
