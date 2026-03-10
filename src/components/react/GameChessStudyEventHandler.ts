@@ -23,7 +23,7 @@ import { displayRelativeMoveInHistory } from '../../lib/ui-state/display_relativ
 import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
-import { rightmost_neo_node } from './rightmost_neo_node';
+import { rightmost_neo_node } from '../../lib/neo/rightmost_neo_node';
 import { get_move_next } from '../../lib/neo/get_move_next';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
@@ -201,13 +201,12 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 			}
 			case 'neo': {
 				try {
-					const root = state.neoStudy.root;
 					if (state.currentMove) {
 						// Dereference the currentMove. In future we might grab it directly.
 						const move = get_neo_move_by_id(state.neoStudy, state.currentMove.moveId);
 						const next_move = get_move_next(move);
 						if (next_move) {
-							// There is a following Main Line move.
+							console.log('There is a following Main Line move.');
 							if (next_move.san === m.san) {
 								state.currentMove = next_move;
 								return;
@@ -226,7 +225,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 							parent.right = neo_move_from_user_move(m, null, null);
 							state.currentMove = parent.right;
 						} else {
-							// There is no following Main Line move.
+							console.log('There is no following Main Line move.');
 							// Look in the variations.
 							let right = move.right;
 							while (right) {
@@ -246,11 +245,14 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 							state.currentMove = new_move;
 						}
 					} else {
-						if (root === null) {
+						console.log('There is no current move');
+						if (state.neoStudy.root === null) {
+							console.log('The root is null');
 							const move = neo_move_from_user_move(m, null, null);
 							state.neoStudy.root = move;
 							state.currentMove = move;
 						} else {
+							console.log('The root is defined');
 							const first_move = first_neo_move(state.neoStudy) as NeoMove;
 							state.currentMove = ensure_move_is_neo_move_or_variation(m, first_move);
 						}

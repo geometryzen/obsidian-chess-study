@@ -1,4 +1,4 @@
-import { NeoMove } from '../../lib/neo/NeoMove';
+import { NeoMove } from './NeoMove';
 
 export function rightmost_neo_node(node: NeoMove) {
 	if (node) {
