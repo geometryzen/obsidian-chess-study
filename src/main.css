@@ -136,6 +136,16 @@
 	font-weight: bold;
 }
 
+.chess-study .move-item.variation-depth-1 {
+	color: darkviolet;
+}
+.chess-study .move-item.variation-depth-2 {
+	color: darkblue;
+}
+.chess-study .move-item.variation-depth-3 {
+	color: darkgreen;
+}
+
 /* Variant Move Items */
 
 .chess-study .variants-container {

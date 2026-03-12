@@ -11,6 +11,7 @@ import { get_move_next } from '../../lib/neo/get_move_next';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
 import { get_variation_next } from '../../lib/neo/get_variation_next';
 import { is_main_line, is_prior_move } from '../../lib/neo/is_parent';
+import { get_variation_depth } from '../../lib/neo/get_variation_depth';
 
 export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	const {
@@ -36,13 +37,19 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 			? get_neo_move_by_id(study, currentMoveId)
 			: null;
 		const data: {
-			[id: string]: { moveNumber: number; ancestor: boolean; mainline: boolean };
+			[id: string]: {
+				moveNumber: number;
+				ancestor: boolean;
+				mainline: boolean;
+				depth: number;
+			};
 		} = {};
 		if (study.root) {
 			data[study.root.moveId] = {
 				moveNumber: initialMoveNumber,
 				ancestor: is_prior_move(study.root, study.root, currentMove),
 				mainline: is_main_line(study.root, currentMove),
+				depth: get_variation_depth(study.root, study.root),
 			};
 		}
 		const nodes = dfsGeneratorRL(study.root);
@@ -70,16 +77,22 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 			}
 			const ancestor = is_prior_move(study.root, node, currentMove);
 			const mainline = is_main_line(node, currentMove);
+			const depth = get_variation_depth(study.root, node);
 			const parent = find_parent(study.root, node);
 			if (parent) {
 				const parent_move_number: number = data[parent.moveId].moveNumber;
 				if (get_variation_next(parent) === node) {
-					data[node.moveId] = { moveNumber: parent_move_number, ancestor, mainline };
+					data[node.moveId] = {
+						moveNumber: parent_move_number,
+						ancestor,
+						mainline,
+						depth,
+					};
 				} else {
 					data[node.moveId] =
 						node.color === 'w'
-							? { moveNumber: parent_move_number + 1, ancestor, mainline }
-							: { moveNumber: parent_move_number, ancestor, mainline };
+							? { moveNumber: parent_move_number + 1, ancestor, mainline, depth }
+							: { moveNumber: parent_move_number, ancestor, mainline, depth };
 				}
 			}
 		}
@@ -102,6 +115,7 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 										isCurrentMove={white ? white.moveId === currentMoveId : false}
 										ancestor={white ? data[white.moveId].ancestor : false}
 										mainline={white ? data[white.moveId].mainline : false}
+										depth={white ? data[white.moveId].depth : 0}
 										onMoveItemClick={
 											white ? () => onMoveItemClick(white.moveId) : () => {}
 										}
@@ -112,6 +126,7 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 										isCurrentMove={black ? black.moveId === currentMoveId : false}
 										ancestor={black ? data[black.moveId].ancestor : false}
 										mainline={black ? data[black.moveId].mainline : false}
+										depth={black ? data[black.moveId].depth : 0}
 										onMoveItemClick={
 											black ? () => onMoveItemClick(black.moveId) : () => {}
 										}

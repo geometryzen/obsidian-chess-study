@@ -2,21 +2,49 @@ import * as React from 'react';
 import { NumericAnnotationGlyph } from '../../lib/NumericAnnotationGlyphs';
 import { move_text } from './move_text';
 
+export interface MoveItemProps {
+	isCurrentMove: boolean;
+	ancestor: boolean;
+	mainline: boolean;
+	depth: number;
+	san: string;
+	nags: NumericAnnotationGlyph[];
+	onMoveItemClick: () => void;
+}
+
+export function className(
+	isCurrentMove: boolean,
+	ancestor: boolean,
+	mainline: boolean,
+	depth: number,
+): string {
+	const parts: string[] = [];
+	parts.push('move-item');
+	if (isCurrentMove) {
+		parts.push('active');
+	}
+	parts.push('vertical-align');
+	if (ancestor) {
+		parts.push('ancestor');
+	}
+	if (mainline) {
+		parts.push('mainline');
+	}
+	if (depth > -1) {
+		parts.push(`variation-depth-${depth}`);
+	}
+	return parts.join(' ');
+}
+
 export const MoveItem = ({
 	isCurrentMove,
 	ancestor,
 	mainline,
+	depth,
 	san,
 	nags,
 	onMoveItemClick,
-}: {
-	isCurrentMove: boolean;
-	ancestor: boolean;
-	mainline: boolean;
-	san: string;
-	nags: NumericAnnotationGlyph[];
-	onMoveItemClick: () => void;
-}) => {
+}: MoveItemProps) => {
 	const ref = React.useRef<HTMLParagraphElement>(null);
 
 	React.useEffect(() => {
@@ -31,7 +59,7 @@ export const MoveItem = ({
 
 	return (
 		<p
-			className={`move-item ${(isCurrentMove && 'active') || ''} vertical-align ${(ancestor && 'ancestor') || ''} ${(mainline && 'mainline') || ''}`}
+			className={className(isCurrentMove, ancestor, mainline, depth)}
 			ref={ref}
 			onClick={(e) => {
 				e.stopPropagation();
