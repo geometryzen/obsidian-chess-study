@@ -395,25 +395,35 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 	user-select: none;
 	font-weight: normal;
 }
-.chess-study .move-item:hover {
-	background-color: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l)));
+.chess-study .move-item.variation-depth-0:hover {
+	background-color: darkgray;
 	color: var(--text-on-accent);
 	cursor: pointer;
 }
-.chess-study .move-item.active {
-	background-color: hsl(
-		var(--accent-h),
-		var(--accent-s),
-		calc(var(--accent-l) - 10%)
-	);
+.chess-study .move-item.variation-depth-1:hover {
+	background-color: darkviolet;
 	color: var(--text-on-accent);
-	font-weight: bold;
+	cursor: pointer;
 }
-.chess-study .move-item.ancestor {
-	font-weight: bold;
+.chess-study .move-item.variation-depth-2:hover {
+	background-color: darkblue;
+	color: var(--text-on-accent);
+	cursor: pointer;
 }
-.chess-study .move-item.mainline {
-	font-weight: bold;
+.chess-study .move-item.variation-depth-3:hover {
+	background-color: darkgreen;
+	color: var(--text-on-accent);
+	cursor: pointer;
+}
+.chess-study .move-item.variation-depth-4:hover {
+	background-color: darkgoldenrod;
+	color: var(--text-on-accent);
+	cursor: pointer;
+}
+.chess-study .move-item.variation-depth-5:hover {
+	background-color: darksalmon;
+	color: var(--text-on-accent);
+	cursor: pointer;
 }
 .chess-study .move-item.variation-depth-1 {
 	color: darkviolet;
@@ -423,6 +433,48 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 }
 .chess-study .move-item.variation-depth-3 {
 	color: darkgreen;
+}
+.chess-study .move-item.variation-depth-4 {
+	color: darkgoldenrod;
+}
+.chess-study .move-item.variation-depth-5 {
+	color: darksalmon;
+}
+.chess-study .move-item.active.variation-depth-0 {
+	background-color: darkgray;
+	color: var(--text-on-accent);
+	font-weight: bold;
+}
+.chess-study .move-item.active.variation-depth-1 {
+	background-color: darkviolet;
+	color: var(--text-on-accent);
+	font-weight: bold;
+}
+.chess-study .move-item.active.variation-depth-2 {
+	background-color: darkblue;
+	color: var(--text-on-accent);
+	font-weight: bold;
+}
+.chess-study .move-item.active.variation-depth-3 {
+	background-color: darkgreen;
+	color: var(--text-on-accent);
+	font-weight: bold;
+}
+.chess-study .move-item.active.variation-depth-4 {
+	background-color: darkgoldenrod;
+	color: var(--text-on-accent);
+	font-weight: bold;
+}
+.chess-study .move-item.active.variation-depth-5 {
+	background-color: darksalmon;
+	color: var(--text-on-accent);
+	font-weight: bold;
+}
+.chess-study .move-item.ancestor {
+	font-weight: bold;
+}
+.chess-study .move-item.mainline {
+	font-weight: bold;
 }
 .chess-study .variants-container {
 	grid-column: span 3 / auto;
