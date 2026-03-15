@@ -6,12 +6,13 @@ import { NeoMove } from '../../lib/neo/NeoMove';
 import { Controls } from './Controls';
 import { MoveItem } from './MoveItem';
 import { NeoMovesViewerProps } from './NeoMovesViewerProps';
-// import { get_move_next } from '../../lib/neo/get_move_next';
 import { get_move_next } from '../../lib/neo/get_move_next';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
 import { get_variation_next } from '../../lib/neo/get_variation_next';
 import { is_main_line, is_prior_move } from '../../lib/neo/is_parent';
 import { get_variation_depth } from '../../lib/neo/get_variation_depth';
+import { Notice } from 'obsidian';
+import { MoveIndicator } from './MoveIndicator';
 
 export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	const {
@@ -106,9 +107,14 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 						{rows.map(({ key, white, black }, index) => {
 							return (
 								<React.Fragment key={key}>
-									<p className="move-indicator center">
-										{`${data[white ? white.moveId : (black as NeoMove).moveId].moveNumber}`}
-									</p>
+									<MoveIndicator
+										moveNumber={
+											data[white ? white.moveId : (black as NeoMove).moveId].moveNumber
+										}
+										onMoveIndexClick={() => {
+											new Notice('clicked');
+										}}
+									/>
 									<MoveItem
 										san={white ? white.san : '...'}
 										nags={white ? white.nags : []}

@@ -12,7 +12,7 @@ export interface MoveItemProps {
 	onMoveItemClick: () => void;
 }
 
-export function className(
+function className(
 	isCurrentMove: boolean,
 	ancestor: boolean,
 	mainline: boolean,
