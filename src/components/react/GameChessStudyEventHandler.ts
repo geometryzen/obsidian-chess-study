@@ -154,6 +154,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				const study = state.study;
 				state.study = new NeoStudy(
 					study.comment,
+					study.shapes,
 					study.headers,
 					root,
 					study.rootFEN,
@@ -165,6 +166,10 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 * @override
 	 */
 	shapes(state: GameState): DrawShape[] {
-		return state.currentMove?.shapes || [];
+		if (state.currentMove) {
+			return state.currentMove.shapes;
+		} else {
+			return state.study.shapes;
+		}
 	}
 }

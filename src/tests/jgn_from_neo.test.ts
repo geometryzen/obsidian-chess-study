@@ -20,6 +20,7 @@ describe('jgn_from_neo', () => {
 
 		const model = new NeoStudy(
 			null,
+			[],
 			headers,
 			null,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -73,6 +74,7 @@ describe('jgn_from_neo', () => {
 
 		const model = new NeoStudy(
 			null,
+			[],
 			headers,
 			root,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -174,6 +176,7 @@ describe('jgn_from_neo', () => {
 
 		const model = new NeoStudy(
 			null,
+			[],
 			headers,
 			white_node,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -284,6 +287,7 @@ describe('jgn_from_neo', () => {
 
 		const model = new NeoStudy(
 			null,
+			[],
 			headers,
 			e4_node,
 			'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',

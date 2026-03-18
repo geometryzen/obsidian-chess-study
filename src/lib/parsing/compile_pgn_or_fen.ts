@@ -57,6 +57,7 @@ function chess_to_study(
 	const fileContent: JgnStudy = {
 		headers: chess.getHeaders(),
 		comment: gameComment(), // seems to return the last comment
+		shapes: [],
 		moves: chess.history({ verbose: true }).map((move) => ({
 			moveId: nanoid(),
 			variants: [],
@@ -398,6 +399,7 @@ function compile_pgn(pgn: string): JgnStudy {
 	const fileContent: JgnStudy = {
 		headers: tags_to_headers(game.tags),
 		comment: game_comment_to_json_comment(game.gameComment),
+		shapes: [],
 		moves: pgn_moves_to_chess_study_moves(game.moves, ROOT_FEN),
 		// TODO: This does not long correct for the case of starting from a non-root position.
 		rootFEN: ROOT_FEN,

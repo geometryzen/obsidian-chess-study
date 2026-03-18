@@ -11,6 +11,7 @@ describe('jgn_to_pgn_string', () => {
 		const chessStudy: JgnStudy = {
 			headers: {},
 			comment: null,
+			shapes: [],
 			moves: [],
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};

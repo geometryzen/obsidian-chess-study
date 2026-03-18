@@ -7,10 +7,11 @@ import { node_from_move_and_links } from './node_from_move_and_links';
 
 export function neo_from_jgn(jgnStudy: JgnStudy): NeoStudy {
 	const comment = jgnStudy.comment;
+	const shapes = jgnStudy.shapes;
 	const headers = jgnStudy.headers;
 	const root: NeoMove | null = node_from_jgn_moves(jgnStudy.moves);
 	const rootFEN = jgnStudy.rootFEN;
-	return new NeoStudy(comment, headers, root, rootFEN);
+	return new NeoStudy(comment, shapes, headers, root, rootFEN);
 }
 
 function node_from_jgn_moves(moves: JgnMove[]): NeoMove | null {

@@ -88,7 +88,13 @@ export interface GameState {
 	isViewOnly: boolean;
 }
 
-function comment_from_game_state(state: GameState): JSONContent | null {
+/**
+ * If there us a current move then we return the comment for that move,
+ * Otherwise we return the comment for the study itself.
+ */
+function comment_from_game_state(
+	state: Readonly<GameState>,
+): JSONContent | null {
 	return state.currentMove
 		? state.currentMove.comment
 			? state.currentMove.comment
@@ -301,7 +307,6 @@ export const ChessStudy = ({
 					break;
 				}
 				case 'SYNC_SHAPES': {
-					if (!chessView || has_no_moves(state)) return state;
 					state.study = neo_clone(state.study);
 					const move = get_current_neo_move(state);
 					if (move) {
@@ -309,11 +314,13 @@ export const ChessStudy = ({
 						// Isn't this redundant? Didn't we just get the current move?
 						// Caution: The issue may be that we have changed the comment of the current move.
 						state.currentMove = move;
+					} else {
+						// We should be allowed to have shapes in the
+						state.study.shapes = event.shapes;
 					}
 					return state;
 				}
 				case 'SYNC_COMMENT': {
-					if (!chessView || has_no_moves(state)) return state;
 					state.study = neo_clone(state.study);
 					const move = get_current_neo_move(state);
 					if (move) {

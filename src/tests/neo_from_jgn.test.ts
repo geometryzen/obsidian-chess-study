@@ -10,6 +10,7 @@ describe('neo_from_jgn', () => {
 		const json: JgnStudy = {
 			headers: {},
 			comment: null,
+			shapes: [],
 			moves: [],
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
@@ -45,6 +46,7 @@ describe('neo_from_jgn', () => {
 		const json: JgnStudy = {
 			headers: {},
 			comment: null,
+			shapes: [],
 			moves: [move],
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
@@ -103,6 +105,7 @@ describe('neo_from_jgn', () => {
 		const json: JgnStudy = {
 			headers: {},
 			comment: null,
+			shapes: [],
 			moves: [white_move, black_move],
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
@@ -183,6 +186,7 @@ describe('neo_from_jgn', () => {
 		const json: JgnStudy = {
 			headers: {},
 			comment: null,
+			shapes: [],
 			moves: [e4_move, d4_move],
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
@@ -282,6 +286,7 @@ describe('neo_from_jgn', () => {
 		const json: JgnStudy = {
 			headers: {},
 			comment: null,
+			shapes: [],
 			moves: [e4_move],
 			rootFEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		};
