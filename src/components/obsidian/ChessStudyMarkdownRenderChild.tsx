@@ -6,7 +6,6 @@ import {
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
 import { ChessStudyLoader } from '../../lib/obsidian/ChessStudyLoader';
-import { JgnStudy } from '../../lib/jgn/JgnStudy';
 import { ChessStudy } from '../react/ChessStudy';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
 import { NeoStudy } from '../../lib/neo/NeoStudy';
@@ -20,7 +19,6 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	source: string;
 	app: App;
 	settings: ChessStudyPluginSettings;
-	readonly #jgnStudy: JgnStudy;
 	readonly #neoStudy: NeoStudy;
 	readonly #studyLoader: ChessStudyLoader;
 
@@ -31,7 +29,7 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	 * @param source
 	 * @param app
 	 * @param settings
-	 * @param jgnStudy
+	 * @param neoStudy
 	 * @param studyLoader
 	 */
 	constructor(
@@ -39,7 +37,6 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 		source: string,
 		app: App,
 		settings: ChessStudyPluginSettings,
-		jgnStudy: JgnStudy,
 		neoStudy: NeoStudy,
 		studyLoader: ChessStudyLoader,
 	) {
@@ -47,7 +44,6 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 		this.source = source;
 		this.app = app;
 		this.settings = settings;
-		this.#jgnStudy = jgnStudy;
 		this.#neoStudy = neoStudy;
 		this.#studyLoader = studyLoader;
 	}
@@ -73,8 +69,7 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 				pluginSettings={this.settings}
 				initialPos={config.initialPosition}
 				config={config}
-				jgnStudy={this.#jgnStudy}
-				neoStudy={this.#neoStudy}
+				study={this.#neoStudy}
 				studyLoader={this.#studyLoader}
 			/>,
 			/*

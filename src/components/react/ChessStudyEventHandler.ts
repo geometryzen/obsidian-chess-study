@@ -1,6 +1,5 @@
 import { Move } from 'chess.js';
 import { DrawShape } from 'chessground/draw';
-import { JgnStudy } from '../../lib/jgn/JgnStudy';
 import { NeoStudy } from '../../lib/neo/NeoStudy';
 import { GameState, MoveToken } from './ChessStudy';
 
@@ -9,7 +8,6 @@ export interface ChessStudyEventHandler {
 		state: Pick<GameState, 'isNotationHidden'>,
 		currentMove: MoveToken | null,
 		neoStudy: NeoStudy,
-		jgnStudy: JgnStudy,
 	): void;
 	gotoNextMove(state: Readonly<GameState>): MoveToken | null;
 	gotoPrevMove(state: GameState): void;

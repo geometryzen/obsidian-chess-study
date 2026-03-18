@@ -8,7 +8,7 @@ export function get_current_neo_move(state: GameState): NeoMove | null {
 		const moveId = currentMove.moveId;
 
 		if (moveId) {
-			return get_neo_move_by_id(state.neoStudy, moveId);
+			return get_neo_move_by_id(state.study, moveId);
 		} else {
 			return null;
 		}

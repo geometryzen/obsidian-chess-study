@@ -119,8 +119,6 @@ export default class ChessStudyPlugin extends Plugin {
 					);
 
 				try {
-					const jgnStudy: JgnStudy =
-						await this.#studyLoader.loadJgnStudy(chessStudyId);
 					const neoStudy: NeoStudy =
 						await this.#studyLoader.loadNeoStudy(chessStudyId);
 
@@ -130,7 +128,6 @@ export default class ChessStudyPlugin extends Plugin {
 							source,
 							this.app,
 							this.settings,
-							jgnStudy,
 							neoStudy,
 							this.#studyLoader,
 						),

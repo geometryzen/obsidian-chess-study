@@ -2,17 +2,16 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import { dfsGeneratorRL } from '../../lib/neo/dfsGeneratorRL';
 import { find_parent } from '../../lib/neo/find_parent';
-import { NeoMove } from '../../lib/neo/NeoMove';
-import { Controls } from './Controls';
-import { MoveItem } from './MoveItem';
-import { NeoMovesViewerProps } from './NeoMovesViewerProps';
 import { get_move_next } from '../../lib/neo/get_move_next';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
+import { get_variation_depth } from '../../lib/neo/get_variation_depth';
 import { get_variation_next } from '../../lib/neo/get_variation_next';
 import { is_main_line, is_prior_move } from '../../lib/neo/is_parent';
-import { get_variation_depth } from '../../lib/neo/get_variation_depth';
-import { Notice } from 'obsidian';
+import { NeoMove } from '../../lib/neo/NeoMove';
+import { Controls } from './Controls';
 import { MoveIndicator } from './MoveIndicator';
+import { MoveItem } from './MoveItem';
+import { NeoMovesViewerProps } from './NeoMovesViewerProps';
 
 export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	const {
@@ -112,7 +111,7 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 											data[white ? white.moveId : (black as NeoMove).moveId].moveNumber
 										}
 										onMoveIndexClick={() => {
-											new Notice('clicked');
+											// TODO
 										}}
 									/>
 									<MoveItem
