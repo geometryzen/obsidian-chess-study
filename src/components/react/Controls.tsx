@@ -27,6 +27,10 @@ export const Controls = (props: ControlProps) => {
 						<button title="Forward" onClick={() => props.onForwardButtonClick()}>
 							<ArrowBigRight strokeWidth={'2px'} />
 						</button>
+					</React.Fragment>
+				)}
+				{props.readOnly ? null : (
+					<React.Fragment>
 						<button
 							title="Promote Line"
 							disabled={false}

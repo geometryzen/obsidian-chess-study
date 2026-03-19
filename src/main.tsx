@@ -13,6 +13,8 @@ import { DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS } from './components/obsidian/DEFAU
 import { compile_pgn_or_fen } from './lib/parsing/compile_pgn_or_fen';
 import { ROOT_FEN } from './lib/chess-logic/ROOT_FEN';
 import {
+	CHESS_STUDY_KIND_GAME,
+	CHESS_STUDY_KIND_PUZZLE,
 	CHESS_STUDY_KIND_YAML_NAME,
 	ChessStudyKind,
 } from './lib/config/ChessStudyKind';
@@ -89,11 +91,52 @@ export default class ChessStudyPlugin extends Plugin {
 
 						const id = await this.#studyLoader.saveJgnStudy(jgnStudy);
 
-						// TODO: It would be nice for the boardOrientation and viewComments to be in the UI as configuration options.
-						editor.replaceRange(
-							`\`\`\`chessStudy\nchessStudyId: ${id}\n${INITIAL_POSITION_YAML_NAME}: ${initialPosition}\n${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}\nboardOrientation: ${boardOrientation}\ndisableCopy: ${disableCopy ? 'true' : 'false'}\ndisableNavigation: ${disableNavigation ? 'true' : 'false'}\nreadOnly: ${readOnly ? 'true' : 'false'}\nviewComments: ${viewComments ? 'true' : 'false'}\n\`\`\``,
-							cursorPosition,
-						);
+						const BACKTICKS = '```';
+						const parts: string[] = [];
+						switch (chessStudyKind) {
+							case 'puzzle': {
+								// The first instance of the chess study is the puzzle.
+								parts.push(`${BACKTICKS}chessStudy`);
+								parts.push(`chessStudyId: ${id}`);
+								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
+								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${CHESS_STUDY_KIND_PUZZLE}`);
+								parts.push(`boardOrientation: ${boardOrientation}`);
+								parts.push('disableCopy: true');
+								parts.push('disableNavigation: true');
+								parts.push(`readOnly: true`);
+								parts.push(`viewComments: false`);
+								parts.push(BACKTICKS);
+								// Using spaced repetition Question Mark as separator.
+								parts.push('?');
+								// The second instance of the chess study is the solution, which is fully editable.
+								parts.push(`${BACKTICKS}chessStudy`);
+								parts.push(`chessStudyId: ${id}`);
+								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
+								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${CHESS_STUDY_KIND_GAME}`);
+								parts.push(`boardOrientation: ${boardOrientation}`);
+								parts.push(`disableCopy: false`);
+								parts.push(`disableNavigation: false`);
+								parts.push(`readOnly: false`);
+								parts.push(`viewComments: true`);
+								parts.push(BACKTICKS);
+								break;
+							}
+							default: {
+								parts.push(`${BACKTICKS}chessStudy`);
+								parts.push(`chessStudyId: ${id}`);
+								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
+								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}`);
+								parts.push(`boardOrientation: ${boardOrientation}`);
+								parts.push(`disableCopy: ${disableCopy ? 'true' : 'false'}`);
+								parts.push(
+									`disableNavigation: ${disableNavigation ? 'true' : 'false'}`,
+								);
+								parts.push(`readOnly: ${readOnly ? 'true' : 'false'}`);
+								parts.push(`viewComments: ${viewComments ? 'true' : 'false'}`);
+								parts.push(BACKTICKS);
+							}
+						}
+						editor.replaceRange(parts.join('\n'), cursorPosition);
 					} catch (e) {
 						new Notice(
 							`Oops?? There was an error during PGN parsing. Cause: ${e}`,
