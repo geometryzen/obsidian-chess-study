@@ -137,6 +137,7 @@ export const ChessStudy = ({
 		boardOrientation,
 		disableCopy,
 		disableNavigation,
+		disableSave,
 		// initialPosition: ignoreMe,
 		readOnly,
 		chessStudyKind,
@@ -518,6 +519,7 @@ export const ChessStudy = ({
 							}
 							disableCopy={disableCopy}
 							disableNavigation={disableNavigation}
+							disableSave={disableSave}
 							readOnly={readOnly}
 							chessStudyKind={chessStudyKind}
 							onBeginButtonClick={() => dispatch({ type: 'GOTO_BEGIN_POSITION' })}

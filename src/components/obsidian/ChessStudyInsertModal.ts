@@ -33,6 +33,7 @@ export class ChessStudyInsertModal extends Modal {
 	#boardOrientation: BoardOrientation = 'white';
 	#disableCopy = false;
 	#disableNavigation = false;
+	#disableSave = false;
 	#initialPosition: InitialPosition = 'begin';
 	#readOnly = false;
 	#viewComments = true;
@@ -42,6 +43,7 @@ export class ChessStudyInsertModal extends Modal {
 		boardOrientation: BoardOrientation,
 		disableCopy: boolean,
 		disableNavigation: boolean,
+		disableSave: boolean,
 		initialPosition: InitialPosition,
 		readOnly: boolean,
 		chessStudyKind: ChessStudyKind,
@@ -55,6 +57,7 @@ export class ChessStudyInsertModal extends Modal {
 			boardOrientation: BoardOrientation,
 			disableCopy: boolean,
 			disableNavigation: boolean,
+			disableSave: boolean,
 			initialPosition: InitialPosition,
 			readOnly: boolean,
 			chessStudyKind: ChessStudyKind,
@@ -120,6 +123,16 @@ export class ChessStudyInsertModal extends Modal {
 			});
 
 		new Setting(contentEl)
+			.setName('disableSave')
+			.addToggle((toggle: ToggleComponent) => {
+				toggle.setValue(this.#disableSave);
+				toggle.setTooltip('Determines whether the study can be saved', {});
+				toggle.onChange((disableSave) => {
+					this.#disableSave = disableSave;
+				});
+			});
+
+		new Setting(contentEl)
 			.setName(INITIAL_POSITION_YAML_NAME)
 			.addDropdown((dropdown: DropdownComponent) => {
 				dropdown.addOption(INITIAL_POSITION_BEGIN, 'Begin');
@@ -177,6 +190,7 @@ export class ChessStudyInsertModal extends Modal {
 						this.#boardOrientation,
 						this.#disableCopy,
 						this.#disableNavigation,
+						this.#disableSave,
 						this.#initialPosition,
 						this.#readOnly,
 						this.#chessStudyKind,

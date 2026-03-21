@@ -3,6 +3,7 @@ import { ChessStudyKind } from '../../lib/config/ChessStudyKind';
 export interface ControlProps {
 	disableCopy: boolean;
 	disableNavigation: boolean;
+	disableSave: boolean;
 	readOnly: boolean;
 	chessStudyKind: ChessStudyKind;
 	currentMoveId: string | null;

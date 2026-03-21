@@ -82,6 +82,7 @@ Here are the available settings for a `chessStudy` code block:
 | `boardColor`        | `green` \| `brown`                           | Color of the board                               |
 | `disableCopy`       | `true`  \| `false`                           | Determines whether the study can be copied       |
 | `disableNavigation` | `true`  \| `false`                           | Determines whether the study can be navigated    |
+| `disableSave`       | `true`  \| `false`                           | Determines whether the study can be saved        |
 | `initialPosition`   | `begin` \| `end`                             | Determines the initial position                  |
 | `readOnly`          | `true`  \| `false`                           | Determines whether the study can be changed      |
 | `chessStudyKind`    | `game`  \| `position` \| `puzzle`\| `legacy` | Determines how the plugin works                  |

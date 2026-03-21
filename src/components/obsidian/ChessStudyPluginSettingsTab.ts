@@ -90,6 +90,20 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
+			.setName('Disable Save')
+			.setDesc('Sets the default value of the disableSave property')
+			.addDropdown((dropdown) => {
+				dropdown.addOption('true', 'True');
+				dropdown.addOption('false', 'False');
+				dropdown
+					.setValue(this.#plugin.settings.disableSave.toString())
+					.onChange((disableSave) => {
+						this.#plugin.settings.disableSave = disableSave === 'true';
+						this.#plugin.saveSettings();
+					});
+			});
+
+		new Setting(containerEl)
 			.setName(INITIAL_POSITION_YAML_NAME)
 			.setDesc(
 				`Sets the default value of the ${INITIAL_POSITION_YAML_NAME} property`,

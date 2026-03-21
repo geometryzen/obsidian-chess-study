@@ -10,6 +10,7 @@ export const DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS: ChessStudyPluginSettings = {
 	boardColor: 'brown',
 	disableCopy: false,
 	disableNavigation: false,
+	disableSave: false,
 	initialPosition: INITIAL_POSITION_BEGIN,
 	readOnly: false,
 	chessStudyKind: CHESS_STUDY_KIND_GAME,

@@ -93,7 +93,7 @@ export const Controls = (props: ControlProps) => {
 						</button>
 					</React.Fragment>
 				)}
-				{props.readOnly ? null : (
+				{props.disableSave || props.readOnly ? null : (
 					<button title="Save" onClick={() => props.onSaveButtonClick()}>
 						<Save color="purple" strokeWidth={'2px'} />
 					</button>

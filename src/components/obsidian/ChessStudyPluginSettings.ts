@@ -11,6 +11,7 @@ export interface ChessStudyPluginSettings {
 	chessStudyKind: ChessStudyKind;
 	disableCopy: true | false;
 	disableNavigation: true | false;
+	disableSave: true | false;
 	initialPosition: InitialPosition;
 	readOnly: true | false;
 	viewComments: true | false;

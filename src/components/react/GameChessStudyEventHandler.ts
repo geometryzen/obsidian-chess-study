@@ -15,6 +15,8 @@ import { displayRelativeMoveInHistory } from '../../lib/ui-state/display_relativ
 import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
+import { get_variation_next } from '../../lib/neo/get_variation_next';
+import { assert } from 'console';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
@@ -94,38 +96,31 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 		try {
 			if (state.currentMove) {
 				// Dereference the currentMove. In future we might grab it directly.
-				const move = get_neo_move_by_id(state.study, state.currentMove.moveId);
-				const next_move = get_move_next(move);
+				const current_move = get_neo_move_by_id(
+					state.study,
+					state.currentMove.moveId,
+				);
+				// console.lg('move', move.san);
+				const next_move = get_move_next(current_move);
 				if (next_move) {
-					// console.lg('There is a following Main Line move.');
-					if (next_move.san === m.san) {
-						state.currentMove = next_move;
-						return;
-					} else {
-						let right = move.right;
-						while (right) {
-							if (right.san === m.san) {
-								state.currentMove = right;
-								return;
-							}
-							right = right.right;
+					// console.lg('next_move', next_move.san);
+					let candidate: NeoMove | null = next_move;
+					while (candidate) {
+						// console.lg('candidate', candidate.san);
+						assert(candidate.color === m.color, candidate.color, m.color);
+						candidate.color;
+						m.color;
+						if (candidate.san === m.san) {
+							state.currentMove = candidate;
+							return;
 						}
+						candidate = get_variation_next(candidate);
 					}
 					// The move will be added as a variation of the next move.
 					const parent = rightmost_neo_node(next_move);
 					parent.right = neo_move_from_user_move(m, null, null);
 					state.currentMove = parent.right;
 				} else {
-					// console.lg('There is no following Main Line move.');
-					// Look in the variations.
-					let right = move.right;
-					while (right) {
-						if (right.san === m.san) {
-							state.currentMove = right;
-							return;
-						}
-						right = right.right;
-					}
 					// The move will be added as the next Main Line move
 					const new_move = neo_move_from_user_move(m, null, null);
 					const target = get_neo_move_by_id(state.study, state.currentMove.moveId);

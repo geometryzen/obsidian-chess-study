@@ -75,6 +75,7 @@ export default class ChessStudyPlugin extends Plugin {
 					boardOrientation: BoardOrientation,
 					disableCopy: boolean,
 					disableNavigation: boolean,
+					disableSave: boolean,
 					initialPosition: InitialPosition,
 					readOnly: boolean,
 					chessStudyKind: ChessStudyKind,
@@ -103,6 +104,7 @@ export default class ChessStudyPlugin extends Plugin {
 								parts.push(`boardOrientation: ${boardOrientation}`);
 								parts.push('disableCopy: true');
 								parts.push('disableNavigation: true');
+								parts.push('disableSave: true');
 								parts.push(`readOnly: true`);
 								parts.push(`viewComments: false`);
 								parts.push(BACKTICKS);
@@ -116,6 +118,7 @@ export default class ChessStudyPlugin extends Plugin {
 								parts.push(`boardOrientation: ${boardOrientation}`);
 								parts.push(`disableCopy: false`);
 								parts.push(`disableNavigation: false`);
+								parts.push(`disableSave: false`);
 								parts.push(`readOnly: false`);
 								parts.push(`viewComments: true`);
 								parts.push(BACKTICKS);
@@ -131,6 +134,7 @@ export default class ChessStudyPlugin extends Plugin {
 								parts.push(
 									`disableNavigation: ${disableNavigation ? 'true' : 'false'}`,
 								);
+								parts.push(`disableSave: ${disableSave ? 'true' : 'false'}`);
 								parts.push(`readOnly: ${readOnly ? 'true' : 'false'}`);
 								parts.push(`viewComments: ${viewComments ? 'true' : 'false'}`);
 								parts.push(BACKTICKS);
