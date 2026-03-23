@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import { dfsGeneratorRL } from '../../lib/neo/dfsGeneratorRL';
 import { find_parent } from '../../lib/neo/find_parent';
-import { get_move_next } from '../../lib/neo/get_move_next';
+import { get_next_move } from '../../lib/neo/get_next_move';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
 import { get_variation_depth } from '../../lib/neo/get_variation_depth';
 import { get_variation_next } from '../../lib/neo/get_variation_next';
@@ -63,7 +63,7 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 					const previous_row = rows[rows.length - 1];
 					if (previous_row.white) {
 						const white = previous_row.white;
-						if (get_move_next(white) === node) {
+						if (get_next_move(white) === node) {
 							previous_row.black = node;
 						} else {
 							rows.push({ key: node.moveId, white: null, black: node });

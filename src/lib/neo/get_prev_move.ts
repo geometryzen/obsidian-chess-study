@@ -1,8 +1,8 @@
 import { find_parent } from './find_parent';
-import { get_move_next } from './get_move_next';
+import { get_next_move } from './get_next_move';
 import { NeoMove } from './NeoMove';
 
-export function get_move_prev(
+export function get_prev_move(
 	root: NeoMove | null,
 	move: NeoMove,
 ): NeoMove | null {
@@ -10,10 +10,10 @@ export function get_move_prev(
 	if (!parent) {
 		return null;
 	} else {
-		if (get_move_next(parent) === move) {
+		if (get_next_move(parent) === move) {
 			return parent;
 		} else {
-			return get_move_prev(root, parent);
+			return get_prev_move(root, parent);
 		}
 	}
 }

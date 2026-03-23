@@ -1,6 +1,6 @@
 import { find_parent } from './find_parent';
-import { get_move_next } from './get_move_next';
-import { get_move_prev } from './get_move_prev';
+import { get_next_move } from './get_next_move';
+import { get_prev_move } from './get_prev_move';
 import { NeoMove } from './NeoMove';
 
 /**
@@ -29,10 +29,10 @@ export function is_prior_move(
 		return false;
 	}
 	const priors: NeoMove[] = [];
-	let x = get_move_prev(root, b);
+	let x = get_prev_move(root, b);
 	while (x) {
 		priors.push(x);
-		x = get_move_prev(root, x);
+		x = get_prev_move(root, x);
 	}
 	for (const prior of priors) {
 		if (prior === a) {
@@ -52,10 +52,10 @@ export function is_main_line(a: NeoMove, b: NeoMove | null): boolean {
 		return false;
 	}
 	const moves: NeoMove[] = [];
-	let x = get_move_next(b);
+	let x = get_next_move(b);
 	while (x) {
 		moves.push(x);
-		x = get_move_next(x);
+		x = get_next_move(x);
 	}
 	for (const move of moves) {
 		if (move === a) {

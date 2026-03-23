@@ -4,7 +4,7 @@ import { DrawShape } from 'chessground/draw';
 import { deserializePreOrder } from '../../lib/neo/deserializePreOrder';
 import { ensure_move_is_neo_move_or_variation } from '../../lib/neo/ensure_move_is_neo_move_or_variation';
 import { first_neo_move } from '../../lib/neo/first_neo_move';
-import { get_move_next } from '../../lib/neo/get_move_next';
+import { get_next_move } from '../../lib/neo/get_next_move';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
 import { neo_move_from_user_move } from '../../lib/neo/neo_move_from_user_move';
 import { NeoMove } from '../../lib/neo/NeoMove';
@@ -101,7 +101,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					state.currentMove.moveId,
 				);
 				// console.lg('move', move.san);
-				const next_move = get_move_next(current_move);
+				const next_move = get_next_move(current_move);
 				if (next_move) {
 					// console.lg('next_move', next_move.san);
 					let candidate: NeoMove | null = next_move;

@@ -1,9 +1,9 @@
 import { nanoid } from 'nanoid';
 import { NeoMove } from '../lib/neo/NeoMove';
 import { dfsGeneratorRL } from '../lib/neo/dfsGeneratorRL';
-import { get_move_prev } from '../lib/neo/get_move_prev';
+import { get_prev_move } from '../lib/neo/get_prev_move';
 
-describe('get_move_prev', () => {
+describe('get_prev_move', () => {
 	test('variations', () => {
 		const e4_node = new NeoMove(
 			'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
@@ -131,13 +131,13 @@ describe('get_move_prev', () => {
 			sans.push(node.san);
 		}
 
-		expect(get_move_prev(null, e5_node)).toBeNull();
-		expect(get_move_prev(root, root)).toBeNull();
-		expect(get_move_prev(root, e5_node)).toBe(e4_node);
-		expect(get_move_prev(root, d5_node)).toBe(e4_node);
-		expect(get_move_prev(root, d4_node)).toBeNull();
-		expect(get_move_prev(root, Nf6_node)).toBe(d4_node);
-		expect(get_move_prev(root, Nf3_node)).toBeNull();
-		expect(get_move_prev(root, b6_node)).toBe(Nf3_node);
+		expect(get_prev_move(null, e5_node)).toBeNull();
+		expect(get_prev_move(root, root)).toBeNull();
+		expect(get_prev_move(root, e5_node)).toBe(e4_node);
+		expect(get_prev_move(root, d5_node)).toBe(e4_node);
+		expect(get_prev_move(root, d4_node)).toBeNull();
+		expect(get_prev_move(root, Nf6_node)).toBe(d4_node);
+		expect(get_prev_move(root, Nf3_node)).toBeNull();
+		expect(get_prev_move(root, b6_node)).toBe(Nf3_node);
 	});
 });

@@ -2,12 +2,17 @@ import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
 import { first_neo_move } from '../../lib/neo/first_neo_move';
-import { get_move_next } from '../../lib/neo/get_move_next';
+import { get_next_move } from '../../lib/neo/get_next_move';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
 import { NeoMove } from '../../lib/neo/NeoMove';
 import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
+import { get_next_moves } from '../../lib/neo/get_next_moves';
+
+export function random_element<T>(xs: T[]): T {
+	return xs[Math.floor(Math.random() * xs.length)];
+}
 
 export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
@@ -56,25 +61,25 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 				state.study,
 				state.currentMove.moveId,
 			);
-			const next_move = get_move_next(current_move);
-			if (next_move) {
-				// There is a following Main Line move.
-				if (next_move.san === m.san) {
-					const reply_move = get_move_next(next_move);
-					if (reply_move) {
+			const repertoire_move = get_next_move(current_move);
+			if (repertoire_move) {
+				if (m.san === repertoire_move.san) {
+					const generated_moves = get_next_moves(repertoire_move);
+					if (generated_moves.length > 0) {
+						const generated_move = random_element(generated_moves);
 						update_view_and_logic(
 							this.#chessView,
 							this.#setChessLogic,
-							reply_move.after,
+							generated_move.after,
 						);
-						state.currentMove = reply_move;
+						state.currentMove = generated_move;
 					} else {
 						update_view_and_logic(
 							this.#chessView,
 							this.#setChessLogic,
-							next_move.after,
+							repertoire_move.after,
 						);
-						state.currentMove = next_move;
+						state.currentMove = repertoire_move;
 						state.isNotationHidden = false;
 					}
 				} else {
@@ -88,8 +93,7 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 					);
 				}
 			} else {
-				// There is no following Main Line move.
-				// The user is trying to move the opponent's piece!
+				// There are no following moves.
 				update_view_and_logic(
 					this.#chessView,
 					this.#setChessLogic,
@@ -107,9 +111,10 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 					state.study.rootFEN,
 				);
 			} else {
+				// TODO: Generalize to first_neo_moves so as to include variations
 				const first_move = first_neo_move(state.study) as NeoMove;
 				if (first_move.san === m.san) {
-					const reply_move = get_move_next(first_move);
+					const reply_move = get_next_move(first_move);
 					if (reply_move) {
 						update_view_and_logic(
 							this.#chessView,
