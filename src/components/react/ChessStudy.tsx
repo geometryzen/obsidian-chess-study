@@ -48,6 +48,7 @@ import { get_current_neo_move } from './get_current_neo_move';
 import { has_no_moves } from './has_no_moves';
 import { NeoMovesViewer } from './NeoMovesViewer';
 import { neo_clone } from '../../lib/neo/neo_clone';
+import { get_next_move } from '../../lib/neo/get_next_move';
 export type ChessStudyConfig = ChessgroundProps;
 
 interface AppProps {
@@ -265,7 +266,17 @@ export const ChessStudy = ({
 		(state: GameState, event: GameEvent) => {
 			switch (event.type) {
 				case 'GOTO_NEXT_MOVE': {
-					state.currentMove = handler.gotoNextMove(state);
+					if (state.currentMove) {
+						const currentMove = get_neo_move_by_id(
+							state.study,
+							state.currentMove.moveId,
+						);
+						if (get_next_move(currentMove)) {
+							state.currentMove = handler.gotoNextMove(state);
+						}
+					} else {
+						state.currentMove = handler.gotoNextMove(state);
+					}
 					break;
 				}
 				case 'GOTO_PREV_MOVE': {
@@ -430,7 +441,7 @@ export const ChessStudy = ({
 								state.study.root = move;
 							}
 						} else {
-							// You can't promote a move if it does not have a superior variation.
+							// You can't promote a line if it does not have a superior variation.
 						}
 					}
 					return state;
@@ -457,7 +468,7 @@ export const ChessStudy = ({
 								state.study.root = other;
 							}
 						} else {
-							// You can't demote a move if it already the highest.
+							// You can't demote a line if it does not have an inferior variation.
 						}
 					}
 					return state;

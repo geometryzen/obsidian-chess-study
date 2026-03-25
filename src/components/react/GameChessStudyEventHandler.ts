@@ -11,7 +11,7 @@ import { NeoMove } from '../../lib/neo/NeoMove';
 import { NeoStudy } from '../../lib/neo/NeoStudy';
 import { rightmost_neo_node } from '../../lib/neo/rightmost_neo_node';
 import { serializePreOrder } from '../../lib/neo/serializePreOrder';
-import { displayRelativeMoveInHistory } from '../../lib/ui-state/display_relative_move';
+import { display_relative_move } from '../../lib/ui-state/display_relative_move';
 import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
@@ -50,15 +50,9 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	gotoNextMove(state: Readonly<GameState>): MoveToken | null {
 		if (!this.#chessView) return null;
 		// We mutate the state so it cannot be readonly
-		return displayRelativeMoveInHistory(
-			state,
-			this.#chessView,
-			this.#setChessLogic,
-			{
-				offset: 1,
-				selectedMoveId: null,
-			},
-		);
+		return display_relative_move(state, this.#chessView, this.#setChessLogic, {
+			offset: 1,
+		});
 	}
 	/**
 	 * @override
@@ -66,15 +60,9 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	gotoPrevMove(state: Readonly<GameState>): MoveToken | null {
 		if (!this.#chessView) return null;
 		// Why do we update the currentMove going backwards but not going forwards?
-		return displayRelativeMoveInHistory(
-			state,
-			this.#chessView,
-			this.#setChessLogic,
-			{
-				offset: -1,
-				selectedMoveId: null,
-			},
-		);
+		return display_relative_move(state, this.#chessView, this.#setChessLogic, {
+			offset: -1,
+		});
 	}
 	/**
 	 * @override

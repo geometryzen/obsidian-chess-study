@@ -8,35 +8,34 @@ import { NeoMove } from '../neo/NeoMove';
 import { update_view_and_logic } from './update_view_and_logic';
 
 /**
- * TODO: refactor the function so
  * @param state
  * @param chessView
  * @param setChessLogic
  * @param options
  * @returns
  */
-export const displayRelativeMoveInHistory = (
+export function display_relative_move(
 	state: Readonly<GameState>,
 	chessView: ChessgroundApi,
 	setChessLogic: React.Dispatch<React.SetStateAction<Chess>>,
-	options: { offset: 1 | -1; selectedMoveId: string | null },
-): MoveToken | null => {
+	options: { offset: 1 | -1 },
+): MoveToken | null {
 	let nodeToDisplay: NeoMove | null = null;
 
-	const { offset, selectedMoveId } = options;
+	const { offset } = options;
 
 	// Figure out where we are
 	const currentMove = state.currentMove;
 
 	if (currentMove) {
-		const currentMoveId = currentMove.moveId;
-
-		// If we pass a moveId, find out where that is and offset from there, otherwise take current moveId
-		const baseMoveId = selectedMoveId || currentMoveId;
-
-		nodeToDisplay = get_neo_move_from_offset(state.study, baseMoveId, offset);
+		nodeToDisplay = get_neo_move_from_offset(
+			state.study,
+			currentMove.moveId,
+			offset,
+		);
 	} else {
 		if (offset < 0) {
+			// If we are going backwards
 			nodeToDisplay = last_neo_move(state.study);
 		} else {
 			// An offset of +1 always means that the user wants to go "Forward".
@@ -56,4 +55,4 @@ export const displayRelativeMoveInHistory = (
 		update_view_and_logic(chessView, setChessLogic, chess.fen());
 		return null;
 	}
-};
+}

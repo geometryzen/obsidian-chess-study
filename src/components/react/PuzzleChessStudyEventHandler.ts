@@ -9,17 +9,49 @@ import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic'
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { get_next_moves } from '../../lib/neo/get_next_moves';
+import { Dispatch, SetStateAction } from 'react';
 
 export function random_element<T>(xs: T[]): T {
 	return xs[Math.floor(Math.random() * xs.length)];
 }
 
+/**
+ * Plays a response (or completes the puzzle) in response to the user's move.
+ * If the puzzle has multiple possible responses then a random one is chosen.
+ * If there are no more response moves then the state ends with the user's move and the notation is made visible.
+ * @param user_move
+ * @param chessView
+ * @param setChessLogic
+ * @param state
+ */
+function play_synthetic_move(
+	user_move: NeoMove,
+	chessView: ChessView,
+	setChessLogic: Dispatch<SetStateAction<ChessJs>>,
+	state: GameState,
+) {
+	const synthetic_moves = get_next_moves(user_move);
+	if (synthetic_moves.length > 0) {
+		const synthetic_move = random_element(synthetic_moves);
+		console.log(
+			'generated_moves',
+			synthetic_moves.map((move) => move.san),
+		);
+		update_view_and_logic(chessView, setChessLogic, synthetic_move.after);
+		state.currentMove = synthetic_move;
+	} else {
+		update_view_and_logic(chessView, setChessLogic, user_move.after);
+		state.currentMove = user_move;
+		state.isNotationHidden = false;
+	}
+}
+
 export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
-	readonly #setChessLogic: React.Dispatch<React.SetStateAction<ChessJs>>;
+	readonly #setChessLogic: Dispatch<SetStateAction<ChessJs>>;
 	constructor(
 		chessView: ChessView | null,
-		setChessLogic: React.Dispatch<React.SetStateAction<ChessJs>>,
+		setChessLogic: Dispatch<SetStateAction<ChessJs>>,
 	) {
 		this.#chessView = chessView;
 		this.#setChessLogic = setChessLogic;
@@ -65,24 +97,12 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 			const repertoire_move = get_next_move(current_move);
 			if (repertoire_move) {
 				if (m.san === repertoire_move.san) {
-					const generated_moves = get_next_moves(repertoire_move);
-					if (generated_moves.length > 0) {
-						const generated_move = random_element(generated_moves);
-						update_view_and_logic(
-							this.#chessView,
-							this.#setChessLogic,
-							generated_move.after,
-						);
-						state.currentMove = generated_move;
-					} else {
-						update_view_and_logic(
-							this.#chessView,
-							this.#setChessLogic,
-							repertoire_move.after,
-						);
-						state.currentMove = repertoire_move;
-						state.isNotationHidden = false;
-					}
+					play_synthetic_move(
+						repertoire_move,
+						this.#chessView,
+						this.#setChessLogic,
+						state,
+					);
 				} else {
 					// There is a current move.
 					// A move was made that did not match the puzzle.
@@ -102,6 +122,9 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 				);
 			}
 		} else {
+			// There is no current move.
+			// This can happen in puzzles when the move that gave rise to the position is not known.
+			console.log('There is no current move');
 			if (root === null) {
 				// If there are no moves, then this is not a puzzle!
 				// Update the view to revert the position.
@@ -112,25 +135,16 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 					state.study.rootFEN,
 				);
 			} else {
-				// TODO: Generalize to first_neo_moves so as to include variations
+				// TODO: Generalize to first_neo_moves so as to include variations. YES
+				// However, generally we are looking for only one move in a puzzle.
 				const first_move = first_neo_move(state.study) as NeoMove;
 				if (first_move.san === m.san) {
-					const reply_move = get_next_move(first_move);
-					if (reply_move) {
-						update_view_and_logic(
-							this.#chessView,
-							this.#setChessLogic,
-							reply_move.after,
-						);
-						state.currentMove = reply_move;
-					} else {
-						update_view_and_logic(
-							this.#chessView,
-							this.#setChessLogic,
-							first_move.after,
-						);
-						state.currentMove = first_move;
-					}
+					play_synthetic_move(
+						first_move,
+						this.#chessView,
+						this.#setChessLogic,
+						state,
+					);
 				} else {
 					// It's not the correct move
 					// There is no current move so we are at the beginning of the game.
