@@ -10,7 +10,7 @@ export interface ChessStudyEventHandler {
 		neoStudy: NeoStudy,
 	): void;
 	gotoNextMove(state: Readonly<GameState>): MoveToken | null;
-	gotoPrevMove(state: GameState): void;
+	gotoPrevMove(state: Readonly<GameState>): MoveToken | null;
 	gotoMove(state: Readonly<GameState>, moveId: string): MoveToken | null;
 	/**
 	 * TODO: Rename because it is confusing that the move has already been played in the user interface?

@@ -148,20 +148,34 @@
 	cursor: pointer;
 }
 
+.chess-study .move-item.variation-depth-6:hover {
+	background-color: darkkhaki;
+	color: var(--text-on-accent);
+	cursor: pointer;
+}
+
 .chess-study .move-item.variation-depth-1 {
 	color: darkviolet;
 }
+
 .chess-study .move-item.variation-depth-2 {
 	color: darkblue;
 }
+
 .chess-study .move-item.variation-depth-3 {
 	color: darkgreen;
 }
+
 .chess-study .move-item.variation-depth-4 {
 	color: darkgoldenrod;
 }
+
 .chess-study .move-item.variation-depth-5 {
 	color: darksalmon;
+}
+
+.chess-study .move-item.variation-depth-6 {
+	color: darkkhaki;
 }
 
 .chess-study .move-item.active.variation-depth-0 {
@@ -196,6 +210,12 @@
 
 .chess-study .move-item.active.variation-depth-5 {
 	background-color: darksalmon;
+	color: var(--text-on-accent);
+	font-weight: bold;
+}
+
+.chess-study .move-item.active.variation-depth-6 {
+	background-color: darkkhaki;
 	color: var(--text-on-accent);
 	font-weight: bold;
 }

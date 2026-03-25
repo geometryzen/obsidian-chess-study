@@ -40,8 +40,9 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoPrevMove(state: GameState): void {
+	gotoPrevMove(state: Readonly<GameState>): MoveToken | null {
 		// Do nothing
+		return null;
 	}
 	/**
 	 * @override

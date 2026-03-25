@@ -269,7 +269,7 @@ export const ChessStudy = ({
 					break;
 				}
 				case 'GOTO_PREV_MOVE': {
-					handler.gotoPrevMove(state);
+					state.currentMove = handler.gotoPrevMove(state);
 					break;
 				}
 				case 'DELETE_MOVE': {

@@ -63,10 +63,10 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoPrevMove(state: GameState): void {
-		if (!this.#chessView) return;
-
-		state.currentMove = displayRelativeMoveInHistory(
+	gotoPrevMove(state: Readonly<GameState>): MoveToken | null {
+		if (!this.#chessView) return null;
+		// Why do we update the currentMove going backwards but not going forwards?
+		return displayRelativeMoveInHistory(
 			state,
 			this.#chessView,
 			this.#setChessLogic,

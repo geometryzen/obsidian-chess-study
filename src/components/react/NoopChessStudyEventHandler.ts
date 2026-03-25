@@ -20,8 +20,9 @@ export class NoopChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoPrevMove(state: GameState): void {
+	gotoPrevMove(state: Readonly<GameState>): MoveToken | null {
 		// Do nothing
+		return null;
 	}
 	/**
 	 * @override
