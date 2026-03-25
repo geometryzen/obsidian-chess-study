@@ -33,10 +33,6 @@ function play_synthetic_move(
 	const synthetic_moves = get_next_moves(user_move);
 	if (synthetic_moves.length > 0) {
 		const synthetic_move = random_element(synthetic_moves);
-		console.log(
-			'generated_moves',
-			synthetic_moves.map((move) => move.san),
-		);
 		update_view_and_logic(chessView, setChessLogic, synthetic_move.after);
 		state.currentMove = synthetic_move;
 	} else {
@@ -94,6 +90,7 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 				state.study,
 				state.currentMove.moveId,
 			);
+			// TODO: There may be several move choices that the user is allowed to make due to variations.
 			const repertoire_move = get_next_move(current_move);
 			if (repertoire_move) {
 				if (m.san === repertoire_move.san) {
@@ -124,7 +121,6 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 		} else {
 			// There is no current move.
 			// This can happen in puzzles when the move that gave rise to the position is not known.
-			console.log('There is no current move');
 			if (root === null) {
 				// If there are no moves, then this is not a puzzle!
 				// Update the view to revert the position.
