@@ -23,6 +23,7 @@ export interface ControlProps {
 	onDecreaseMoveAnnotation: () => void;
 	onIncreasePositionEvaluation: () => void;
 	onDecreasePositionEvaluation: () => void;
+	onResetButtonClick: () => void;
 	onSettingsButtonClick: () => void;
 	onSearchDatabase: () => void;
 	onPromoteLine: () => void;

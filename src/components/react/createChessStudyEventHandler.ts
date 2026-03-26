@@ -8,6 +8,7 @@ import { PuzzleChessStudyEventHandler } from './PuzzleChessStudyEventHandler';
 export const createChessStudyEventHandler = (
 	chessStudyKind: ChessStudyKind,
 	chessView: ChessView | null,
+	chessLogic: ChessJs,
 	setChessLogic: React.Dispatch<React.SetStateAction<ChessJs>>,
 ) => {
 	switch (chessStudyKind) {
@@ -15,7 +16,11 @@ export const createChessStudyEventHandler = (
 			return new GameChessStudyEventHandler(chessView, setChessLogic);
 		}
 		case 'puzzle': {
-			return new PuzzleChessStudyEventHandler(chessView, setChessLogic);
+			return new PuzzleChessStudyEventHandler(
+				chessView,
+				chessLogic,
+				setChessLogic,
+			);
 		}
 		case 'position': {
 			return new NoopChessStudyEventHandler();

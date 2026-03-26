@@ -8,6 +8,7 @@ import {
 	ClipboardPlus,
 	Delete,
 	Film,
+	RotateCcw,
 	Save,
 	ThumbsDown,
 	ThumbsUp,
@@ -26,6 +27,13 @@ export const Controls = (props: ControlProps) => {
 						</button>
 						<button title="Forward" onClick={() => props.onForwardButtonClick()}>
 							<ArrowBigRight strokeWidth={'2px'} />
+						</button>
+					</React.Fragment>
+				)}
+				{props.chessStudyKind !== 'puzzle' ? null : (
+					<React.Fragment>
+						<button title="Reset" onClick={() => props.onResetButtonClick()}>
+							<RotateCcw strokeWidth={'2px'} />
 						</button>
 					</React.Fragment>
 				)}

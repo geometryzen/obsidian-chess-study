@@ -1,23 +1,14 @@
-import { Chess } from 'chess.js';
+import { Chess as ChessPosition } from 'chess.js';
 import { Api as ChessgroundApi } from 'chessground/api';
 import { legal_moves } from '../chess-logic/legal_moves';
 import { turn_color_white_or_black } from '../chess-logic/turn_color_white_or_black';
 
-/**
- *
- * @param chessView
- * @param setChessLogic
- * @param fen
- */
-export const update_view_and_logic = (
+export function update_board_view_from_position(
 	chessView: ChessgroundApi,
-	setChessLogic: React.Dispatch<React.SetStateAction<Chess>>,
-	fen: string,
-): void => {
-	const chess = new Chess(fen);
-
+	chess: ChessPosition,
+): void {
 	chessView.set({
-		fen,
+		fen: chess.fen(),
 		check: chess.isCheck(),
 		movable: {
 			free: false,
@@ -26,6 +17,4 @@ export const update_view_and_logic = (
 		},
 		turnColor: turn_color_white_or_black(chess),
 	});
-
-	setChessLogic(chess);
-};
+}

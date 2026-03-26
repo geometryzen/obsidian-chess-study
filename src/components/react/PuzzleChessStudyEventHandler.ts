@@ -1,15 +1,17 @@
 import { Chess as ChessJs, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
+import { Dispatch, SetStateAction } from 'react';
 import { first_neo_move } from '../../lib/neo/first_neo_move';
-import { get_next_move } from '../../lib/neo/get_next_move';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
+import { get_next_move } from '../../lib/neo/get_next_move';
+import { get_next_moves } from '../../lib/neo/get_next_moves';
 import { NeoMove } from '../../lib/neo/NeoMove';
-import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
+import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position';
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
-import { get_next_moves } from '../../lib/neo/get_next_moves';
-import { Dispatch, SetStateAction } from 'react';
+import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
+import { initialize_position } from './foobar';
 
 export function random_element<T>(xs: T[]): T {
 	return xs[Math.floor(Math.random() * xs.length)];
@@ -33,10 +35,14 @@ function play_synthetic_move(
 	const synthetic_moves = get_next_moves(user_move);
 	if (synthetic_moves.length > 0) {
 		const synthetic_move = random_element(synthetic_moves);
-		update_view_and_logic(chessView, setChessLogic, synthetic_move.after);
+		const position = new ChessJs(synthetic_move.after);
+		update_board_view_from_position(chessView, position);
+		setChessLogic(position);
 		state.currentMove = synthetic_move;
 	} else {
-		update_view_and_logic(chessView, setChessLogic, user_move.after);
+		const position = new ChessJs(user_move.after);
+		update_board_view_from_position(chessView, position);
+		setChessLogic(position);
 		state.currentMove = user_move;
 		state.isNotationHidden = false;
 	}
@@ -44,12 +50,15 @@ function play_synthetic_move(
 
 export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
+	readonly #chessLogic: ChessJs;
 	readonly #setChessLogic: Dispatch<SetStateAction<ChessJs>>;
 	constructor(
 		chessView: ChessView | null,
+		chessLogic: ChessJs,
 		setChessLogic: Dispatch<SetStateAction<ChessJs>>,
 	) {
 		this.#chessView = chessView;
+		this.#chessLogic = chessLogic;
 		this.#setChessLogic = setChessLogic;
 	}
 	/**
@@ -104,19 +113,15 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 					// There is a current move.
 					// A move was made that did not match the puzzle.
 					// Revert to the position after the current move.
-					update_view_and_logic(
-						this.#chessView,
-						this.#setChessLogic,
-						current_move.after,
-					);
+					const position = new ChessJs(current_move.after);
+					update_board_view_from_position(this.#chessView, position);
+					this.#setChessLogic(position);
 				}
 			} else {
 				// There are no following moves.
-				update_view_and_logic(
-					this.#chessView,
-					this.#setChessLogic,
-					current_move.after,
-				);
+				const position = new ChessJs(current_move.after);
+				update_board_view_from_position(this.#chessView, position);
+				this.#setChessLogic(position);
 			}
 		} else {
 			// There is no current move.
@@ -125,11 +130,9 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 				// If there are no moves, then this is not a puzzle!
 				// Update the view to revert the position.
 				// There is no change in state.
-				update_view_and_logic(
-					this.#chessView,
-					this.#setChessLogic,
-					state.study.rootFEN,
-				);
+				const position = new ChessJs(state.study.rootFEN);
+				update_board_view_from_position(this.#chessView, position);
+				this.#setChessLogic(position);
 			} else {
 				// TODO: Generalize to first_neo_moves so as to include variations. YES
 				// However, generally we are looking for only one move in a puzzle.
@@ -145,14 +148,23 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 					// It's not the correct move
 					// There is no current move so we are at the beginning of the game.
 					// Additionally, the move made did not match the first so we revert to the root position.
-					update_view_and_logic(
-						this.#chessView,
-						this.#setChessLogic,
-						state.study.rootFEN,
-					);
+					const position = new ChessJs(state.study.rootFEN);
+					update_board_view_from_position(this.#chessView, position);
+					this.#setChessLogic(position);
 				}
 			}
 		}
+	}
+	reset(state: GameState, initialPosition: string): void {
+		if (!this.#chessView) return;
+
+		const position = initialize_position(state.study, initialPosition);
+		this.#setChessLogic(position);
+		update_board_view_from_position(this.#chessView, position);
+		// TODO: It seems a bit strange that the computation of the current move does not happen
+		// in a more coherent way with the initialization of the position.
+		state.currentMove = initial_move_from_neo_study(state.study, initialPosition);
+		state.isNotationHidden = true;
 	}
 	shapes(state: GameState): DrawShape[] {
 		return [];

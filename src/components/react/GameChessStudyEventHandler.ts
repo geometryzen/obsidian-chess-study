@@ -12,7 +12,7 @@ import { NeoStudy } from '../../lib/neo/NeoStudy';
 import { rightmost_neo_node } from '../../lib/neo/rightmost_neo_node';
 import { serializePreOrder } from '../../lib/neo/serializePreOrder';
 import { display_relative_move } from '../../lib/ui-state/display_relative_move';
-import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
+import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position';
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { get_variation_next } from '../../lib/neo/get_variation_next';
@@ -71,7 +71,9 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 		if (!this.#chessView) return null;
 
 		const neoMove: NeoMove = get_neo_move_by_id(state.study, moveId);
-		update_view_and_logic(this.#chessView, this.#setChessLogic, neoMove.after);
+		const position = new ChessJs(neoMove.after);
+		this.#setChessLogic(position);
+		update_board_view_from_position(this.#chessView, position);
 		return neoMove;
 	}
 	/**
@@ -144,6 +146,12 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 				);
 			}
 		}
+	}
+	/**
+	 * @override
+	 */
+	reset(state: GameState): void {
+		// Do nothing
 	}
 	/**
 	 * @override

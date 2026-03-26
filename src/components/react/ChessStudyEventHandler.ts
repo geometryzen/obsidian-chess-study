@@ -19,5 +19,9 @@ export interface ChessStudyEventHandler {
 	/**
 	 *
 	 */
+	reset(state: GameState, initialPosition: string): void;
+	/**
+	 *
+	 */
 	shapes(state: GameState): DrawShape[];
 }

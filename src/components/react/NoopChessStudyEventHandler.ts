@@ -37,6 +37,9 @@ export class NoopChessStudyEventHandler implements ChessStudyEventHandler {
 	playMove(state: GameState, move: Move): void {
 		// Do nothing
 	}
+	reset(state: GameState, initialPosition: string): void {
+		// Do nothing
+	}
 	shapes(state: GameState): DrawShape[] {
 		return [];
 	}

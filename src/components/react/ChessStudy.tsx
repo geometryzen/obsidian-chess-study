@@ -10,13 +10,13 @@ import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPl
 import { InitialPosition } from '../../lib/config/InitialPosition';
 import { jgn_to_pgn_string } from '../../lib/jgn/jgn_to_pgn_string';
 import { find_parent } from '../../lib/neo/find_parent';
-import { first_neo_move } from '../../lib/neo/first_neo_move';
-import { get_neo_main_line } from '../../lib/neo/get_neo_main_line';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
+import { get_next_move } from '../../lib/neo/get_next_move';
 import { get_variation_next } from '../../lib/neo/get_variation_next';
 import { get_variation_prev } from '../../lib/neo/get_variation_prev';
 import { has_neo_move_by_id } from '../../lib/neo/has_neo_move_by_id';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
+import { neo_clone } from '../../lib/neo/neo_clone';
 import { NeoStudy } from '../../lib/neo/NeoStudy';
 import {
 	annotate_move_blunder,
@@ -39,16 +39,15 @@ import {
 	parse_user_config,
 } from '../../lib/obsidian/parse_user_config';
 import { jgn_from_neo } from '../../lib/transform/jgn_from_neo';
-import { update_view_and_logic } from '../../lib/ui-state/update_view_and_logic';
+import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position';
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { CommentSection } from './CommentSection';
 import { createChessStudyEventHandler } from './createChessStudyEventHandler';
+import { initialize_position } from './foobar';
 import { get_current_neo_move } from './get_current_neo_move';
 import { has_no_moves } from './has_no_moves';
 import { NeoMovesViewer } from './NeoMovesViewer';
-import { neo_clone } from '../../lib/neo/neo_clone';
-import { get_next_move } from '../../lib/neo/get_next_move';
 export type ChessStudyConfig = ChessgroundProps;
 
 interface AppProps {
@@ -118,6 +117,7 @@ export type GameEvent =
 	| { type: 'EVALUATE_POSITION'; direction: 1 | -1 }
 	| { type: 'PROMOTE_LINE' }
 	| { type: 'DEMOTE_LINE' }
+	| { type: 'RESET' }
 	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
 	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
 
@@ -154,58 +154,10 @@ export const ChessStudy = ({
 	 *
 	 */
 	const [initialChessModel, initialPlayer, initialMoveNumber] = useMemo(() => {
-		const chess = new ChessJs(study.rootFEN);
+		const chess = initialize_position(study, config.initialPosition);
 
 		const initialPlayer: 'w' | 'b' = chess.turn();
 		const initialMoveNumber = chess.moveNumber();
-
-		switch (config.initialPosition) {
-			case 'end': {
-				get_neo_main_line(study).forEach((move) => {
-					chess.move({
-						from: move.from,
-						to: move.to,
-						promotion: move.promotion,
-					});
-				});
-				break;
-			}
-			case 'first': {
-				const move = first_neo_move(study);
-				if (move) {
-					chess.move({
-						from: move.from,
-						to: move.to,
-						promotion: move.promotion,
-					});
-				}
-				break;
-			}
-			case 'begin': {
-				// Do nothing.
-				break;
-			}
-			default: {
-				const desiredMove = initial_move_from_neo_study(
-					study,
-					config.initialPosition,
-				);
-				if (desiredMove) {
-					const moves = get_neo_main_line(study);
-					for (let i = 0; i < moves.length; i++) {
-						const move = moves[i];
-						chess.move({
-							from: move.from,
-							to: move.to,
-							promotion: move.promotion,
-						});
-						if (desiredMove.moveId === move.moveId) {
-							break;
-						}
-					}
-				}
-			}
-		}
 
 		return [chess, initialPlayer, initialMoveNumber];
 	}, [study, config.initialPosition]);
@@ -219,6 +171,7 @@ export const ChessStudy = ({
 	const handler: ChessStudyEventHandler = createChessStudyEventHandler(
 		chessStudyKind,
 		chessView,
+		chessLogic,
 		setChessLogic,
 	);
 
@@ -299,12 +252,16 @@ export const ChessStudy = ({
 									parent.right = target.right;
 								}
 								state.currentMove = parent;
-								update_view_and_logic(chessView, setChessLogic, parent.after);
+								const chess = new ChessJs(parent.after);
+								update_board_view_from_position(chessView, chess);
+								setChessLogic(chess);
 							} else {
 								// We must be deleting the root node
 								state.study.root = null;
 								state.currentMove = null;
-								update_view_and_logic(chessView, setChessLogic, state.study.rootFEN);
+								const chess = new ChessJs(state.study.rootFEN);
+								update_board_view_from_position(chessView, chess);
+								setChessLogic(chess);
 							}
 						} else {
 							// console.lg('Ignoring the event because the node no longer exists');
@@ -316,6 +273,10 @@ export const ChessStudy = ({
 				}
 				case 'GOTO_MOVE': {
 					state.currentMove = handler.gotoMove(state, event.moveId);
+					break;
+				}
+				case 'RESET': {
+					handler.reset(state, initialPosition);
 					break;
 				}
 				case 'SYNC_SHAPES': {
@@ -566,6 +527,7 @@ export const ChessStudy = ({
 									});
 								}
 							}}
+							onResetButtonClick={() => dispatch({ type: 'RESET' })}
 							onAnnotateMoveCorrect={() =>
 								dispatch({ type: 'ANNOTATE_MOVE', glyph: NAG_null })
 							}
