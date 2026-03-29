@@ -10,6 +10,7 @@ import {
 import {
 	CHESS_STUDY_KIND_GAME,
 	CHESS_STUDY_KIND_LEGACY,
+	CHESS_STUDY_KIND_MEMORIZE,
 	CHESS_STUDY_KIND_POSITION,
 	CHESS_STUDY_KIND_PUZZLE,
 	CHESS_STUDY_KIND_YAML_NAME,
@@ -75,10 +76,12 @@ export class ChessStudyInsertModal extends Modal {
 		const { contentEl } = this;
 
 		contentEl.createEl('h1', {
+			// TODO: Translation.
 			text: 'Insert Chess Study',
 		});
 
 		new Setting(contentEl)
+			// TODO: Translation.
 			.setName('PGN/FEN')
 			.addTextArea((text: TextAreaComponent) =>
 				text
@@ -91,6 +94,7 @@ export class ChessStudyInsertModal extends Modal {
 			);
 
 		new Setting(contentEl)
+			// TODO: Humanize/Translation the YAML name.
 			.setName('boardOrientation')
 			.addDropdown((dropdown: DropdownComponent) => {
 				dropdown.addOption('white', 'White');
@@ -103,6 +107,7 @@ export class ChessStudyInsertModal extends Modal {
 			});
 
 		new Setting(contentEl)
+			// TODO: Humanize/Translation the YAML name.
 			.setName('disableCopy')
 			.addToggle((toggle: ToggleComponent) => {
 				toggle.setValue(this.#disableCopy);
@@ -113,6 +118,7 @@ export class ChessStudyInsertModal extends Modal {
 			});
 
 		new Setting(contentEl)
+			// TODO: Humanize/Translation the YAML name.
 			.setName('disableNavigation')
 			.addToggle((toggle: ToggleComponent) => {
 				toggle.setValue(this.#disableNavigation);
@@ -123,6 +129,7 @@ export class ChessStudyInsertModal extends Modal {
 			});
 
 		new Setting(contentEl)
+			// TODO: Humanize/Translation the YAML name.
 			.setName('disableSave')
 			.addToggle((toggle: ToggleComponent) => {
 				toggle.setValue(this.#disableSave);
@@ -133,6 +140,7 @@ export class ChessStudyInsertModal extends Modal {
 			});
 
 		new Setting(contentEl)
+			// TODO: Humanize/Translation the YAML name.
 			.setName(INITIAL_POSITION_YAML_NAME)
 			.addDropdown((dropdown: DropdownComponent) => {
 				dropdown.addOption(INITIAL_POSITION_BEGIN, 'Begin');
@@ -145,6 +153,7 @@ export class ChessStudyInsertModal extends Modal {
 			});
 
 		new Setting(contentEl)
+			// TODO: Humanize/Translation the YAML name.
 			.setName('readOnly')
 			.addToggle((toggle: ToggleComponent) => {
 				toggle.setValue(this.#readOnly);
@@ -155,7 +164,7 @@ export class ChessStudyInsertModal extends Modal {
 			});
 
 		new Setting(contentEl)
-			// TODO: Humanize the YAML name.
+			// TODO: Humanize/Translation the YAML name.
 			.setName(CHESS_STUDY_KIND_YAML_NAME)
 			.addDropdown((dropdown: DropdownComponent) => {
 				// TODO: Humanize the option display string
@@ -163,6 +172,7 @@ export class ChessStudyInsertModal extends Modal {
 				dropdown.addOption(CHESS_STUDY_KIND_POSITION, 'Position');
 				dropdown.addOption(CHESS_STUDY_KIND_PUZZLE, 'Puzzle');
 				dropdown.addOption(CHESS_STUDY_KIND_LEGACY, 'Legacy');
+				dropdown.addOption(CHESS_STUDY_KIND_MEMORIZE, 'Memorize');
 				dropdown.setValue(this.#chessStudyKind);
 				dropdown.onChange((type) => {
 					this.#chessStudyKind = type as ChessStudyKind;
@@ -170,6 +180,7 @@ export class ChessStudyInsertModal extends Modal {
 			});
 
 		new Setting(contentEl)
+			// TODO: Humanize/Translation the YAML name.
 			.setName('viewComments')
 			.addToggle((toggle: ToggleComponent) => {
 				toggle.setValue(this.#viewComments);
@@ -181,6 +192,7 @@ export class ChessStudyInsertModal extends Modal {
 
 		new Setting(contentEl).addButton((button: ButtonComponent) =>
 			button
+				// TODO: Translation.
 				.setButtonText('Submit')
 				.setCta()
 				.onClick(() => {

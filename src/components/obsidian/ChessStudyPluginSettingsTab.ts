@@ -2,6 +2,7 @@ import { App, PluginSettingTab, Setting } from 'obsidian';
 import {
 	CHESS_STUDY_KIND_GAME,
 	CHESS_STUDY_KIND_LEGACY,
+	CHESS_STUDY_KIND_MEMORIZE,
 	CHESS_STUDY_KIND_POSITION,
 	CHESS_STUDY_KIND_PUZZLE,
 	CHESS_STUDY_KIND_YAML_NAME,
@@ -146,6 +147,7 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 				dropdown.addOption(CHESS_STUDY_KIND_POSITION, 'Position');
 				dropdown.addOption(CHESS_STUDY_KIND_PUZZLE, 'Puzzle');
 				dropdown.addOption(CHESS_STUDY_KIND_LEGACY, 'Legacy');
+				dropdown.addOption(CHESS_STUDY_KIND_MEMORIZE, 'Memorize');
 				dropdown
 					.setValue(this.#plugin.settings.chessStudyKind)
 					.onChange((chessStudyKind) => {

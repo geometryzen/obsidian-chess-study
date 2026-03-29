@@ -14,6 +14,7 @@ import { compile_pgn_or_fen } from './lib/parsing/compile_pgn_or_fen';
 import { ROOT_FEN } from './lib/chess-logic/ROOT_FEN';
 import {
 	CHESS_STUDY_KIND_GAME,
+	CHESS_STUDY_KIND_MEMORIZE,
 	CHESS_STUDY_KIND_PUZZLE,
 	CHESS_STUDY_KIND_YAML_NAME,
 	ChessStudyKind,
@@ -95,12 +96,13 @@ export default class ChessStudyPlugin extends Plugin {
 						const BACKTICKS = '```';
 						const parts: string[] = [];
 						switch (chessStudyKind) {
-							case 'puzzle': {
+							case CHESS_STUDY_KIND_PUZZLE:
+							case CHESS_STUDY_KIND_MEMORIZE: {
 								// The first instance of the chess study is the puzzle.
 								parts.push(`${BACKTICKS}chessStudy`);
 								parts.push(`chessStudyId: ${id}`);
 								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
-								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${CHESS_STUDY_KIND_PUZZLE}`);
+								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}`);
 								parts.push(`boardOrientation: ${boardOrientation}`);
 								parts.push('disableCopy: true');
 								parts.push('disableNavigation: true');
