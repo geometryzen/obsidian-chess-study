@@ -17,7 +17,7 @@ export interface NeoMovesViewerProps extends ControlProps {
 	/**
 	 * The move number in the initial position.
 	 */
-	initialMoveNumber: number;
+	rootMoveNumber: number;
 	isVisible: boolean;
 	onMoveItemClick: (moveId: string) => void;
 }

@@ -35,7 +35,7 @@ export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 		// neoMoves,
 		currentMoveId,
 		initialPlayer,
-		initialMoveNumber,
+		rootMoveNumber,
 		isVisible,
 		onMoveItemClick,
 		...controlActions
@@ -71,7 +71,7 @@ export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 									}
 								>
 									<p className="move-indicator center">
-										{main_move_pairs_index + initialMoveNumber}
+										{main_move_pairs_index + rootMoveNumber}
 									</p>
 									{
 										// Special logic here because of the chunking into pairs.
@@ -135,10 +135,7 @@ export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 																					onMoveItemClick(white_variation_move.moveId)
 																				}
 																				moveIndicator={`${
-																					main_move_pairs_index +
-																					initialMoveNumber +
-																					0 +
-																					wMoveVarianti
+																					main_move_pairs_index + rootMoveNumber + 0 + wMoveVarianti
 																				}. `}
 																			/>
 																			{
@@ -169,7 +166,7 @@ export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 									{black_main_move && !!white_main_move?.variants.length && (
 										<React.Fragment>
 											<p className="move-indicator center">
-												{main_move_pairs_index + initialMoveNumber}
+												{main_move_pairs_index + rootMoveNumber}
 											</p>
 											<MoveItem
 												san={'...'}
@@ -223,7 +220,7 @@ export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 																					bMoveVarianti === 0
 																						? `${
 																								main_move_pairs_index +
-																								initialMoveNumber +
+																								rootMoveNumber +
 																								0 /* was 1 */ +
 																								bMoveVarianti
 																							}... `
@@ -244,7 +241,7 @@ export const JgnMovesViewer = React.memo((props: JgnMovesViewerProps) => {
 																						}
 																						moveIndicator={`${
 																							main_move_pairs_index +
-																							initialMoveNumber +
+																							rootMoveNumber +
 																							1 +
 																							bMoveVarianti
 																						}. `}

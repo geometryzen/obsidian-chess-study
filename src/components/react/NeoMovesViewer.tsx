@@ -19,7 +19,7 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 		// neoMoves,
 		currentMoveId,
 		// initialPlayer,
-		initialMoveNumber,
+		rootMoveNumber,
 		isVisible,
 		onMoveItemClick,
 		...controlActions
@@ -46,7 +46,7 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 		} = {};
 		if (study.root) {
 			data[study.root.moveId] = {
-				moveNumber: initialMoveNumber,
+				moveNumber: rootMoveNumber,
 				ancestor: is_prior_move(study.root, study.root, currentMove),
 				mainline: is_main_line(study.root, currentMove),
 				depth: get_variation_depth(study.root, study.root),
@@ -97,7 +97,7 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 			}
 		}
 		return { data, rows };
-	}, [study, initialMoveNumber, currentMoveId]);
+	}, [study, rootMoveNumber, currentMoveId]);
 	return (
 		<div className="height-width-100">
 			{isVisible && (

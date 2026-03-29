@@ -1,4 +1,4 @@
-import { Chess as ChessJs, Move } from 'chess.js';
+import { Chess as ChessPosition, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
 import { deserializePreOrder } from '../../lib/neo/deserializePreOrder';
@@ -20,10 +20,10 @@ import { assert } from 'console';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
-	readonly #setChessLogic: React.Dispatch<React.SetStateAction<ChessJs>>;
+	readonly #setChessLogic: React.Dispatch<React.SetStateAction<ChessPosition>>;
 	constructor(
 		chessView: ChessView | null,
-		setChessLogic: React.Dispatch<React.SetStateAction<ChessJs>>,
+		setChessLogic: React.Dispatch<React.SetStateAction<ChessPosition>>,
 	) {
 		this.#chessView = chessView;
 		this.#setChessLogic = setChessLogic;
@@ -71,9 +71,9 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 		if (!this.#chessView) return null;
 
 		const neoMove: NeoMove = get_neo_move_by_id(state.study, moveId);
-		const position = new ChessJs(neoMove.after);
-		this.#setChessLogic(position);
-		update_board_view_from_position(this.#chessView, position);
+		const pos = new ChessPosition(neoMove.after);
+		this.#setChessLogic(pos);
+		update_board_view_from_position(this.#chessView, pos);
 		return neoMove;
 	}
 	/**

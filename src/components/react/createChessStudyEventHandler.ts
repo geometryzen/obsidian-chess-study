@@ -1,4 +1,4 @@
-import { Chess as ChessJs } from 'chess.js';
+import { Chess as ChessPosition } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import {
 	CHESS_STUDY_KIND_GAME,
@@ -16,8 +16,8 @@ import { MemorizeChessStudyEventHandler } from './MemorizeChessStudyEventHandler
 export const createChessStudyEventHandler = (
 	chessStudyKind: ChessStudyKind,
 	chessView: ChessView | null,
-	chessLogic: ChessJs,
-	setChessLogic: React.Dispatch<React.SetStateAction<ChessJs>>,
+	chessLogic: ChessPosition,
+	setChessLogic: React.Dispatch<React.SetStateAction<ChessPosition>>,
 ) => {
 	switch (chessStudyKind) {
 		case CHESS_STUDY_KIND_GAME: {

@@ -13,9 +13,9 @@ export interface JgnMovesViewerProps extends ControlProps {
 	 */
 	initialPlayer: 'w' | 'b';
 	/**
-	 * The move number in the initial position.
+	 * The move number or the root position.
 	 */
-	initialMoveNumber: number;
+	rootMoveNumber: number;
 	isVisible: boolean;
 	onMoveItemClick: (moveId: string) => void;
 }

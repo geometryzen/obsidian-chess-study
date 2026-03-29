@@ -1,5 +1,5 @@
 import { JSONContent } from '@tiptap/react';
-import { Chess as ChessJs, Move } from 'chess.js';
+import { Chess as ChessPosition, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
 import { App, Notice } from 'obsidian';
@@ -44,7 +44,7 @@ import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { CommentSection } from './CommentSection';
 import { createChessStudyEventHandler } from './createChessStudyEventHandler';
-import { initialize_position } from './foobar';
+import { initialize_position } from '../../lib/chess-logic/initialize_position';
 import { get_current_neo_move } from './get_current_neo_move';
 import { has_no_moves } from './has_no_moves';
 import { NeoMovesViewer } from './NeoMovesViewer';
@@ -153,13 +153,17 @@ export const ChessStudy = ({
 	/**
 	 *
 	 */
-	const [initialChessModel, initialPlayer, initialMoveNumber] = useMemo(() => {
-		const position = initialize_position(study, config.initialPosition);
+	const [initialChessModel, initialPlayer, rootMoveNumber] = useMemo(() => {
+		const { pos, rootMoveNumber } = initialize_position(
+			study,
+			config.initialPosition,
+		);
 
-		const initialPlayer: 'w' | 'b' = position.turn();
-		const initialMoveNumber = position.moveNumber();
+		// TODO: We may have to review this given that we can advance the position using the initialPosition parameter.
+		// This may actually be the current player?
+		const initialPlayer: 'w' | 'b' = pos.turn();
 
-		return [position, initialPlayer, initialMoveNumber];
+		return [pos, initialPlayer, rootMoveNumber];
 	}, [study, config.initialPosition]);
 
 	/**
@@ -252,16 +256,16 @@ export const ChessStudy = ({
 									parent.right = target.right;
 								}
 								state.currentMove = parent;
-								const chess = new ChessJs(parent.after);
-								update_board_view_from_position(chessView, chess);
-								setChessLogic(chess);
+								const pos = new ChessPosition(parent.after);
+								update_board_view_from_position(chessView, pos);
+								setChessLogic(pos);
 							} else {
 								// We must be deleting the root node
 								state.study.root = null;
 								state.currentMove = null;
-								const chess = new ChessJs(state.study.rootFEN);
-								update_board_view_from_position(chessView, chess);
-								setChessLogic(chess);
+								const pos = new ChessPosition(state.study.rootFEN);
+								update_board_view_from_position(chessView, pos);
+								setChessLogic(pos);
 							}
 						} else {
 							// console.lg('Ignoring the event because the node no longer exists');
@@ -481,7 +485,7 @@ export const ChessStudy = ({
 							study={gameState.study}
 							currentMoveId={gameState.currentMove?.moveId ?? null}
 							initialPlayer={initialPlayer}
-							initialMoveNumber={initialMoveNumber}
+							rootMoveNumber={rootMoveNumber}
 							isVisible={!gameState.isNotationHidden}
 							onMoveItemClick={(moveId: string) =>
 								dispatch({
