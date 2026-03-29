@@ -154,12 +154,12 @@ export const ChessStudy = ({
 	 *
 	 */
 	const [initialChessModel, initialPlayer, initialMoveNumber] = useMemo(() => {
-		const chess = initialize_position(study, config.initialPosition);
+		const position = initialize_position(study, config.initialPosition);
 
-		const initialPlayer: 'w' | 'b' = chess.turn();
-		const initialMoveNumber = chess.moveNumber();
+		const initialPlayer: 'w' | 'b' = position.turn();
+		const initialMoveNumber = position.moveNumber();
 
-		return [chess, initialPlayer, initialMoveNumber];
+		return [position, initialPlayer, initialMoveNumber];
 	}, [study, config.initialPosition]);
 
 	/**

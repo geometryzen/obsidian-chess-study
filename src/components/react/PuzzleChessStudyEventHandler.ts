@@ -12,6 +12,7 @@ import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
 import { initialize_position } from './foobar';
+import { has_next_moves } from '../../lib/neo/has_next_moves';
 
 export function random_element<T>(xs: T[]): T {
 	return xs[Math.floor(Math.random() * xs.length)];
@@ -39,6 +40,7 @@ function play_synthetic_move(
 		update_board_view_from_position(chessView, position);
 		setChessLogic(position);
 		state.currentMove = synthetic_move;
+		state.isNotationHidden = has_next_moves(synthetic_move);
 	} else {
 		const position = new ChessJs(user_move.after);
 		update_board_view_from_position(chessView, position);
