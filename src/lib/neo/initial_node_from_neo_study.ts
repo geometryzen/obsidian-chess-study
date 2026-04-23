@@ -7,6 +7,8 @@ import {
 } from '../config/InitialPosition';
 import { NeoMove } from './NeoMove';
 import { NeoStudy } from './NeoStudy';
+import { bfsGeneratorLR } from './bfsGeneratorLR';
+import { compute_move_number } from './compute_move_number';
 
 /**
  *
@@ -38,13 +40,6 @@ export function initial_move_from_neo_study(
 				return last;
 			}
 			default: {
-				// We are currently defaulting to the last move (legacy behavior)
-				const moves: NeoMove[] = [root];
-				let last = root;
-				while (last.left) {
-					last = last.left;
-					moves.push(last);
-				}
 				const game = parse(initialPosition, { startRule: 'game' }) as ParseTree;
 				if (Array.isArray(game.moves)) {
 					const ipmoves = game.moves;
@@ -54,11 +49,25 @@ export function initial_move_from_neo_study(
 						// The PGN parsing library seems to get the color wrong.
 						const turn = initialPosition.includes('...') ? 'b' : 'w';
 						// The following needs refinement for when the first move does not start at 1.
-						const index =
-							turn === 'w' ? 2 * (moveNumber - 1) : 2 * (moveNumber - 1) + 1;
-						const move = moves[index];
-						return move;
+						// const index = turn === 'w' ? 2 * (moveNumber - 1) : 2 * (moveNumber - 1) + 1;
+						const nodes = bfsGeneratorLR(root);
+						for (const node of nodes) {
+							if (node.san === ipmove.notation.notation) {
+								if (node.color === turn) {
+									if (moveNumber === compute_move_number(node, root)) {
+										return node;
+									}
+								}
+							}
+						}
 					}
+				}
+				// We are currently defaulting to the last move (legacy behavior)
+				const moves: NeoMove[] = [root];
+				let last = root;
+				while (last.left) {
+					last = last.left;
+					moves.push(last);
 				}
 				return moves[moves.length - 1] ?? null;
 			}

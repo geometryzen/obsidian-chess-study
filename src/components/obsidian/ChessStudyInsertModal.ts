@@ -13,6 +13,7 @@ import {
 	CHESS_STUDY_KIND_MEMORIZE,
 	CHESS_STUDY_KIND_POSITION,
 	CHESS_STUDY_KIND_PUZZLE,
+	CHESS_STUDY_KIND_REPERTOIRE,
 	CHESS_STUDY_KIND_YAML_NAME,
 	ChessStudyKind,
 } from '../../lib/config/ChessStudyKind';
@@ -171,6 +172,7 @@ export class ChessStudyInsertModal extends Modal {
 				dropdown.addOption(CHESS_STUDY_KIND_GAME, 'Game');
 				dropdown.addOption(CHESS_STUDY_KIND_POSITION, 'Position');
 				dropdown.addOption(CHESS_STUDY_KIND_PUZZLE, 'Puzzle');
+				dropdown.addOption(CHESS_STUDY_KIND_REPERTOIRE, 'Repertoire');
 				dropdown.addOption(CHESS_STUDY_KIND_LEGACY, 'Legacy');
 				dropdown.addOption(CHESS_STUDY_KIND_MEMORIZE, 'Memorize');
 				dropdown.setValue(this.#chessStudyKind);

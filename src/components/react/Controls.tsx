@@ -15,6 +15,33 @@ import {
 } from 'lucide-react';
 import * as React from 'react';
 import { ControlProps } from './ControlsProps';
+import {
+	CHESS_STUDY_KIND_GAME,
+	CHESS_STUDY_KIND_LEGACY,
+	CHESS_STUDY_KIND_MEMORIZE,
+	CHESS_STUDY_KIND_POSITION,
+	CHESS_STUDY_KIND_PUZZLE,
+	CHESS_STUDY_KIND_REPERTOIRE,
+	ChessStudyKind,
+} from '../../lib/config/ChessStudyKind';
+
+function has_reset_feature(chessStudyKind: ChessStudyKind): boolean {
+	switch (chessStudyKind) {
+		case CHESS_STUDY_KIND_REPERTOIRE:
+		case CHESS_STUDY_KIND_MEMORIZE:
+		case CHESS_STUDY_KIND_PUZZLE: {
+			return true;
+		}
+		case CHESS_STUDY_KIND_GAME:
+		case CHESS_STUDY_KIND_LEGACY:
+		case CHESS_STUDY_KIND_POSITION: {
+			return false;
+		}
+		default: {
+			return false;
+		}
+	}
+}
 
 export const Controls = (props: ControlProps) => {
 	return (
@@ -30,13 +57,13 @@ export const Controls = (props: ControlProps) => {
 						</button>
 					</React.Fragment>
 				)}
-				{props.chessStudyKind !== 'puzzle' ? null : (
+				{has_reset_feature(props.chessStudyKind) ? (
 					<React.Fragment>
 						<button title="Reset" onClick={() => props.onResetButtonClick()}>
 							<RotateCcw strokeWidth={'2px'} />
 						</button>
 					</React.Fragment>
-				)}
+				) : null}
 				{props.readOnly ? null : (
 					<React.Fragment>
 						<button

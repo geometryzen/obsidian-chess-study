@@ -6,6 +6,7 @@ import {
 	CHESS_STUDY_KIND_MEMORIZE,
 	CHESS_STUDY_KIND_POSITION,
 	CHESS_STUDY_KIND_PUZZLE,
+	CHESS_STUDY_KIND_REPERTOIRE,
 	ChessStudyKind,
 } from '../../lib/config/ChessStudyKind';
 import { GameChessStudyEventHandler } from './GameChessStudyEventHandler';
@@ -36,6 +37,7 @@ export const createChessStudyEventHandler = (
 		case CHESS_STUDY_KIND_LEGACY: {
 			return new GameChessStudyEventHandler(chessView, setChessLogic);
 		}
+		case CHESS_STUDY_KIND_REPERTOIRE:
 		case CHESS_STUDY_KIND_MEMORIZE: {
 			return new MemorizeChessStudyEventHandler(
 				chessView,
