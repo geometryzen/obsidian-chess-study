@@ -14,8 +14,13 @@ export interface ChessStudyEventHandler {
 	gotoMove(state: Readonly<GameState>, moveId: string): MoveToken | null;
 	/**
 	 * TODO: Rename because it is confusing that the move has already been played in the user interface?
+	 * Maybe just call this onMove
 	 */
-	playMove(state: GameState, playedMove: Move): void;
+	playMove(
+		state: GameState,
+		playedMove: Move,
+		boardOrientation: 'w' | 'b',
+	): void;
 	/**
 	 *
 	 */

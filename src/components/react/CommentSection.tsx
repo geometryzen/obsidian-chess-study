@@ -27,7 +27,7 @@ export const CommentSection = React.memo(
 			if (!editor) return;
 			const { from, to } = editor.state.selection;
 			if (currentComment) {
-				// TODO: How to upgrade from 2.x to 3.x
+				// TODO: How to upgrade from 2.x to 3.x?
 				/*
 				editor.commands.setContent(currentComment, false, {
 					preserveWhitespace: true,

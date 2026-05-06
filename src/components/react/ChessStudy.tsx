@@ -79,7 +79,15 @@ export interface GameState {
 	 */
 	study: NeoStudy;
 	/**
-	 * Determines whether the game notation is visible or not.
+	 * Determines whether the comments are visible or not.
+	 */
+	isCommentsHidden: boolean;
+	/**
+	 * Determines whether the move navigation buttons are visible.
+	 */
+	isNavigationHidden: boolean;
+	/**
+	 * Determines whether the notation is visible or not.
 	 */
 	isNotationHidden: boolean;
 	/**
@@ -194,8 +202,18 @@ export const ChessStudy = ({
 		 */
 		study,
 		/**
+		 * In most cases the comments are visible.
+		 * However, in the case of puzzle-like modes, the comments are the hints, and may be hidden.
+		 */
+		isCommentsHidden: !viewComments,
+		/**
+		 * In most cases the navigation buttons are visible.
+		 * However, in the case of puzzle-like modes, the navigation buttons would provide access to the main line, and may be hidden.
+		 */
+		isNavigationHidden: disableNavigation,
+		/**
 		 * In most use cases the notation is visible.
-		 * However, in the case of a puzzle, the notation is the solution, and may be hidden.
+		 * However, in the case of a puzzle-like modes, the notation is the solution, and may be hidden.
 		 */
 		isNotationHidden: false,
 		/**
@@ -311,7 +329,11 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'PLAY_MOVE': {
-					handler.playMove(state, event.move);
+					handler.playMove(
+						state,
+						event.move,
+						config.boardOrientation === 'white' ? 'w' : 'b',
+					);
 					return state;
 				}
 				case 'ANNOTATE_MOVE': {
@@ -494,7 +516,7 @@ export const ChessStudy = ({
 								})
 							}
 							disableCopy={disableCopy}
-							disableNavigation={disableNavigation}
+							disableNavigation={gameState.isNavigationHidden}
 							disableSave={disableSave}
 							readOnly={readOnly}
 							chessStudyKind={chessStudyKind}
@@ -576,7 +598,7 @@ export const ChessStudy = ({
 					</div>
 				}
 			</div>
-			{viewComments && (
+			{!gameState.isCommentsHidden && (
 				<div className="CommentSection">
 					<CommentSection
 						currentComment={comment_from_game_state(gameState)}

@@ -16,7 +16,6 @@ import { update_board_view_from_position } from '../../lib/ui-state/update_board
 import { GameState, MoveToken } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { get_variation_next } from '../../lib/neo/get_variation_next';
-import { assert } from 'console';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
@@ -97,9 +96,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					let candidate: NeoMove | null = next_move;
 					while (candidate) {
 						// console.lg('candidate', candidate.san);
-						assert(candidate.color === m.color, candidate.color, m.color);
-						candidate.color;
-						m.color;
 						if (candidate.san === m.san) {
 							state.currentMove = candidate;
 							return;

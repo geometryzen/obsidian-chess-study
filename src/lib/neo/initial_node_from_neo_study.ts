@@ -9,6 +9,7 @@ import { NeoMove } from './NeoMove';
 import { NeoStudy } from './NeoStudy';
 import { bfsGeneratorLR } from './bfsGeneratorLR';
 import { compute_move_number } from './compute_move_number';
+import { get_next_move_by_san } from './get_next_move_by_san';
 
 /**
  *
@@ -44,6 +45,8 @@ export function initial_move_from_neo_study(
 				if (Array.isArray(game.moves)) {
 					const ipmoves = game.moves;
 					if (ipmoves.length === 1) {
+						// If we have just one move then we return the first match.
+						// This can lead to the wrong move if there is ambiguity.
 						const ipmove = ipmoves[0];
 						const moveNumber = ipmove.moveNumber;
 						// The PGN parsing library seems to get the color wrong.
@@ -60,6 +63,15 @@ export function initial_move_from_neo_study(
 								}
 							}
 						}
+					} else if (ipmoves.length > 1) {
+						// If we have multiple moves then we walk through from the root.
+						let move: NeoMove | null = null;
+						for (let i = 0; i < ipmoves.length; i++) {
+							const ipmove = ipmoves[i];
+							const san = ipmove.notation.notation;
+							move = get_next_move_by_san(move, san, root);
+						}
+						return move;
 					}
 				}
 				// We are currently defaulting to the last move (legacy behavior)

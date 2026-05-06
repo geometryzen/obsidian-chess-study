@@ -13,6 +13,7 @@ import { GameChessStudyEventHandler } from './GameChessStudyEventHandler';
 import { NoopChessStudyEventHandler } from './NoopChessStudyEventHandler';
 import { PuzzleChessStudyEventHandler } from './PuzzleChessStudyEventHandler';
 import { MemorizeChessStudyEventHandler } from './MemorizeChessStudyEventHandler';
+import { RepertoireChessStudyEventHandler } from './RepertoireChessStudyEventHandler';
 
 export const createChessStudyEventHandler = (
 	chessStudyKind: ChessStudyKind,
@@ -37,7 +38,9 @@ export const createChessStudyEventHandler = (
 		case CHESS_STUDY_KIND_LEGACY: {
 			return new GameChessStudyEventHandler(chessView, setChessLogic);
 		}
-		case CHESS_STUDY_KIND_REPERTOIRE:
+		case CHESS_STUDY_KIND_REPERTOIRE: {
+			return new RepertoireChessStudyEventHandler(chessView, setChessLogic);
+		}
 		case CHESS_STUDY_KIND_MEMORIZE: {
 			return new MemorizeChessStudyEventHandler(
 				chessView,

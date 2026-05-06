@@ -31,7 +31,7 @@ import { BoardOrientation, ChessString } from '../../main';
  */
 export class ChessStudyInsertModal extends Modal {
 	#chessString: ChessString;
-	#chessStudyKind: ChessStudyKind = CHESS_STUDY_KIND_GAME;
+	#chessStudyKind: ChessStudyKind = CHESS_STUDY_KIND_PUZZLE;
 	#boardOrientation: BoardOrientation = 'white';
 	#disableCopy = false;
 	#disableNavigation = false;
