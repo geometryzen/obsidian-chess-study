@@ -4,7 +4,6 @@ import { DrawShape } from 'chessground/draw';
 import { Dispatch, SetStateAction } from 'react';
 import { first_neo_move } from '../../lib/neo/first_neo_move';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
-import { get_next_move } from '../../lib/neo/get_next_move';
 import { get_next_moves } from '../../lib/neo/get_next_moves';
 import { NeoMove } from '../../lib/neo/NeoMove';
 import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position';
@@ -13,6 +12,7 @@ import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
 import { initialize_position } from '../../lib/chess-logic/initialize_position';
 import { has_next_moves } from '../../lib/neo/has_next_moves';
+import { is_correct_move } from '../../lib/neo/is_questionable_move';
 
 export function random_element<T>(xs: T[]): T {
 	return xs[Math.floor(Math.random() * xs.length)];
@@ -101,12 +101,20 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 				state.study,
 				state.currentMove.moveId,
 			);
-			// TODO: There may be several move choices that the user is allowed to make due to variations.
-			const repertoire_move = get_next_move(current_move);
-			if (repertoire_move) {
-				if (m.san === repertoire_move.san) {
+			// There may be several move choices that the user is allowed to make due to variations.
+			// Make sure that the user plays only correct moves.
+			const variations = get_next_moves(current_move);
+			const correct_moves = variations.filter((variation) =>
+				is_correct_move(variation),
+			);
+			if (correct_moves.length > 0) {
+				const matching_moves = correct_moves.filter(
+					(correct_move) => correct_move.san === m.san,
+				);
+				if (matching_moves.length === 1) {
+					const matching_move = matching_moves[0];
 					play_synthetic_move(
-						repertoire_move,
+						matching_move,
 						this.#chessView,
 						this.#setChessLogic,
 						state,
