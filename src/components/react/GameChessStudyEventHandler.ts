@@ -1,21 +1,21 @@
 import { Chess as ChessPosition, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
-import { deserializePreOrder } from '../../lib/neo/deserializePreOrder';
-import { ensure_move_is_neo_move_or_variation } from '../../lib/neo/ensure_move_is_neo_move_or_variation';
-import { first_neo_move } from '../../lib/neo/first_neo_move';
-import { get_next_move } from '../../lib/neo/get_next_move';
-import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
-import { neo_move_from_user_move } from '../../lib/neo/neo_move_from_user_move';
-import { NeoMove } from '../../lib/neo/NeoMove';
-import { NeoStudy } from '../../lib/neo/NeoStudy';
-import { rightmost_neo_node } from '../../lib/neo/rightmost_neo_node';
-import { serializePreOrder } from '../../lib/neo/serializePreOrder';
-import { display_relative_move } from '../../lib/ui-state/display_relative_move';
-import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position';
-import { GameState, MoveToken } from './ChessStudy';
-import { ChessStudyEventHandler } from './ChessStudyEventHandler';
-import { get_variation_next } from '../../lib/neo/get_variation_next';
+import { deserializePreOrder } from '../../lib/neo/deserializePreOrder.js';
+import { ensure_move_is_neo_move_or_variation } from '../../lib/neo/ensure_move_is_neo_move_or_variation.js';
+import { first_neo_move } from '../../lib/neo/first_neo_move.js';
+import { get_next_move } from '../../lib/neo/get_next_move.js';
+import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id.js';
+import { neo_move_from_user_move } from '../../lib/neo/neo_move_from_user_move.js';
+import { NeoMove } from '../../lib/neo/NeoMove.js';
+import { NeoStudy } from '../../lib/neo/NeoStudy.js';
+import { rightmost_neo_node } from '../../lib/neo/rightmost_neo_node.js';
+import { serializePreOrder } from '../../lib/neo/serializePreOrder.js';
+import { display_relative_move } from '../../lib/ui-state/display_relative_move.js';
+import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position.js';
+import { GameState, MoveToken } from './ChessStudy.js';
+import { ChessStudyEventHandler } from './ChessStudyEventHandler.js';
+import { get_variation_next } from '../../lib/neo/get_variation_next.js';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;

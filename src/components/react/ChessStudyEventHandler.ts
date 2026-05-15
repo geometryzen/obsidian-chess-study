@@ -1,7 +1,7 @@
 import { Move } from 'chess.js';
 import { DrawShape } from 'chessground/draw';
-import { NeoStudy } from '../../lib/neo/NeoStudy';
-import { GameState, MoveToken } from './ChessStudy';
+import { NeoStudy } from '../../lib/neo/NeoStudy.js';
+import { GameState, MoveToken } from './ChessStudy.js';
 
 export interface ChessStudyEventHandler {
 	setInitialState(

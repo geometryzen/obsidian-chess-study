@@ -8,12 +8,12 @@ import {
 	CHESS_STUDY_KIND_PUZZLE,
 	CHESS_STUDY_KIND_REPERTOIRE,
 	ChessStudyKind,
-} from '../../lib/config/ChessStudyKind';
-import { GameChessStudyEventHandler } from './GameChessStudyEventHandler';
-import { NoopChessStudyEventHandler } from './NoopChessStudyEventHandler';
-import { PuzzleChessStudyEventHandler } from './PuzzleChessStudyEventHandler';
-import { MemorizeChessStudyEventHandler } from './MemorizeChessStudyEventHandler';
-import { RepertoireChessStudyEventHandler } from './RepertoireChessStudyEventHandler';
+} from '../../lib/config/ChessStudyKind.js';
+import { GameChessStudyEventHandler } from './GameChessStudyEventHandler.js';
+import { NoopChessStudyEventHandler } from './NoopChessStudyEventHandler.js';
+import { PuzzleChessStudyEventHandler } from './PuzzleChessStudyEventHandler.js';
+import { MemorizeChessStudyEventHandler } from './MemorizeChessStudyEventHandler.js';
+import { RepertoireChessStudyEventHandler } from './RepertoireChessStudyEventHandler.js';
 
 export const createChessStudyEventHandler = (
 	chessStudyKind: ChessStudyKind,

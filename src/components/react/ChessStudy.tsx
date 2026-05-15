@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box';
 import { JSONContent } from '@tiptap/react';
 import { Chess as ChessPosition, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
@@ -7,17 +8,18 @@ import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useImmerReducer } from 'use-immer';
 import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPluginSettings';
+import { initialize_position } from '../../lib/chess-logic/initialize_position';
 import { InitialPosition } from '../../lib/config/InitialPosition';
 import { jgn_to_pgn_string } from '../../lib/jgn/jgn_to_pgn_string';
 import { find_parent } from '../../lib/neo/find_parent';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
 import { get_next_move } from '../../lib/neo/get_next_move';
-import { get_variation_next } from '../../lib/neo/get_variation_next';
-import { get_variation_prev } from '../../lib/neo/get_variation_prev';
-import { has_neo_move_by_id } from '../../lib/neo/has_neo_move_by_id';
-import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
-import { neo_clone } from '../../lib/neo/neo_clone';
-import { NeoStudy } from '../../lib/neo/NeoStudy';
+import { get_variation_next } from '../../lib/neo/get_variation_next.js';
+import { get_variation_prev } from '../../lib/neo/get_variation_prev.js';
+import { has_neo_move_by_id } from '../../lib/neo/has_neo_move_by_id.js';
+import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study.js';
+import { neo_clone } from '../../lib/neo/neo_clone.js';
+import { NeoStudy } from '../../lib/neo/NeoStudy.js';
 import {
 	annotate_move_blunder,
 	annotate_move_correct,
@@ -44,7 +46,6 @@ import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { CommentSection } from './CommentSection';
 import { createChessStudyEventHandler } from './createChessStudyEventHandler';
-import { initialize_position } from '../../lib/chess-logic/initialize_position';
 import { get_current_neo_move } from './get_current_neo_move';
 import { has_no_moves } from './has_no_moves';
 import { NeoMovesViewer } from './NeoMovesViewer';
@@ -599,14 +600,14 @@ export const ChessStudy = ({
 				}
 			</div>
 			{!gameState.isCommentsHidden && (
-				<div className="CommentSection">
+				<Box className="CommentSection">
 					<CommentSection
 						currentComment={comment_from_game_state(gameState)}
 						setComments={(comment: JSONContent) =>
 							dispatch({ type: 'SYNC_COMMENT', comment: comment })
 						}
 					/>
-				</div>
+				</Box>
 			)}
 		</div>
 	);

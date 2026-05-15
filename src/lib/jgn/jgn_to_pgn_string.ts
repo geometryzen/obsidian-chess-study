@@ -5,8 +5,8 @@ import {
 	nags_to_dollars,
 	NumericAnnotationGlyph,
 } from '../NumericAnnotationGlyphs';
+import { JgnMove, JgnVariation } from './JgnMove';
 import { JgnStudy } from './JgnStudy';
-import { JgnMove } from './JgnMove';
 
 /**
  * The keys of the Seven Tags Roster in the canonical ordering.
@@ -38,7 +38,10 @@ function move_san_and_nags_to_pgn_string(
 
 const seven_tag_defaults = ['?', '?', '????.??.??', '?', '?', '?', '*'];
 
-function commands_from_move(move: JgnMove): [string, string][] {
+/**
+ * commands are properties of the move that will be encoded as comments with the [%key value] syntax.
+ */
+function commands_from_move(move: JgnMove): [key: string, value: string][] {
 	const commands: [string, string][] = [];
 	if (typeof move.evaluation === 'number') {
 		commands.push(['eval', move.evaluation.toString()]);
@@ -49,7 +52,12 @@ function commands_from_move(move: JgnMove): [string, string][] {
 	return commands;
 }
 
-function comment_from_commands(commands: [string, string][]): string {
+/**
+ * computes the comment string corresponding to a list of commands.
+ */
+function comment_from_commands(
+	commands: [key: string, value: string][],
+): string {
 	const blocks = commands
 		.map(([key, value]) => {
 			return `[%${key} ${value}]`;
@@ -58,7 +66,10 @@ function comment_from_commands(commands: [string, string][]): string {
 	return `{ ${blocks} }`;
 }
 
-function append_comments(base: string, move: JgnMove): string {
+/**
+ * appends the text comment for the move to the base string
+ */
+function append_text_comments(base: string, move: JgnMove): string {
 	if (move.comment) {
 		try {
 			const text = generateText(move.comment, [StarterKit]);
@@ -73,6 +84,9 @@ function append_comments(base: string, move: JgnMove): string {
 	}
 }
 
+/**
+ * appends the commands comment to the base string.
+ */
 function append_commands(base: string, move: JgnMove): string {
 	const commands = commands_from_move(move);
 	if (commands.length > 0) {
@@ -80,6 +94,60 @@ function append_commands(base: string, move: JgnMove): string {
 	} else {
 		return base;
 	}
+}
+
+function append_variations(
+	base: string,
+	move: JgnMove,
+	indexOffset: number,
+	rootMoveNumber: number,
+): string {
+	if (Array.isArray(move.variants)) {
+		if (move.variants.length > 0) {
+			return `${base} ${move.variants
+				.map((variation: JgnVariation) => {
+					return `(${moves_to_string(variation.moves, indexOffset, rootMoveNumber)})`;
+				})
+				.join(' ')}`;
+		} else {
+			return base;
+		}
+	} else {
+		return base;
+	}
+}
+
+function moves_to_string(
+	moves: JgnMove[],
+	indexOffset: number,
+	rootMoveNumber: number,
+): string {
+	return moves
+		.map((move, index) => {
+			switch (move.color) {
+				case 'w': {
+					const num_san_nags_white = `${(index + indexOffset) / 2 + rootMoveNumber}. ${move_san_and_nags_to_pgn_string(move.san, move.nags)}`;
+					return append_variations(
+						append_commands(append_text_comments(num_san_nags_white, move), move),
+						move,
+						index + indexOffset,
+						rootMoveNumber,
+					);
+				}
+				case 'b':
+				default: {
+					// This tends to be verbose when White's move has no comments or commands.
+					const num_san_nags_black = `${(index + indexOffset - 1) / 2 + rootMoveNumber}... ${move_san_and_nags_to_pgn_string(move.san, move.nags)}`;
+					return append_variations(
+						append_commands(append_text_comments(num_san_nags_black, move), move),
+						move,
+						index + indexOffset,
+						rootMoveNumber,
+					);
+				}
+			}
+		})
+		.join(' ');
 }
 
 /**
@@ -124,23 +192,9 @@ export function jgn_to_pgn_string(study: JgnStudy): string {
 	}
 
 	const indexOffset = root.turn() === 'w' ? 0 : 1;
+	console.log('indexOffset', indexOffset);
 	const rootMoveNumber = root.moveNumber();
-	const moves_string = study.moves
-		.map((move, index) => {
-			switch (move.color) {
-				case 'w': {
-					const move_string = `${(index + indexOffset) / 2 + rootMoveNumber}. ${move_san_and_nags_to_pgn_string(move.san, move.nags)}`;
-					return append_commands(append_comments(move_string, move), move);
-				}
-				case 'b':
-				default: {
-					// This tends to be verbose when White's move has no comments or commands.
-					const move_string = `${(index + indexOffset - 1) / 2 + rootMoveNumber}... ${move_san_and_nags_to_pgn_string(move.san, move.nags)}`;
-					return append_commands(append_comments(move_string, move), move);
-				}
-			}
-		})
-		.join(' ');
-
+	console.log('rootMoveNumber', rootMoveNumber);
+	const moves_string = moves_to_string(study.moves, indexOffset, rootMoveNumber);
 	return `${tags_string}\n\n${gameComment ? `{${gameComment}}\n` : ''}${moves_string} ${result}`;
 }

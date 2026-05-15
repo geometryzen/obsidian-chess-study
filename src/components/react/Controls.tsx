@@ -14,7 +14,7 @@ import {
 	ThumbsUp,
 } from 'lucide-react';
 import * as React from 'react';
-import { ControlProps } from './ControlsProps';
+import { ControlProps } from './ControlsProps.js';
 import {
 	CHESS_STUDY_KIND_GAME,
 	CHESS_STUDY_KIND_LEGACY,
@@ -23,7 +23,7 @@ import {
 	CHESS_STUDY_KIND_PUZZLE,
 	CHESS_STUDY_KIND_REPERTOIRE,
 	ChessStudyKind,
-} from '../../lib/config/ChessStudyKind';
+} from '../../lib/config/ChessStudyKind.js';
 
 function has_reset_feature(chessStudyKind: ChessStudyKind): boolean {
 	switch (chessStudyKind) {

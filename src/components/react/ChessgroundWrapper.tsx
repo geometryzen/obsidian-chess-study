@@ -6,9 +6,9 @@ import { DrawShape } from 'chessground/draw';
 import { Key, MoveMetadata } from 'chessground/types';
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
-import { legal_moves } from '../../lib/chess-logic/legal_moves';
-import { make_move_handler } from '../../lib/chess-logic/make_move_handler';
-import { turn_color_white_or_black } from '../../lib/chess-logic/turn_color_white_or_black';
+import { legal_moves } from '../../lib/chess-logic/legal_moves.js';
+import { make_move_handler } from '../../lib/chess-logic/make_move_handler.js';
+import { turn_color_white_or_black } from '../../lib/chess-logic/turn_color_white_or_black.js';
 
 /**
  * Strictly speaking, these are the React properties of our Chessground wrapper.
