@@ -137,6 +137,7 @@ function moves_to_string(
 				case 'b':
 				default: {
 					// This tends to be verbose when White's move has no comments or commands.
+					// TODO: Work on making the output a little more terse.
 					const num_san_nags_black = `${(index + indexOffset - 1) / 2 + rootMoveNumber}... ${move_san_and_nags_to_pgn_string(move.san, move.nags)}`;
 					return append_variations(
 						append_commands(append_text_comments(num_san_nags_black, move), move),

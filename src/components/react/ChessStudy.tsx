@@ -535,6 +535,8 @@ export const ChessStudy = ({
 							}}
 							onCopyPgnButtonClick={() => {
 								try {
+									// We currently onle have a serializer from JGN to PGN.
+									// So we must convert our NEO structure to JGN and then serialize to PGN.
 									const jgn = jgn_from_neo(gameState.study);
 									const pgn_string = jgn_to_pgn_string(jgn);
 									navigator.clipboard.writeText(pgn_string);
