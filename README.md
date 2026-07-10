@@ -77,13 +77,14 @@ Here are the available settings for a `chessStudy` code block:
 
 | Setting             | Possible Values                              | Description                                      |
 | ------------------- | -------------------------------------------- | ------------------------------------------------ |
-| `chessStudyId`      | Valid nanoid                                 | Valid ID for a file stored in the plugin store   |
+| `chessStudyId`      | Unique Identifier                            | Valid ID for a file stored in the plugin store   |
 | `boardOrientation`  | `white` \| `black`                           | Orientation of the board                         |
 | `boardColor`        | `green` \| `brown`                           | Color of the board                               |
 | `disableCopy`       | `true`  \| `false`                           | Determines whether the study can be copied       |
 | `disableNavigation` | `true`  \| `false`                           | Determines whether the study can be navigated    |
 | `disableSave`       | `true`  \| `false`                           | Determines whether the study can be saved        |
 | `initialPosition`   | `begin` \| `end`                             | Determines the initial position                  |
+| `puzzleCompleted`   | Forsyth-Edwards Notation                     | A FEN that indicates when the puzzle is solved   |
 | `readOnly`          | `true`  \| `false`                           | Determines whether the study can be changed      |
 | `chessStudyKind`    | `game`  \| `position` \| `puzzle`\| `legacy` | Determines how the plugin works                  |
 | `viewComments`      | `true`  \| `false`                           | Whether to display the comments section          |

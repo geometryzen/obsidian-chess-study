@@ -13,9 +13,24 @@ import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo
 import { initialize_position } from '../../lib/chess-logic/initialize_position';
 import { has_next_moves } from '../../lib/neo/has_next_moves';
 import { is_correct_move } from '../../lib/neo/is_questionable_move';
+import { CompletedPosition } from '../../lib/config/CompletedPosition';
 
 export function random_element<T>(xs: T[]): T {
 	return xs[Math.floor(Math.random() * xs.length)];
+}
+
+function terminate_puzzle(
+	user_move: NeoMove,
+	chessView: ChessView,
+	setChessLogic: Dispatch<SetStateAction<ChessPosition>>,
+	state: GameState,
+) {
+	const pos = new ChessPosition(user_move.after);
+	update_board_view_from_position(chessView, pos);
+	setChessLogic(pos);
+	state.currentMove = user_move;
+	state.isNotationHidden = false;
+	return;
 }
 
 /**
@@ -27,26 +42,37 @@ export function random_element<T>(xs: T[]): T {
  * @param setChessLogic
  * @param state
  */
-function play_synthetic_move(
+function play_synthetic_move_or_terminate_puzzle(
 	user_move: NeoMove,
 	chessView: ChessView,
 	setChessLogic: Dispatch<SetStateAction<ChessPosition>>,
 	state: GameState,
+	currentPosition: string,
+	completedPosition: CompletedPosition,
 ) {
-	const synthetic_moves = get_next_moves(user_move);
-	if (synthetic_moves.length > 0) {
-		const synthetic_move = random_element(synthetic_moves);
-		const pos = new ChessPosition(synthetic_move.after);
-		update_board_view_from_position(chessView, pos);
-		setChessLogic(pos);
-		state.currentMove = synthetic_move;
-		state.isNotationHidden = has_next_moves(synthetic_move);
+	if (currentPosition === completedPosition) {
+		// The user's move completes the puzzle.
+		terminate_puzzle(user_move, chessView, setChessLogic, state);
 	} else {
-		const pos = new ChessPosition(user_move.after);
-		update_board_view_from_position(chessView, pos);
-		setChessLogic(pos);
-		state.currentMove = user_move;
-		state.isNotationHidden = false;
+		// The possible moves that can be played in response are the main move and all of the variations.
+		const response_moves = get_next_moves(user_move);
+		if (response_moves.length > 0) {
+			// Pick one of the response move at random.
+			const response_move = random_element(response_moves);
+			if (response_move.after === completedPosition) {
+				terminate_puzzle(response_move, chessView, setChessLogic, state);
+			} else {
+				const pos = new ChessPosition(response_move.after);
+				update_board_view_from_position(chessView, pos);
+				setChessLogic(pos);
+				state.currentMove = response_move;
+				state.isNotationHidden = has_next_moves(response_move);
+			}
+		} else {
+			// There are no response moves.
+			// The puzzle has been completed.
+			terminate_puzzle(user_move, chessView, setChessLogic, state);
+		}
 	}
 }
 
@@ -93,7 +119,12 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	playMove(state: GameState, m: Move): void {
+	playMove(
+		state: GameState,
+		m: Move,
+		boardOrientation: 'w' | 'b',
+		completedPosition: CompletedPosition,
+	): void {
 		if (!this.#chessView) return;
 		const root = state.study.root;
 		if (state.currentMove) {
@@ -113,11 +144,13 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 				);
 				if (matching_moves.length === 1) {
 					const matching_move = matching_moves[0];
-					play_synthetic_move(
+					play_synthetic_move_or_terminate_puzzle(
 						matching_move,
 						this.#chessView,
 						this.#setChessLogic,
 						state,
+						this.#chessLogic.fen(),
+						completedPosition,
 					);
 				} else {
 					// There is a current move.
@@ -148,11 +181,13 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 				// However, generally we are looking for only one move in a puzzle.
 				const first_move = first_neo_move(state.study) as NeoMove;
 				if (first_move.san === m.san) {
-					play_synthetic_move(
+					play_synthetic_move_or_terminate_puzzle(
 						first_move,
 						this.#chessView,
 						this.#setChessLogic,
 						state,
+						this.#chessLogic.fen(),
+						completedPosition,
 					);
 				} else {
 					// It's not the correct move

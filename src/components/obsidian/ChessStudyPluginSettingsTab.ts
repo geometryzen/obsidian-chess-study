@@ -16,6 +16,11 @@ import {
 	InitialPosition,
 } from '../../lib/config/InitialPosition';
 import ChessStudyPlugin, { BoardColor, BoardOrientation } from '../../main';
+import {
+	COMPLETED_POSITION_END,
+	COMPLETED_POSITION_YAML_NAME,
+	CompletedPosition,
+} from '../../lib/config/CompletedPosition';
 
 export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 	#plugin: ChessStudyPlugin;
@@ -119,6 +124,22 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 					.onChange((initialPosition) => {
 						this.#plugin.settings.initialPosition =
 							initialPosition as InitialPosition;
+						this.#plugin.saveSettings();
+					});
+			});
+
+		new Setting(containerEl)
+			.setName(COMPLETED_POSITION_YAML_NAME)
+			.setDesc(
+				`Sets the default value of the ${COMPLETED_POSITION_YAML_NAME} property`,
+			)
+			.addDropdown((dropdown) => {
+				dropdown.addOption(COMPLETED_POSITION_END, 'End');
+				dropdown
+					.setValue(this.#plugin.settings.completedPosition)
+					.onChange((completedPosition) => {
+						this.#plugin.settings.completedPosition =
+							completedPosition as CompletedPosition;
 						this.#plugin.saveSettings();
 					});
 			});

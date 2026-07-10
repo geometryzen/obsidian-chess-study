@@ -58,6 +58,7 @@ interface AppProps {
 	source: string;
 	app: App;
 	pluginSettings: ChessStudyPluginSettings;
+	// Why does this appear to duplicate the property in the pluginSettings?
 	initialPos: InitialPosition;
 	config: ChessStudyAppConfig;
 	study: NeoStudy;
@@ -334,6 +335,7 @@ export const ChessStudy = ({
 						state,
 						event.move,
 						config.boardOrientation === 'white' ? 'w' : 'b',
+						config.completedPosition,
 					);
 					return state;
 				}

@@ -1,4 +1,5 @@
 import { CHESS_STUDY_KIND_GAME } from '../../lib/config/ChessStudyKind';
+import { COMPLETED_POSITION_END } from '../../lib/config/CompletedPosition';
 import { INITIAL_POSITION_BEGIN } from '../../lib/config/InitialPosition';
 import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
 
@@ -12,6 +13,7 @@ export const DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS: ChessStudyPluginSettings = {
 	disableNavigation: false,
 	disableSave: false,
 	initialPosition: INITIAL_POSITION_BEGIN,
+	completedPosition: COMPLETED_POSITION_END,
 	readOnly: false,
 	chessStudyKind: CHESS_STUDY_KIND_GAME,
 	viewComments: true,

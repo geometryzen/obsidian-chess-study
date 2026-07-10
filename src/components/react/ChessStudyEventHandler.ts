@@ -2,6 +2,7 @@ import { Move } from 'chess.js';
 import { DrawShape } from 'chessground/draw';
 import { NeoStudy } from '../../lib/neo/NeoStudy.js';
 import { GameState, MoveToken } from './ChessStudy.js';
+import { CompletedPosition } from '../../lib/config/CompletedPosition.js';
 
 export interface ChessStudyEventHandler {
 	setInitialState(
@@ -20,6 +21,7 @@ export interface ChessStudyEventHandler {
 		state: GameState,
 		playedMove: Move,
 		boardOrientation: 'w' | 'b',
+		completedPosition: CompletedPosition,
 	): void;
 	/**
 	 *

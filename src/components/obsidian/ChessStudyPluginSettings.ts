@@ -1,4 +1,5 @@
 import { ChessStudyKind } from '../../lib/config/ChessStudyKind';
+import { CompletedPosition } from '../../lib/config/CompletedPosition';
 import { InitialPosition } from '../../lib/config/InitialPosition';
 import { BoardColor, BoardOrientation } from '../../main';
 
@@ -13,6 +14,7 @@ export interface ChessStudyPluginSettings {
 	disableNavigation: true | false;
 	disableSave: true | false;
 	initialPosition: InitialPosition;
+	completedPosition: CompletedPosition;
 	readOnly: true | false;
 	viewComments: true | false;
 }

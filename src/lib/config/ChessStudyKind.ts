@@ -1,10 +1,5 @@
 export type ChessStudyKind =
-	| 'game'
-	| 'puzzle'
-	| 'position'
-	| 'repertoire'
-	| 'legacy'
-	| 'memorize';
+	'game' | 'puzzle' | 'position' | 'repertoire' | 'legacy' | 'memorize';
 export const CHESS_STUDY_KIND_YAML_NAME = 'chessStudyKind';
 export const CHESS_STUDY_KIND_GAME: ChessStudyKind = 'game';
 export const CHESS_STUDY_KIND_POSITION: ChessStudyKind = 'position';

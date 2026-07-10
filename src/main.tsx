@@ -28,6 +28,10 @@ import { ChessStudyLoader } from './lib/obsidian/ChessStudyLoader';
 import { parse_user_config } from './lib/obsidian/parse_user_config';
 import './main.css';
 import { NeoStudy } from './lib/neo/NeoStudy';
+import {
+	COMPLETED_POSITION_YAML_NAME,
+	CompletedPosition,
+} from './lib/config/CompletedPosition';
 
 type FEN = string;
 type PGN = string;
@@ -78,6 +82,7 @@ export default class ChessStudyPlugin extends Plugin {
 					disableNavigation: boolean,
 					disableSave: boolean,
 					initialPosition: InitialPosition,
+					completedPosition: CompletedPosition,
 					readOnly: boolean,
 					chessStudyKind: ChessStudyKind,
 					viewComments: boolean,
@@ -101,8 +106,9 @@ export default class ChessStudyPlugin extends Plugin {
 								// The first instance of the chess study is the puzzle.
 								parts.push(`${BACKTICKS}chessStudy`);
 								parts.push(`chessStudyId: ${id}`);
-								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
 								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}`);
+								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
+								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
 								parts.push(`boardOrientation: ${boardOrientation}`);
 								parts.push('disableCopy: true');
 								parts.push('disableNavigation: true');
@@ -115,8 +121,9 @@ export default class ChessStudyPlugin extends Plugin {
 								// The second instance of the chess study is the solution, which is fully editable.
 								parts.push(`${BACKTICKS}chessStudy`);
 								parts.push(`chessStudyId: ${id}`);
-								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
 								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${CHESS_STUDY_KIND_GAME}`);
+								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
+								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
 								parts.push(`boardOrientation: ${boardOrientation}`);
 								parts.push(`disableCopy: false`);
 								parts.push(`disableNavigation: false`);
@@ -129,8 +136,9 @@ export default class ChessStudyPlugin extends Plugin {
 							default: {
 								parts.push(`${BACKTICKS}chessStudy`);
 								parts.push(`chessStudyId: ${id}`);
-								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
 								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}`);
+								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
+								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${completedPosition}`);
 								parts.push(`boardOrientation: ${boardOrientation}`);
 								parts.push(`disableCopy: ${disableCopy ? 'true' : 'false'}`);
 								parts.push(

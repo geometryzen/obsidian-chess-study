@@ -25,6 +25,11 @@ import {
 	InitialPosition,
 } from '../../lib/config/InitialPosition';
 import { BoardOrientation, ChessString } from '../../main';
+import {
+	COMPLETED_POSITION_END,
+	COMPLETED_POSITION_YAML_NAME,
+	CompletedPosition,
+} from '../../lib/config/CompletedPosition';
 
 /**
  * The Modal Dialog that pops up when creating a new Chess Study.
@@ -36,7 +41,8 @@ export class ChessStudyInsertModal extends Modal {
 	#disableCopy = false;
 	#disableNavigation = false;
 	#disableSave = false;
-	#initialPosition: InitialPosition = 'begin';
+	#initialPosition: InitialPosition = INITIAL_POSITION_BEGIN;
+	#completedPosition: CompletedPosition = COMPLETED_POSITION_END;
 	#readOnly = false;
 	#viewComments = true;
 
@@ -47,6 +53,7 @@ export class ChessStudyInsertModal extends Modal {
 		disableNavigation: boolean,
 		disableSave: boolean,
 		initialPosition: InitialPosition,
+		completedPosition: CompletedPosition,
 		readOnly: boolean,
 		chessStudyKind: ChessStudyKind,
 		viewComments: boolean,
@@ -61,6 +68,7 @@ export class ChessStudyInsertModal extends Modal {
 			disableNavigation: boolean,
 			disableSave: boolean,
 			initialPosition: InitialPosition,
+			completedPosition: CompletedPosition,
 			readOnly: boolean,
 			chessStudyKind: ChessStudyKind,
 			viewComments: boolean,
@@ -93,6 +101,23 @@ export class ChessStudyInsertModal extends Modal {
 					})
 					.inputEl.setCssStyles({ width: '100%', height: '250px' }),
 			);
+
+		new Setting(contentEl)
+			// TODO: Humanize/Translation the YAML name.
+			.setName(CHESS_STUDY_KIND_YAML_NAME)
+			.addDropdown((dropdown: DropdownComponent) => {
+				// TODO: Humanize the option display string
+				dropdown.addOption(CHESS_STUDY_KIND_GAME, 'Game');
+				dropdown.addOption(CHESS_STUDY_KIND_POSITION, 'Position');
+				dropdown.addOption(CHESS_STUDY_KIND_PUZZLE, 'Puzzle');
+				dropdown.addOption(CHESS_STUDY_KIND_REPERTOIRE, 'Repertoire');
+				dropdown.addOption(CHESS_STUDY_KIND_LEGACY, 'Legacy');
+				dropdown.addOption(CHESS_STUDY_KIND_MEMORIZE, 'Memorize');
+				dropdown.setValue(this.#chessStudyKind);
+				dropdown.onChange((type) => {
+					this.#chessStudyKind = type as ChessStudyKind;
+				});
+			});
 
 		new Setting(contentEl)
 			// TODO: Humanize/Translation the YAML name.
@@ -155,29 +180,23 @@ export class ChessStudyInsertModal extends Modal {
 
 		new Setting(contentEl)
 			// TODO: Humanize/Translation the YAML name.
+			.setName(COMPLETED_POSITION_YAML_NAME)
+			.addDropdown((dropdown: DropdownComponent) => {
+				dropdown.addOption(COMPLETED_POSITION_END, 'End');
+				dropdown.setValue(this.#completedPosition);
+				dropdown.onChange((completedPosition) => {
+					this.#initialPosition = completedPosition as InitialPosition;
+				});
+			});
+
+		new Setting(contentEl)
+			// TODO: Humanize/Translation the YAML name.
 			.setName('readOnly')
 			.addToggle((toggle: ToggleComponent) => {
 				toggle.setValue(this.#readOnly);
 				toggle.setTooltip('Determines whether the study can be changed', {});
 				toggle.onChange((readOnly) => {
 					this.#readOnly = readOnly;
-				});
-			});
-
-		new Setting(contentEl)
-			// TODO: Humanize/Translation the YAML name.
-			.setName(CHESS_STUDY_KIND_YAML_NAME)
-			.addDropdown((dropdown: DropdownComponent) => {
-				// TODO: Humanize the option display string
-				dropdown.addOption(CHESS_STUDY_KIND_GAME, 'Game');
-				dropdown.addOption(CHESS_STUDY_KIND_POSITION, 'Position');
-				dropdown.addOption(CHESS_STUDY_KIND_PUZZLE, 'Puzzle');
-				dropdown.addOption(CHESS_STUDY_KIND_REPERTOIRE, 'Repertoire');
-				dropdown.addOption(CHESS_STUDY_KIND_LEGACY, 'Legacy');
-				dropdown.addOption(CHESS_STUDY_KIND_MEMORIZE, 'Memorize');
-				dropdown.setValue(this.#chessStudyKind);
-				dropdown.onChange((type) => {
-					this.#chessStudyKind = type as ChessStudyKind;
 				});
 			});
 
@@ -206,6 +225,7 @@ export class ChessStudyInsertModal extends Modal {
 						this.#disableNavigation,
 						this.#disableSave,
 						this.#initialPosition,
+						this.#completedPosition,
 						this.#readOnly,
 						this.#chessStudyKind,
 						this.#viewComments,
