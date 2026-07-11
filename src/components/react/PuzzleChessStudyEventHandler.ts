@@ -42,7 +42,7 @@ function terminate_puzzle(
  * @param setChessLogic
  * @param state
  */
-function play_synthetic_move_or_terminate_puzzle(
+function play_response_move_or_terminate_puzzle(
 	user_move: NeoMove,
 	chessView: ChessView,
 	setChessLogic: Dispatch<SetStateAction<ChessPosition>>,
@@ -57,7 +57,7 @@ function play_synthetic_move_or_terminate_puzzle(
 		// The possible moves that can be played in response are the main move and all of the variations.
 		const response_moves = get_next_moves(user_move);
 		if (response_moves.length > 0) {
-			// Pick one of the response move at random.
+			// Pick one of the response moves at random.
 			const response_move = random_element(response_moves);
 			if (response_move.after === completedPosition) {
 				terminate_puzzle(response_move, chessView, setChessLogic, state);
@@ -144,7 +144,7 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 				);
 				if (matching_moves.length === 1) {
 					const matching_move = matching_moves[0];
-					play_synthetic_move_or_terminate_puzzle(
+					play_response_move_or_terminate_puzzle(
 						matching_move,
 						this.#chessView,
 						this.#setChessLogic,
@@ -181,7 +181,7 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 				// However, generally we are looking for only one move in a puzzle.
 				const first_move = first_neo_move(state.study) as NeoMove;
 				if (first_move.san === m.san) {
-					play_synthetic_move_or_terminate_puzzle(
+					play_response_move_or_terminate_puzzle(
 						first_move,
 						this.#chessView,
 						this.#setChessLogic,
