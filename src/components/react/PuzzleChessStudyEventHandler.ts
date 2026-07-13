@@ -7,13 +7,14 @@ import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
 import { get_next_moves } from '../../lib/neo/get_next_moves';
 import { NeoMove } from '../../lib/neo/NeoMove';
 import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position';
-import { GameState, MoveToken } from './ChessStudy';
+import { GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
 import { initialize_position } from '../../lib/chess-logic/initialize_position';
 import { has_next_moves } from '../../lib/neo/has_next_moves';
 import { is_correct_move } from '../../lib/neo/is_questionable_move';
 import { CompletedPosition } from '../../lib/config/CompletedPosition';
+import { get_target_move } from '../../lib/neo/get_target_move';
 
 export function random_element<T>(xs: T[]): T {
 	return xs[Math.floor(Math.random() * xs.length)];
@@ -28,7 +29,12 @@ function terminate_puzzle(
 	const pos = new ChessPosition(user_move.after);
 	update_board_view_from_position(chessView, pos);
 	setChessLogic(pos);
-	state.currentMove = user_move;
+	state.currentChessStudyMove = user_move;
+	state.currentRepertoireMove = get_target_move(
+		state.currentChessStudyMove,
+		state.chessStudy,
+		state.repertoire,
+	);
 	state.isNotationHidden = false;
 	return;
 }
@@ -65,7 +71,12 @@ function play_response_move_or_terminate_puzzle(
 				const pos = new ChessPosition(response_move.after);
 				update_board_view_from_position(chessView, pos);
 				setChessLogic(pos);
-				state.currentMove = response_move;
+				state.currentChessStudyMove = response_move;
+				state.currentRepertoireMove = get_target_move(
+					state.currentChessStudyMove,
+					state.chessStudy,
+					state.repertoire,
+				);
 				state.isNotationHidden = has_next_moves(response_move);
 			}
 		} else {
@@ -98,21 +109,21 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoNextMove(state: Readonly<GameState>): MoveToken | null {
+	gotoNextMove(state: Readonly<GameState>): NeoMove | null {
 		// Do nothing
 		return null;
 	}
 	/**
 	 * @override
 	 */
-	gotoPrevMove(state: Readonly<GameState>): MoveToken | null {
+	gotoPrevMove(state: Readonly<GameState>): NeoMove | null {
 		// Do nothing
 		return null;
 	}
 	/**
 	 * @override
 	 */
-	gotoMove(state: Readonly<GameState>, moveId: string): MoveToken | null {
+	gotoMove(state: Readonly<GameState>, moveId: string): NeoMove | null {
 		// Do nothing
 		return null;
 	}
@@ -126,11 +137,11 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 		completedPosition: CompletedPosition,
 	): void {
 		if (!this.#chessView) return;
-		const root = state.study.root;
-		if (state.currentMove) {
+		const root = state.chessStudy.root;
+		if (state.currentChessStudyMove) {
 			const current_move = get_neo_move_by_id(
-				state.study,
-				state.currentMove.moveId,
+				state.chessStudy,
+				state.currentChessStudyMove.moveId,
 			);
 			// There may be several move choices that the user is allowed to make due to variations.
 			// Make sure that the user plays only correct moves.
@@ -173,13 +184,13 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 				// If there are no moves, then this is not a puzzle!
 				// Update the view to revert the position.
 				// There is no change in state.
-				const pos = new ChessPosition(state.study.rootFEN);
+				const pos = new ChessPosition(state.chessStudy.rootFEN);
 				update_board_view_from_position(this.#chessView, pos);
 				this.#setChessLogic(pos);
 			} else {
 				// TODO: Generalize to first_neo_moves so as to include variations. YES
 				// However, generally we are looking for only one move in a puzzle.
-				const first_move = first_neo_move(state.study) as NeoMove;
+				const first_move = first_neo_move(state.chessStudy) as NeoMove;
 				if (first_move.san === m.san) {
 					play_response_move_or_terminate_puzzle(
 						first_move,
@@ -193,7 +204,7 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 					// It's not the correct move
 					// There is no current move so we are at the beginning of the game.
 					// Additionally, the move made did not match the first so we revert to the root position.
-					const pos = new ChessPosition(state.study.rootFEN);
+					const pos = new ChessPosition(state.chessStudy.rootFEN);
 					update_board_view_from_position(this.#chessView, pos);
 					this.#setChessLogic(pos);
 				}
@@ -203,12 +214,20 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	reset(state: GameState, initialPosition: string): void {
 		if (!this.#chessView) return;
 
-		const { pos } = initialize_position(state.study, initialPosition);
+		const { pos } = initialize_position(state.chessStudy, initialPosition);
 		this.#setChessLogic(pos);
 		update_board_view_from_position(this.#chessView, pos);
 		// TODO: It seems a bit strange that the computation of the current move does not happen
 		// in a more coherent way with the initialization of the position.
-		state.currentMove = initial_move_from_neo_study(state.study, initialPosition);
+		state.currentChessStudyMove = initial_move_from_neo_study(
+			state.chessStudy,
+			initialPosition,
+		);
+		state.currentRepertoireMove = get_target_move(
+			state.currentChessStudyMove,
+			state.chessStudy,
+			state.repertoire,
+		);
 		state.isNotationHidden = true;
 	}
 	shapes(state: GameState): DrawShape[] {

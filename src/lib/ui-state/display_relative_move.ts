@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js';
 import { Api as ChessgroundApi } from 'chessground/api';
-import { GameState, MoveToken } from '../../components/react/ChessStudy';
+import { GameState } from '../../components/react/ChessStudy';
 import { first_neo_move } from '../neo/first_neo_move';
 import { get_neo_move_from_offset } from '../neo/get_neo_move_from_offset';
 import { last_neo_move } from '../neo/last_neo_move';
@@ -19,28 +19,28 @@ export function display_relative_move(
 	chessView: ChessgroundApi,
 	setChessLogic: React.Dispatch<React.SetStateAction<Chess>>,
 	options: { offset: 1 | -1 },
-): MoveToken | null {
+): NeoMove | null {
 	let nodeToDisplay: NeoMove | null = null;
 
 	const { offset } = options;
 
 	// Figure out where we are
-	const currentMove = state.currentMove;
+	const currentMove = state.currentChessStudyMove;
 
 	if (currentMove) {
 		nodeToDisplay = get_neo_move_from_offset(
-			state.study,
+			state.chessStudy,
 			currentMove.moveId,
 			offset,
 		);
 	} else {
 		if (offset < 0) {
 			// If we are going backwards
-			nodeToDisplay = last_neo_move(state.study);
+			nodeToDisplay = last_neo_move(state.chessStudy);
 		} else {
 			// An offset of +1 always means that the user wants to go "Forward".
 			// There will be no selected move.
-			nodeToDisplay = first_neo_move(state.study);
+			nodeToDisplay = first_neo_move(state.chessStudy);
 		}
 	}
 
@@ -50,8 +50,8 @@ export function display_relative_move(
 		update_board_view_from_position(chessView, position);
 		return nodeToDisplay;
 	} else {
-		const position = state.study.rootFEN
-			? new Chess(state.study.rootFEN)
+		const position = state.chessStudy.rootFEN
+			? new Chess(state.chessStudy.rootFEN)
 			: new Chess();
 		setChessLogic(position);
 		update_board_view_from_position(chessView, position);

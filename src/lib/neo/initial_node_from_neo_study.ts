@@ -18,11 +18,11 @@ import { get_next_move_by_san } from './get_next_move_by_san';
  * @returns
  */
 export function initial_move_from_neo_study(
-	study: NeoStudy,
+	study: NeoStudy | null,
 	initialPosition: InitialPosition,
 ): NeoMove | null {
 	if (!study) {
-		throw new Error('study must be defined.');
+		return null;
 	}
 	const root = study.root;
 	if (root) {

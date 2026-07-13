@@ -167,31 +167,61 @@ export default class ChessStudyPlugin extends Plugin {
 		this.registerMarkdownCodeBlockProcessor(
 			'chessStudy',
 			async (source, el, ctx) => {
-				const { chessStudyId } = parse_user_config(this.settings, source);
+				const { chessStudyId, repertoireId } = parse_user_config(
+					this.settings,
+					source,
+				);
 
-				if (!chessStudyId.trim().length)
+				if (!chessStudyId.trim().length) {
 					return new Notice(
 						"No chessStudyId parameter found, please add one manually if the file already exists or add it via the 'Insert PGN-Editor at cursor position' command.",
 						0,
 					);
+				}
 
 				try {
-					const neoStudy: NeoStudy =
+					const chessStudy: NeoStudy =
 						await this.#studyLoader.loadNeoStudy(chessStudyId);
 
-					ctx.addChild(
-						new ChessStudyMarkdownRenderChild(
-							el,
-							source,
-							this.app,
-							this.settings,
-							neoStudy,
-							this.#studyLoader,
-						),
-					);
+					// If there is a repertoire specified, load that as well.
+					if (typeof repertoireId === 'string' && repertoireId.trim().length > 0) {
+						try {
+							const repertoire: NeoStudy =
+								await this.#studyLoader.loadNeoStudy(repertoireId);
+
+							ctx.addChild(
+								new ChessStudyMarkdownRenderChild(
+									el,
+									source,
+									this.app,
+									this.settings,
+									chessStudy,
+									repertoire,
+									this.#studyLoader,
+								),
+							);
+						} catch (e) {
+							new Notice(
+								`There was an error while trying to load the repertoire file ${repertoireId}.json. You can check the plugin folder if the file exist and if not add one via the 'Insert PGN-Editor at cursor position' command.`,
+								0,
+							);
+						}
+					} else {
+						ctx.addChild(
+							new ChessStudyMarkdownRenderChild(
+								el,
+								source,
+								this.app,
+								this.settings,
+								chessStudy,
+								null,
+								this.#studyLoader,
+							),
+						);
+					}
 				} catch (e) {
 					new Notice(
-						`There was an error while trying to load ${chessStudyId}.json. You can check the plugin folder if the file exist and if not add one via the 'Insert PGN-Editor at cursor position' command.`,
+						`There was an error while trying to load the chessStudy file ${chessStudyId}.json. You can check the plugin folder if the file exist and if not add one via the 'Insert PGN-Editor at cursor position' command.`,
 						0,
 					);
 				}

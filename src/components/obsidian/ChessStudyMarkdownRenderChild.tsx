@@ -19,7 +19,11 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	source: string;
 	app: App;
 	settings: ChessStudyPluginSettings;
-	readonly #neoStudy: NeoStudy;
+	readonly #chessStudy: NeoStudy;
+	/**
+	 * The optional repertoire that provides meta information for the chess study.
+	 */
+	readonly #repertoire: NeoStudy | null;
 	readonly #studyLoader: ChessStudyLoader;
 
 	/**
@@ -29,7 +33,7 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 	 * @param source
 	 * @param app
 	 * @param settings
-	 * @param neoStudy
+	 * @param chessStudy
 	 * @param studyLoader
 	 */
 	constructor(
@@ -37,14 +41,16 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 		source: string,
 		app: App,
 		settings: ChessStudyPluginSettings,
-		neoStudy: NeoStudy,
+		chessStudy: NeoStudy,
+		repertoire: NeoStudy | null,
 		studyLoader: ChessStudyLoader,
 	) {
 		super(containerEL);
 		this.source = source;
 		this.app = app;
 		this.settings = settings;
-		this.#neoStudy = neoStudy;
+		this.#chessStudy = chessStudy;
+		this.#repertoire = repertoire;
 		this.#studyLoader = studyLoader;
 	}
 
@@ -69,7 +75,8 @@ export class ChessStudyMarkdownRenderChild extends MarkdownRenderChild {
 				pluginSettings={this.settings}
 				initialPos={config.initialPosition}
 				config={config}
-				study={this.#neoStudy}
+				chessStudy={this.#chessStudy}
+				repertoire={this.#repertoire}
 				studyLoader={this.#studyLoader}
 			/>,
 			/*

@@ -7,6 +7,7 @@ import { BoardColor, BoardOrientation } from '../../main';
  * Everything in the chessStudy YAML block except the chessStudId
  */
 export interface ChessStudyPluginSettings {
+	repertoireId?: string;
 	boardOrientation: BoardOrientation;
 	boardColor: BoardColor;
 	chessStudyKind: ChessStudyKind;

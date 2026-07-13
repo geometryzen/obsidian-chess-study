@@ -35,22 +35,19 @@ export class ChessStudyLoader {
 	}
 
 	async saveJgnStudy(jgn: JgnStudy, id?: string): Promise<string> {
-		const chessStudyId = id || nanoid();
-		/*
-		console.lg(
-			`Writing file to ${normalizePath(
-				`${this.#studiesPath}/${chessStudyId}.json`,
-			)}`,
+		const studyId = id || nanoid();
+
+		console.log(
+			`Writing file to ${normalizePath(`${this.#studiesPath}/${studyId}.json`)}`,
 		);
-		*/
 
 		await this.#adapter.write(
-			normalizePath(`${this.#studiesPath}/${chessStudyId}.json`),
+			normalizePath(`${this.#studiesPath}/${studyId}.json`),
 			JSON.stringify(jgn, null, 2),
 			{},
 		);
 
-		return chessStudyId;
+		return studyId;
 	}
 
 	async loadNeoStudy(id: string): Promise<NeoStudy> {

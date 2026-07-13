@@ -13,9 +13,10 @@ import { rightmost_neo_node } from '../../lib/neo/rightmost_neo_node.js';
 import { serializePreOrder } from '../../lib/neo/serializePreOrder.js';
 import { display_relative_move } from '../../lib/ui-state/display_relative_move.js';
 import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position.js';
-import { GameState, MoveToken } from './ChessStudy.js';
+import { GameState } from './ChessStudy.js';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler.js';
 import { get_variation_next } from '../../lib/neo/get_variation_next.js';
+import { get_target_move } from '../../lib/neo/get_target_move.js';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
@@ -32,7 +33,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 */
 	setInitialState(
 		state: Pick<GameState, 'isNotationHidden'>,
-		currentMove: MoveToken,
+		currentMove: NeoMove,
 		study: NeoStudy,
 	): void {
 		state.isNotationHidden = false;
@@ -46,7 +47,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoNextMove(state: Readonly<GameState>): MoveToken | null {
+	gotoNextMove(state: Readonly<GameState>): NeoMove | null {
 		if (!this.#chessView) return null;
 		// We mutate the state so it cannot be readonly
 		return display_relative_move(state, this.#chessView, this.#setChessLogic, {
@@ -56,7 +57,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoPrevMove(state: Readonly<GameState>): MoveToken | null {
+	gotoPrevMove(state: Readonly<GameState>): NeoMove | null {
 		if (!this.#chessView) return null;
 		// Why do we update the currentMove going backwards but not going forwards?
 		return display_relative_move(state, this.#chessView, this.#setChessLogic, {
@@ -66,10 +67,10 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoMove(state: Readonly<GameState>, moveId: string): MoveToken | null {
+	gotoMove(state: Readonly<GameState>, moveId: string): NeoMove | null {
 		if (!this.#chessView) return null;
 
-		const neoMove: NeoMove = get_neo_move_by_id(state.study, moveId);
+		const neoMove: NeoMove = get_neo_move_by_id(state.chessStudy, moveId);
 		const pos = new ChessPosition(neoMove.after);
 		this.#setChessLogic(pos);
 		update_board_view_from_position(this.#chessView, pos);
@@ -83,11 +84,11 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 */
 	playMove(state: GameState, m: Move): void {
 		try {
-			if (state.currentMove) {
+			if (state.currentChessStudyMove) {
 				// Dereference the currentMove. In future we might grab it directly.
 				const current_move = get_neo_move_by_id(
-					state.study,
-					state.currentMove.moveId,
+					state.chessStudy,
+					state.currentChessStudyMove.moveId,
 				);
 				// console.lg('move', move.san);
 				const next_move = get_next_move(current_move);
@@ -97,7 +98,12 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					while (candidate) {
 						// console.lg('candidate', candidate.san);
 						if (candidate.san === m.san) {
-							state.currentMove = candidate;
+							state.currentChessStudyMove = candidate;
+							state.currentRepertoireMove = get_target_move(
+								state.currentChessStudyMove,
+								state.chessStudy,
+								state.repertoire,
+							);
 							return;
 						}
 						candidate = get_variation_next(candidate);
@@ -105,35 +111,61 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					// The move will be added as a variation of the next move.
 					const parent = rightmost_neo_node(next_move);
 					parent.right = neo_move_from_user_move(m, null, null);
-					state.currentMove = parent.right;
+					state.currentChessStudyMove = parent.right;
+					state.currentRepertoireMove = get_target_move(
+						state.currentChessStudyMove,
+						state.chessStudy,
+						state.repertoire,
+					);
 				} else {
 					// The move will be added as the next Main Line move
 					const new_move = neo_move_from_user_move(m, null, null);
-					const target = get_neo_move_by_id(state.study, state.currentMove.moveId);
+					const target = get_neo_move_by_id(
+						state.chessStudy,
+						state.currentChessStudyMove.moveId,
+					);
 					target.left = new_move;
-					state.currentMove = new_move;
+					state.currentChessStudyMove = new_move;
+					state.currentRepertoireMove = get_target_move(
+						state.currentChessStudyMove,
+						state.chessStudy,
+						state.repertoire,
+					);
 				}
 			} else {
 				// console.lg('There is no current move');
-				if (state.study.root === null) {
+				if (state.chessStudy.root === null) {
 					// console.lg('The root is null');
 					const move = neo_move_from_user_move(m, null, null);
-					state.study.root = move;
-					state.currentMove = move;
+					state.chessStudy.root = move;
+					state.currentChessStudyMove = move;
+					state.currentRepertoireMove = get_target_move(
+						state.currentChessStudyMove,
+						state.chessStudy,
+						state.repertoire,
+					);
 				} else {
 					// console.lg('The root is defined');
-					const first_move = first_neo_move(state.study) as NeoMove;
-					state.currentMove = ensure_move_is_neo_move_or_variation(m, first_move);
+					const first_move = first_neo_move(state.chessStudy) as NeoMove;
+					state.currentChessStudyMove = ensure_move_is_neo_move_or_variation(
+						m,
+						first_move,
+					);
+					state.currentRepertoireMove = get_target_move(
+						state.currentChessStudyMove,
+						state.chessStudy,
+						state.repertoire,
+					);
 				}
 			}
 		} finally {
-			if (state.study.root) {
+			if (state.chessStudy.root) {
 				// console.lg('serialize and deserialize');
 				// This is an aggressive hack to try to demonstrate that useMemo is a problem
 				// if we mutate the tree such that a change is not detected.
-				const root = deserializePreOrder(serializePreOrder(state.study.root));
-				const study = state.study;
-				state.study = new NeoStudy(
+				const root = deserializePreOrder(serializePreOrder(state.chessStudy.root));
+				const study = state.chessStudy;
+				state.chessStudy = new NeoStudy(
 					study.comment,
 					study.shapes,
 					study.headers,
@@ -153,10 +185,10 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 * @override
 	 */
 	shapes(state: GameState): DrawShape[] {
-		if (state.currentMove) {
-			return state.currentMove.shapes;
+		if (state.currentChessStudyMove) {
+			return state.currentChessStudyMove.shapes;
 		} else {
-			return state.study.shapes;
+			return state.chessStudy.shapes;
 		}
 	}
 }

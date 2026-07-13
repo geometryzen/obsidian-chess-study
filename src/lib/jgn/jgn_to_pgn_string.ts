@@ -193,9 +193,9 @@ export function jgn_to_pgn_string(study: JgnStudy): string {
 	}
 
 	const indexOffset = root.turn() === 'w' ? 0 : 1;
-	console.log('indexOffset', indexOffset);
+	// console.lg('indexOffset', indexOffset);
 	const rootMoveNumber = root.moveNumber();
-	console.log('rootMoveNumber', rootMoveNumber);
+	// console.lg('rootMoveNumber', rootMoveNumber);
 	const moves_string = moves_to_string(study.moves, indexOffset, rootMoveNumber);
 	return `${tags_string}\n\n${gameComment ? `{${gameComment}}\n` : ''}${moves_string} ${result}`;
 }

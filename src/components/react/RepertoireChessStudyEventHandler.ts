@@ -11,10 +11,11 @@ import { NeoMove } from '../../lib/neo/NeoMove';
 import { NeoStudy } from '../../lib/neo/NeoStudy';
 import { display_relative_move } from '../../lib/ui-state/display_relative_move';
 import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position';
-import { GameState, MoveToken } from './ChessStudy';
+import { GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { get_next_move } from '../../lib/neo/get_next_move';
 import { has_next_moves } from '../../lib/neo/has_next_moves';
+import { get_target_move } from '../../lib/neo/get_target_move';
 export function random_element<T>(xs: T[]): T {
 	return xs[Math.floor(Math.random() * xs.length)];
 }
@@ -49,19 +50,31 @@ function repertoire_user_move_epilog_move(
 	}
 }
 
+/**
+ * TODO: Should this function take an optional repertoireMove or do we compute it from the state?
+ * @param chessStudyMove
+ * @param chessView
+ * @param setChessLogic
+ * @param state
+ */
 function update_board_view_following_move(
-	move: NeoMove,
+	chessStudyMove: NeoMove,
 	chessView: ChessView,
 	setChessLogic: Dispatch<SetStateAction<ChessPosition>>,
 	state: GameState,
 ) {
-	const pos = new ChessPosition(move.after);
+	const pos = new ChessPosition(chessStudyMove.after);
 	update_board_view_from_position(chessView, pos);
 	setChessLogic(pos);
-	state.currentMove = move;
-	state.isCommentsHidden = has_next_moves(move);
-	state.isNavigationHidden = has_next_moves(move);
-	state.isNotationHidden = has_next_moves(move);
+	state.currentChessStudyMove = chessStudyMove;
+	state.currentRepertoireMove = get_target_move(
+		state.currentChessStudyMove,
+		state.chessStudy,
+		state.repertoire,
+	);
+	state.isCommentsHidden = has_next_moves(chessStudyMove);
+	state.isNavigationHidden = has_next_moves(chessStudyMove);
+	state.isNotationHidden = has_next_moves(chessStudyMove);
 }
 
 export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler {
@@ -82,7 +95,7 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 			GameState,
 			'isCommentsHidden' | 'isNavigationHidden' | 'isNotationHidden'
 		>,
-		currentMove: MoveToken,
+		currentMove: NeoMove,
 		study: NeoStudy,
 	): void {
 		// TODO; DRY. Why do we have similar code for reset?
@@ -99,7 +112,7 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 	/**
 	 * @override
 	 */
-	gotoNextMove(state: Readonly<GameState>): MoveToken | null {
+	gotoNextMove(state: Readonly<GameState>): NeoMove | null {
 		if (!this.#chessView) return null;
 		// We mutate the state so it cannot be readonly
 		return display_relative_move(state, this.#chessView, this.#setChessLogic, {
@@ -109,7 +122,7 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 	/**
 	 * @override
 	 */
-	gotoPrevMove(state: Readonly<GameState>): MoveToken | null {
+	gotoPrevMove(state: Readonly<GameState>): NeoMove | null {
 		if (!this.#chessView) return null;
 		// Why do we update the currentMove going backwards but not going forwards?
 		return display_relative_move(state, this.#chessView, this.#setChessLogic, {
@@ -119,10 +132,10 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 	/**
 	 * @override
 	 */
-	gotoMove(state: Readonly<GameState>, moveId: string): MoveToken | null {
+	gotoMove(state: Readonly<GameState>, moveId: string): NeoMove | null {
 		if (!this.#chessView) return null;
 
-		const neoMove: NeoMove = get_neo_move_by_id(state.study, moveId);
+		const neoMove: NeoMove = get_neo_move_by_id(state.chessStudy, moveId);
 		const pos = new ChessPosition(neoMove.after);
 		this.#setChessLogic(pos);
 		update_board_view_from_position(this.#chessView, pos);
@@ -136,11 +149,11 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 	 */
 	playMove(state: GameState, m: Move, boardOrientation: 'w' | 'b'): void {
 		if (!this.#chessView) return;
-		const root = state.study.root;
-		if (state.currentMove) {
+		const root = state.chessStudy.root;
+		if (state.currentChessStudyMove) {
 			const current_move = get_neo_move_by_id(
-				state.study,
-				state.currentMove.moveId,
+				state.chessStudy,
+				state.currentChessStudyMove.moveId,
 			);
 			if (m.color === boardOrientation) {
 				// The move is being made for the user side.
@@ -206,13 +219,13 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 				// If there are no moves, then this is not a puzzle!
 				// Update the view to revert the position.
 				// There is no change in state.
-				const pos = new ChessPosition(state.study.rootFEN);
+				const pos = new ChessPosition(state.chessStudy.rootFEN);
 				update_board_view_from_position(this.#chessView, pos);
 				this.#setChessLogic(pos);
 			} else {
 				// TODO: Generalize to first_neo_moves so as to include variations. YES
 				// However, generally we are looking for only one move in a puzzle.
-				const first_move = first_neo_move(state.study) as NeoMove;
+				const first_move = first_neo_move(state.chessStudy) as NeoMove;
 				if (first_move.san === m.san) {
 					repertoire_user_move_epilog_move(
 						first_move,
@@ -224,7 +237,7 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 					// It's not the correct move
 					// There is no current move so we are at the beginning of the game.
 					// Additionally, the move made did not match the first so we revert to the root position.
-					const pos = new ChessPosition(state.study.rootFEN);
+					const pos = new ChessPosition(state.chessStudy.rootFEN);
 					update_board_view_from_position(this.#chessView, pos);
 					this.#setChessLogic(pos);
 				}
@@ -237,12 +250,20 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 	reset(state: GameState, initialPosition: string): void {
 		if (!this.#chessView) return;
 
-		const { pos } = initialize_position(state.study, initialPosition);
+		const { pos } = initialize_position(state.chessStudy, initialPosition);
 		this.#setChessLogic(pos);
 		update_board_view_from_position(this.#chessView, pos);
 		// TODO: It seems a bit strange that the computation of the current move does not happen
 		// in a more coherent way with the initialization of the position.
-		state.currentMove = initial_move_from_neo_study(state.study, initialPosition);
+		state.currentChessStudyMove = initial_move_from_neo_study(
+			state.chessStudy,
+			initialPosition,
+		);
+		state.currentRepertoireMove = get_target_move(
+			state.currentChessStudyMove,
+			state.chessStudy,
+			state.repertoire,
+		);
 		state.isCommentsHidden = true;
 		state.isNavigationHidden = true;
 		state.isNotationHidden = true;
@@ -251,10 +272,10 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 	 * @override
 	 */
 	shapes(state: GameState): DrawShape[] {
-		if (state.currentMove) {
-			return state.currentMove.shapes;
+		if (state.currentChessStudyMove) {
+			return state.currentChessStudyMove.shapes;
 		} else {
-			return state.study.shapes;
+			return state.chessStudy.shapes;
 		}
 	}
 }

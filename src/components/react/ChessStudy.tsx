@@ -18,8 +18,10 @@ import { get_variation_next } from '../../lib/neo/get_variation_next.js';
 import { get_variation_prev } from '../../lib/neo/get_variation_prev.js';
 import { has_neo_move_by_id } from '../../lib/neo/has_neo_move_by_id.js';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study.js';
+import { moves_from_path } from '../../lib/neo/move_from_path';
 import { neo_clone } from '../../lib/neo/neo_clone.js';
 import { NeoStudy } from '../../lib/neo/NeoStudy.js';
+import { path_from_move } from '../../lib/neo/path_from_move';
 import {
 	annotate_move_blunder,
 	annotate_move_correct,
@@ -46,9 +48,11 @@ import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { CommentSection } from './CommentSection';
 import { createChessStudyEventHandler } from './createChessStudyEventHandler';
-import { get_current_neo_move } from './get_current_neo_move';
+import { get_current_chessstudy_move } from './get_current_chessstudy_move';
 import { has_no_moves } from './has_no_moves';
 import { NeoMovesViewer } from './NeoMovesViewer';
+import { NeoMove } from '../../lib/neo/NeoMove';
+import { get_target_move } from '../../lib/neo/get_target_move';
 export type ChessStudyConfig = ChessgroundProps;
 
 interface AppProps {
@@ -61,25 +65,35 @@ interface AppProps {
 	// Why does this appear to duplicate the property in the pluginSettings?
 	initialPos: InitialPosition;
 	config: ChessStudyAppConfig;
-	study: NeoStudy;
+	chessStudy: NeoStudy;
+	repertoire: NeoStudy | null;
 	studyLoader: ChessStudyLoader;
 }
-
+/*
 export interface MoveToken {
 	readonly moveId: string;
 	readonly comment: JSONContent | null;
 	readonly shapes: DrawShape[];
 }
+*/
 
 export interface GameState {
 	/**
-	 * The same data structure whether 'jgn' or 'neo'
+	 * The current move in the chessStudy property.
 	 */
-	currentMove: MoveToken | null;
+	currentChessStudyMove: NeoMove | null;
+	/**
+	 * The current move in the repertoire property.
+	 */
+	currentRepertoireMove: NeoMove | null;
 	/**
 	 *
 	 */
-	study: NeoStudy;
+	chessStudy: NeoStudy;
+	/**
+	 *
+	 */
+	repertoire: NeoStudy | null;
 	/**
 	 * Determines whether the comments are visible or not.
 	 */
@@ -105,13 +119,44 @@ export interface GameState {
 function comment_from_game_state(
 	state: Readonly<GameState>,
 ): JSONContent | null {
+	if (state.currentChessStudyMove) {
+		if (state.currentChessStudyMove.comment) {
+			return state.currentChessStudyMove.comment;
+		} else {
+			if (state.currentRepertoireMove) {
+				if (state.currentRepertoireMove.comment) {
+					return state.currentRepertoireMove.comment;
+				} else {
+					return null;
+				}
+			} else {
+				return null;
+			}
+		}
+	} else {
+		if (state.chessStudy.comment) {
+			return state.chessStudy.comment;
+		} else {
+			if (state.repertoire) {
+				if (state.repertoire.comment) {
+					return state.repertoire.comment;
+				} else {
+					return null;
+				}
+			} else {
+				return null;
+			}
+		}
+	}
+	/*
 	return state.currentMove
 		? state.currentMove.comment
 			? state.currentMove.comment
 			: null
-		: state.study.comment
-			? state.study.comment
+		: state.chessStudy.comment
+			? state.chessStudy.comment
 			: null;
+	*/
 }
 
 export type GameEvent =
@@ -139,7 +184,8 @@ export const ChessStudy = ({
 	pluginSettings,
 	initialPos: initialPosition,
 	config,
-	study,
+	chessStudy,
+	repertoire,
 	studyLoader,
 }: AppProps) => {
 	// Parse Obsidian / Code Block Settings
@@ -165,7 +211,7 @@ export const ChessStudy = ({
 	 */
 	const [initialChessModel, initialPlayer, rootMoveNumber] = useMemo(() => {
 		const { pos, rootMoveNumber } = initialize_position(
-			study,
+			chessStudy,
 			config.initialPosition,
 		);
 
@@ -174,7 +220,7 @@ export const ChessStudy = ({
 		const initialPlayer: 'w' | 'b' = pos.turn();
 
 		return [pos, initialPlayer, rootMoveNumber];
-	}, [study, config.initialPosition]);
+	}, [chessStudy, config.initialPosition]);
 
 	/**
 	 * These names are quite good since we would like to use chess.js
@@ -190,7 +236,7 @@ export const ChessStudy = ({
 	);
 
 	function initial_move() {
-		return initial_move_from_neo_study(study, initialPosition);
+		return initial_move_from_neo_study(chessStudy, initialPosition);
 	}
 
 	// Because of strict rendering, the initialState is created when the chessView
@@ -198,11 +244,19 @@ export const ChessStudy = ({
 		/**
 		 *
 		 */
-		currentMove: initial_move(),
+		currentChessStudyMove: initial_move(),
+		currentRepertoireMove: initial_move_from_neo_study(
+			repertoire,
+			initialPosition,
+		),
 		/**
 		 * Placing this here to illustrate how the game state can migrate toward the tree model.
 		 */
-		study,
+		chessStudy,
+		/**
+		 *
+		 */
+		repertoire,
 		/**
 		 * In most cases the comments are visible.
 		 * However, in the case of puzzle-like modes, the comments are the hints, and may be hidden.
@@ -226,8 +280,8 @@ export const ChessStudy = ({
 
 	handler.setInitialState(
 		initialState,
-		initialState.currentMove,
-		initialState.study,
+		initialState.currentChessStudyMove,
+		initialState.chessStudy,
 	);
 	/*
 	const reducer: ImmerReducer<GameState, GameEvent> = (state, event) => {
@@ -243,47 +297,72 @@ export const ChessStudy = ({
 		(state: GameState, event: GameEvent) => {
 			switch (event.type) {
 				case 'GOTO_NEXT_MOVE': {
-					if (state.currentMove) {
+					if (state.currentChessStudyMove) {
 						const currentMove = get_neo_move_by_id(
-							state.study,
-							state.currentMove.moveId,
+							state.chessStudy,
+							state.currentChessStudyMove.moveId,
 						);
 						if (get_next_move(currentMove)) {
-							state.currentMove = handler.gotoNextMove(state);
+							state.currentChessStudyMove = handler.gotoNextMove(state);
+							state.currentRepertoireMove = get_target_move(
+								state.currentChessStudyMove,
+								state.chessStudy,
+								state.repertoire,
+							);
 						}
 					} else {
-						state.currentMove = handler.gotoNextMove(state);
+						state.currentChessStudyMove = handler.gotoNextMove(state);
+						state.currentRepertoireMove = get_target_move(
+							state.currentChessStudyMove,
+							state.chessStudy,
+							state.repertoire,
+						);
 					}
 					break;
 				}
 				case 'GOTO_PREV_MOVE': {
-					state.currentMove = handler.gotoPrevMove(state);
+					state.currentChessStudyMove = handler.gotoPrevMove(state);
+					state.currentRepertoireMove = get_target_move(
+						state.currentChessStudyMove,
+						state.chessStudy,
+						state.repertoire,
+					);
 					break;
 				}
 				case 'DELETE_MOVE': {
 					if (!chessView || has_no_moves(state)) return state;
-					if (state.currentMove) {
+					if (state.currentChessStudyMove) {
 						// const moveId = state.currentMove.moveId;
 						// For some reason we get two events so we must be idempotent.
-						if (has_neo_move_by_id(state.study, event.moveId)) {
-							state.study = neo_clone(state.study);
-							const target = get_neo_move_by_id(state.study, event.moveId);
-							const parent = find_parent(state.study.root, target);
+						if (has_neo_move_by_id(state.chessStudy, event.moveId)) {
+							state.chessStudy = neo_clone(state.chessStudy);
+							const target = get_neo_move_by_id(state.chessStudy, event.moveId);
+							const parent = find_parent(state.chessStudy.root, target);
 							if (parent) {
 								if (parent.left === target) {
 									parent.left = target.right;
 								} else {
 									parent.right = target.right;
 								}
-								state.currentMove = parent;
+								state.currentChessStudyMove = parent;
+								state.currentRepertoireMove = get_target_move(
+									state.currentChessStudyMove,
+									state.chessStudy,
+									state.repertoire,
+								);
 								const pos = new ChessPosition(parent.after);
 								update_board_view_from_position(chessView, pos);
 								setChessLogic(pos);
 							} else {
 								// We must be deleting the root node
-								state.study.root = null;
-								state.currentMove = null;
-								const pos = new ChessPosition(state.study.rootFEN);
+								state.chessStudy.root = null;
+								state.currentChessStudyMove = null;
+								state.currentRepertoireMove = get_target_move(
+									state.currentChessStudyMove,
+									state.chessStudy,
+									state.repertoire,
+								);
+								const pos = new ChessPosition(state.chessStudy.rootFEN);
 								update_board_view_from_position(chessView, pos);
 								setChessLogic(pos);
 							}
@@ -296,7 +375,14 @@ export const ChessStudy = ({
 					break;
 				}
 				case 'GOTO_MOVE': {
-					state.currentMove = handler.gotoMove(state, event.moveId);
+					// When a move is clicked in the user interface, the identifier is from the chessStudy.
+					const chessStudyMove = handler.gotoMove(state, event.moveId);
+					state.currentChessStudyMove = chessStudyMove;
+					state.currentRepertoireMove = get_target_move(
+						chessStudyMove,
+						state.chessStudy,
+						state.repertoire,
+					);
 					break;
 				}
 				case 'RESET': {
@@ -304,29 +390,39 @@ export const ChessStudy = ({
 					break;
 				}
 				case 'SYNC_SHAPES': {
-					state.study = neo_clone(state.study);
-					const move = get_current_neo_move(state);
+					state.chessStudy = neo_clone(state.chessStudy);
+					const move = get_current_chessstudy_move(state);
 					if (move) {
 						move.shapes = event.shapes;
 						// Isn't this redundant? Didn't we just get the current move?
 						// Caution: The issue may be that we have changed the comment of the current move.
-						state.currentMove = move;
+						state.currentChessStudyMove = move;
+						state.currentRepertoireMove = get_target_move(
+							state.currentChessStudyMove,
+							state.chessStudy,
+							state.repertoire,
+						);
 					} else {
 						// We should be allowed to have shapes in the
-						state.study.shapes = event.shapes;
+						state.chessStudy.shapes = event.shapes;
 					}
 					return state;
 				}
 				case 'SYNC_COMMENT': {
-					state.study = neo_clone(state.study);
-					const move = get_current_neo_move(state);
+					state.chessStudy = neo_clone(state.chessStudy);
+					const move = get_current_chessstudy_move(state);
 					if (move) {
 						move.comment = event.comment;
 						// Isn't this redundant? Didn't we just get the current move?
 						// Caution: The issue may be that we have changed the comment of the current move.
-						state.currentMove = move;
+						state.currentChessStudyMove = move;
+						state.currentRepertoireMove = get_target_move(
+							state.currentChessStudyMove,
+							state.chessStudy,
+							state.repertoire,
+						);
 					} else {
-						state.study.comment = event.comment;
+						state.chessStudy.comment = event.comment;
 					}
 					return state;
 				}
@@ -340,8 +436,8 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'ANNOTATE_MOVE': {
-					state.study = neo_clone(state.study);
-					const move = get_current_neo_move(state);
+					state.chessStudy = neo_clone(state.chessStudy);
+					const move = get_current_chessstudy_move(state);
 					if (move) {
 						switch (event.glyph) {
 							case NAG_null: {
@@ -370,8 +466,8 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'EVALUATE_MOVE': {
-					state.study = neo_clone(state.study);
-					const move = get_current_neo_move(state);
+					state.chessStudy = neo_clone(state.chessStudy);
+					const move = get_current_chessstudy_move(state);
 					if (move) {
 						switch (event.direction) {
 							case 1: {
@@ -390,8 +486,8 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'EVALUATE_POSITION': {
-					state.study = neo_clone(state.study);
-					const move = get_current_neo_move(state);
+					state.chessStudy = neo_clone(state.chessStudy);
+					const move = get_current_chessstudy_move(state);
 					if (move) {
 						switch (event.direction) {
 							case 1: {
@@ -410,12 +506,12 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'PROMOTE_LINE': {
-					state.study = neo_clone(state.study);
-					const move = get_current_neo_move(state);
+					state.chessStudy = neo_clone(state.chessStudy);
+					const move = get_current_chessstudy_move(state);
 					if (move) {
-						const other = get_variation_prev(state.study.root, move);
+						const other = get_variation_prev(state.chessStudy.root, move);
 						if (other) {
-							const uber = find_parent(state.study.root, other);
+							const uber = find_parent(state.chessStudy.root, other);
 							if (uber) {
 								other.right = move.right;
 								if (uber.right === other) {
@@ -428,7 +524,7 @@ export const ChessStudy = ({
 								// The other was the root, now the root will be the move.
 								other.right = move.right;
 								move.right = other;
-								state.study.root = move;
+								state.chessStudy.root = move;
 							}
 						} else {
 							// You can't promote a line if it does not have a superior variation.
@@ -437,12 +533,12 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'DEMOTE_LINE': {
-					state.study = neo_clone(state.study);
-					const move = get_current_neo_move(state);
+					state.chessStudy = neo_clone(state.chessStudy);
+					const move = get_current_chessstudy_move(state);
 					if (move) {
 						const other = get_variation_next(move);
 						if (other) {
-							const uber = find_parent(state.study.root, move);
+							const uber = find_parent(state.chessStudy.root, move);
 							if (uber) {
 								move.right = other.right;
 								if (uber.right === move) {
@@ -455,7 +551,7 @@ export const ChessStudy = ({
 								// The move was the root, now the root will be the other.
 								move.right = other.right;
 								other.right = move;
-								state.study.root = other;
+								state.chessStudy.root = other;
 							}
 						} else {
 							// You can't demote a line if it does not have an inferior variation.
@@ -477,12 +573,12 @@ export const ChessStudy = ({
 
 	const onSaveButtonClick = useCallback(async () => {
 		try {
-			await studyLoader.saveNeoStudy(gameState.study, chessStudyId);
+			await studyLoader.saveNeoStudy(gameState.chessStudy, chessStudyId);
 			new Notice('Save successfull!');
 		} catch (e) {
 			new Notice(`Something went wrong during saving: Cause: ${e}`, 0);
 		}
-	}, [chessStudyId, studyLoader, gameState.study]);
+	}, [chessStudyId, studyLoader, gameState.chessStudy]);
 
 	return (
 		<div className="chess-study">
@@ -507,8 +603,8 @@ export const ChessStudy = ({
 				{
 					<div className="pgn-container">
 						<NeoMovesViewer
-							study={gameState.study}
-							currentMoveId={gameState.currentMove?.moveId ?? null}
+							study={gameState.chessStudy}
+							currentMoveId={gameState.currentChessStudyMove?.moveId ?? null}
 							initialPlayer={initialPlayer}
 							rootMoveNumber={rootMoveNumber}
 							isVisible={!gameState.isNotationHidden}
@@ -539,19 +635,19 @@ export const ChessStudy = ({
 								try {
 									// We currently onle have a serializer from JGN to PGN.
 									// So we must convert our NEO structure to JGN and then serialize to PGN.
-									const jgn = jgn_from_neo(gameState.study);
+									const jgn = jgn_from_neo(gameState.chessStudy);
 									const pgn_string = jgn_to_pgn_string(jgn);
 									navigator.clipboard.writeText(pgn_string);
 									new Notice('Copied PGN to clipboard!');
 								} catch (e) {
 									console.warn(e);
-									console.warn(JSON.stringify(gameState.study, null, 2));
+									console.warn(JSON.stringify(gameState.chessStudy, null, 2));
 									new Notice('Could not copy PGN to clipboard:', e);
 								}
 							}}
 							onSaveButtonClick={onSaveButtonClick}
 							onDeleteButtonClick={(moveId) => {
-								if (gameState.currentMove) {
+								if (gameState.currentChessStudyMove) {
 									dispatch({
 										type: 'DELETE_MOVE',
 										moveId,

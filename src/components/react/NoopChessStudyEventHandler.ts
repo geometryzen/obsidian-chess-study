@@ -1,7 +1,8 @@
 import { Move } from 'chess.js';
-import { GameState, MoveToken } from './ChessStudy';
+import { GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { DrawShape } from 'chessground/draw';
+import { NeoMove } from '../../lib/neo/NeoMove';
 
 export class NoopChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
@@ -13,21 +14,21 @@ export class NoopChessStudyEventHandler implements ChessStudyEventHandler {
 	/**
 	 * @override
 	 */
-	gotoNextMove(state: Readonly<GameState>): MoveToken | null {
+	gotoNextMove(state: Readonly<GameState>): NeoMove | null {
 		// Do nothing
 		return null;
 	}
 	/**
 	 * @override
 	 */
-	gotoPrevMove(state: Readonly<GameState>): MoveToken | null {
+	gotoPrevMove(state: Readonly<GameState>): NeoMove | null {
 		// Do nothing
 		return null;
 	}
 	/**
 	 * @override
 	 */
-	gotoMove(state: Readonly<GameState>, moveId: string): MoveToken | null {
+	gotoMove(state: Readonly<GameState>, moveId: string): NeoMove | null {
 		// Do nothing
 		return null;
 	}

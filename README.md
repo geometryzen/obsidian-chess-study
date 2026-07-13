@@ -78,6 +78,7 @@ Here are the available settings for a `chessStudy` code block:
 | Setting             | Possible Values                              | Description                                      |
 | ------------------- | -------------------------------------------- | ------------------------------------------------ |
 | `chessStudyId`      | Unique Identifier                            | Valid ID for a file stored in the plugin store   |
+| `repertoireId`      | Unique Identifier                            | Valid ID for a file stored in the plugin store   |
 | `boardOrientation`  | `white` \| `black`                           | Orientation of the board                         |
 | `boardColor`        | `green` \| `brown`                           | Color of the board                               |
 | `disableCopy`       | `true`  \| `false`                           | Determines whether the study can be copied       |
