@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import { JSONContent } from '@tiptap/react';
+import { generateText, JSONContent } from '@tiptap/react';
 import { Chess as ChessPosition, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
 import { DrawShape } from 'chessground/draw';
@@ -53,6 +53,7 @@ import { has_no_moves } from './has_no_moves';
 import { NeoMovesViewer } from './NeoMovesViewer';
 import { NeoMove } from '../../lib/neo/NeoMove';
 import { get_target_move } from '../../lib/neo/get_target_move';
+import StarterKit from '@tiptap/starter-kit';
 export type ChessStudyConfig = ChessgroundProps;
 
 interface AppProps {
@@ -412,7 +413,21 @@ export const ChessStudy = ({
 					state.chessStudy = neo_clone(state.chessStudy);
 					const move = get_current_chessstudy_move(state);
 					if (move) {
-						move.comment = event.comment;
+						if (event.comment) {
+							const strval = generateText(event.comment, [StarterKit]);
+							if (strval.trim().length > 0) {
+								// The comment is genuine is visible to the user.
+								// const repertoireMove = get_target_move(move, state.chessStudy,state.repertoire)
+								move.comment = event.comment;
+							} else {
+								// The comment is a blank string.
+								// TODO: Experiment with undefined in order to remove the property and make the file compact.
+								move.comment = null;
+							}
+						} else {
+							// the comment is null or perhaps undefined
+							move.comment = null;
+						}
 						// Isn't this redundant? Didn't we just get the current move?
 						// Caution: The issue may be that we have changed the comment of the current move.
 						state.currentChessStudyMove = move;
@@ -422,7 +437,21 @@ export const ChessStudy = ({
 							state.repertoire,
 						);
 					} else {
-						state.chessStudy.comment = event.comment;
+						// When there is no current move then we apply the comment to the game itself.
+						if (event.comment) {
+							// TODO: DRY
+							const strval = generateText(event.comment, [StarterKit]);
+							if (strval.trim().length > 0) {
+								// The comment is genuine is visible to the user.
+								state.chessStudy.comment = event.comment;
+							} else {
+								// The comment is a blank string.
+								state.chessStudy.comment = null;
+							}
+						} else {
+							// the comment is null or perhaps undefined
+							state.chessStudy.comment = null;
+						}
 					}
 					return state;
 				}
@@ -635,6 +664,7 @@ export const ChessStudy = ({
 								try {
 									// We currently onle have a serializer from JGN to PGN.
 									// So we must convert our NEO structure to JGN and then serialize to PGN.
+									// TODO: neo_to_pgn_string function.
 									const jgn = jgn_from_neo(gameState.chessStudy);
 									const pgn_string = jgn_to_pgn_string(jgn);
 									navigator.clipboard.writeText(pgn_string);
