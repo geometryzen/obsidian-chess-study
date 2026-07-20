@@ -138,7 +138,7 @@ export default class ChessStudyPlugin extends Plugin {
 								parts.push(`chessStudyId: ${id}`);
 								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}`);
 								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
-								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${completedPosition}`);
+								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
 								parts.push(`boardOrientation: ${boardOrientation}`);
 								parts.push(`disableCopy: ${disableCopy ? 'true' : 'false'}`);
 								parts.push(

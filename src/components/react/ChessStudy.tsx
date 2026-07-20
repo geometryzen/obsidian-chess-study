@@ -18,10 +18,10 @@ import { get_variation_next } from '../../lib/neo/get_variation_next.js';
 import { get_variation_prev } from '../../lib/neo/get_variation_prev.js';
 import { has_neo_move_by_id } from '../../lib/neo/has_neo_move_by_id.js';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study.js';
-import { moves_from_path } from '../../lib/neo/move_from_path';
+//import { moves_from_path } from '../../lib/neo/move_from_path';
 import { neo_clone } from '../../lib/neo/neo_clone.js';
 import { NeoStudy } from '../../lib/neo/NeoStudy.js';
-import { path_from_move } from '../../lib/neo/path_from_move';
+//import { path_from_move } from '../../lib/neo/path_from_move';
 import {
 	annotate_move_blunder,
 	annotate_move_correct,
