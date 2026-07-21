@@ -1,7 +1,7 @@
 import { JSONContent } from '@tiptap/react';
 import { GameState } from './GameState';
 
-const repertoire_takes_precedence = true;
+const repertoire_takes_precedence = false;
 
 /**
  * If there us a current move then we return the comment for that move,
@@ -11,6 +11,7 @@ export function comment_from_game_state(
 	state: Readonly<GameState>,
 ): JSONContent | null {
 	if (repertoire_takes_precedence) {
+		// TODO: This does not work for the repertoire itself!
 		if (state.currentRepertoireMove) {
 			if (state.currentRepertoireMove.comment) {
 				return state.currentRepertoireMove.comment;
