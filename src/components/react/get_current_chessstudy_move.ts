@@ -1,6 +1,6 @@
-import { GameState } from './ChessStudy';
 import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
 import { NeoMove } from '../../lib/neo/NeoMove';
+import { GameState } from './GameState';
 
 export function get_current_chessstudy_move(
 	state: Readonly<GameState>,

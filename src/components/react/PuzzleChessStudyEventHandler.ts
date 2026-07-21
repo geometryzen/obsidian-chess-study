@@ -7,7 +7,6 @@ import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
 import { get_next_moves } from '../../lib/neo/get_next_moves';
 import { NeoMove } from '../../lib/neo/NeoMove';
 import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position';
-import { GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
 import { initialize_position } from '../../lib/chess-logic/initialize_position';
@@ -15,6 +14,7 @@ import { has_next_moves } from '../../lib/neo/has_next_moves';
 import { is_correct_move } from '../../lib/neo/is_questionable_move';
 import { CompletedPosition } from '../../lib/config/CompletedPosition';
 import { get_target_move } from '../../lib/neo/get_target_move';
+import { GameState } from './GameState';
 
 export function random_element<T>(xs: T[]): T {
 	return xs[Math.floor(Math.random() * xs.length)];

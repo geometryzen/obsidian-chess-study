@@ -51,9 +51,10 @@ import { createChessStudyEventHandler } from './createChessStudyEventHandler';
 import { get_current_chessstudy_move } from './get_current_chessstudy_move';
 import { has_no_moves } from './has_no_moves';
 import { NeoMovesViewer } from './NeoMovesViewer';
-import { NeoMove } from '../../lib/neo/NeoMove';
 import { get_target_move } from '../../lib/neo/get_target_move';
 import StarterKit from '@tiptap/starter-kit';
+import { GameState } from './GameState';
+import { comment_from_game_state } from './comment_from_game_state';
 export type ChessStudyConfig = ChessgroundProps;
 
 interface AppProps {
@@ -77,88 +78,6 @@ export interface MoveToken {
 	readonly shapes: DrawShape[];
 }
 */
-
-export interface GameState {
-	/**
-	 * The current move in the chessStudy property.
-	 */
-	currentChessStudyMove: NeoMove | null;
-	/**
-	 * The current move in the repertoire property.
-	 */
-	currentRepertoireMove: NeoMove | null;
-	/**
-	 *
-	 */
-	chessStudy: NeoStudy;
-	/**
-	 *
-	 */
-	repertoire: NeoStudy | null;
-	/**
-	 * Determines whether the comments are visible or not.
-	 */
-	isCommentsHidden: boolean;
-	/**
-	 * Determines whether the move navigation buttons are visible.
-	 */
-	isNavigationHidden: boolean;
-	/**
-	 * Determines whether the notation is visible or not.
-	 */
-	isNotationHidden: boolean;
-	/**
-	 * Determines whether the Board View has mouse or pointer interaction.
-	 */
-	isViewOnly: boolean;
-}
-
-/**
- * If there us a current move then we return the comment for that move,
- * Otherwise we return the comment for the study itself.
- */
-function comment_from_game_state(
-	state: Readonly<GameState>,
-): JSONContent | null {
-	if (state.currentChessStudyMove) {
-		if (state.currentChessStudyMove.comment) {
-			return state.currentChessStudyMove.comment;
-		} else {
-			if (state.currentRepertoireMove) {
-				if (state.currentRepertoireMove.comment) {
-					return state.currentRepertoireMove.comment;
-				} else {
-					return null;
-				}
-			} else {
-				return null;
-			}
-		}
-	} else {
-		if (state.chessStudy.comment) {
-			return state.chessStudy.comment;
-		} else {
-			if (state.repertoire) {
-				if (state.repertoire.comment) {
-					return state.repertoire.comment;
-				} else {
-					return null;
-				}
-			} else {
-				return null;
-			}
-		}
-	}
-	/*
-	return state.currentMove
-		? state.currentMove.comment
-			? state.currentMove.comment
-			: null
-		: state.chessStudy.comment
-			? state.chessStudy.comment
-			: null;
-	*/
-}
 
 export type GameEvent =
 	| { type: 'PLAY_MOVE'; move: Move }

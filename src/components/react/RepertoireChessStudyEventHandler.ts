@@ -11,11 +11,11 @@ import { NeoMove } from '../../lib/neo/NeoMove';
 import { NeoStudy } from '../../lib/neo/NeoStudy';
 import { display_relative_move } from '../../lib/ui-state/display_relative_move';
 import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position';
-import { GameState } from './ChessStudy';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { get_next_move } from '../../lib/neo/get_next_move';
 import { has_next_moves } from '../../lib/neo/has_next_moves';
 import { get_target_move } from '../../lib/neo/get_target_move';
+import { GameState } from './GameState';
 export function random_element<T>(xs: T[]): T {
 	return xs[Math.floor(Math.random() * xs.length)];
 }

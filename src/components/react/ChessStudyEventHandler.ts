@@ -1,7 +1,7 @@
 import { Move } from 'chess.js';
 import { DrawShape } from 'chessground/draw';
 import { NeoStudy } from '../../lib/neo/NeoStudy.js';
-import { GameState } from './ChessStudy.js';
+import { GameState } from './GameState.js';
 import { CompletedPosition } from '../../lib/config/CompletedPosition.js';
 import { NeoMove } from '../../lib/neo/NeoMove.js';
 

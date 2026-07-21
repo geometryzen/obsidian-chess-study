@@ -1,4 +1,4 @@
-import { GameState } from './ChessStudy';
+import { GameState } from './GameState';
 
 /**
  * Determines whether the chessStudy property of the game state has any moves.

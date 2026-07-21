@@ -9,7 +9,7 @@ import { has_next_moves } from '../../lib/neo/has_next_moves';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
 import { NeoMove } from '../../lib/neo/NeoMove';
 import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position';
-import { GameState } from './ChessStudy';
+import { GameState } from './GameState';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { initialize_position } from '../../lib/chess-logic/initialize_position';
 import { get_target_move } from '../../lib/neo/get_target_move';

@@ -1,5 +1,5 @@
 import { Move } from 'chess.js';
-import { GameState } from './ChessStudy';
+import { GameState } from './GameState';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { DrawShape } from 'chessground/draw';
 import { NeoMove } from '../../lib/neo/NeoMove';

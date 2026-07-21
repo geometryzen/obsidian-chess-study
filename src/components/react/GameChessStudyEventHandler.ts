@@ -13,7 +13,7 @@ import { rightmost_neo_node } from '../../lib/neo/rightmost_neo_node.js';
 import { serializePreOrder } from '../../lib/neo/serializePreOrder.js';
 import { display_relative_move } from '../../lib/ui-state/display_relative_move.js';
 import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position.js';
-import { GameState } from './ChessStudy.js';
+import { GameState } from './GameState.js';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler.js';
 import { get_variation_next } from '../../lib/neo/get_variation_next.js';
 import { get_target_move } from '../../lib/neo/get_target_move.js';
