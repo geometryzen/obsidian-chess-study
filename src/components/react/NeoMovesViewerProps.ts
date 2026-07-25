@@ -5,7 +5,8 @@ import { ControlProps } from './ControlsProps';
  * Notice that by design, the PgnViewerProps extends ControlProps to pass the properties through.
  */
 export interface NeoMovesViewerProps extends ControlProps {
-	study: NeoStudy;
+	chessStudy: NeoStudy;
+	repertoire: NeoStudy | null;
 	/**
 	 *
 	 */

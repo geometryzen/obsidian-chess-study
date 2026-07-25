@@ -13,7 +13,6 @@ import { initialize_position } from '../../lib/chess-logic/initialize_position';
 import { has_next_moves } from '../../lib/neo/has_next_moves';
 import { is_correct_move } from '../../lib/neo/is_questionable_move';
 import { CompletedPosition } from '../../lib/config/CompletedPosition';
-import { get_target_move } from '../../lib/neo/get_target_move';
 import { GameState } from './GameState';
 
 export function random_element<T>(xs: T[]): T {
@@ -30,11 +29,6 @@ function terminate_puzzle(
 	update_board_view_from_position(chessView, pos);
 	setChessLogic(pos);
 	state.currentChessStudyMove = user_move;
-	state.currentRepertoireMove = get_target_move(
-		state.currentChessStudyMove,
-		state.chessStudy,
-		state.repertoire,
-	);
 	state.isNotationHidden = false;
 	return;
 }
@@ -72,11 +66,6 @@ function play_response_move_or_terminate_puzzle(
 				update_board_view_from_position(chessView, pos);
 				setChessLogic(pos);
 				state.currentChessStudyMove = response_move;
-				state.currentRepertoireMove = get_target_move(
-					state.currentChessStudyMove,
-					state.chessStudy,
-					state.repertoire,
-				);
 				state.isNotationHidden = has_next_moves(response_move);
 			}
 		} else {
@@ -222,11 +211,6 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 		state.currentChessStudyMove = initial_move_from_neo_study(
 			state.chessStudy,
 			initialPosition,
-		);
-		state.currentRepertoireMove = get_target_move(
-			state.currentChessStudyMove,
-			state.chessStudy,
-			state.repertoire,
 		);
 		state.isNotationHidden = true;
 	}

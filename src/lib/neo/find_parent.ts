@@ -10,7 +10,10 @@ export function find_parent(
 	}
 	const nodes = bfsGeneratorLR(root);
 	for (const node of nodes) {
-		if (node.left === target || node.right === target) {
+		if (
+			node.left?.moveId === target.moveId ||
+			node.right?.moveId === target.moveId
+		) {
 			return node;
 		}
 	}

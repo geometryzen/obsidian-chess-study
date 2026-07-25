@@ -99,11 +99,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 						// console.lg('candidate', candidate.san);
 						if (candidate.san === m.san) {
 							state.currentChessStudyMove = candidate;
-							state.currentRepertoireMove = get_target_move(
-								state.currentChessStudyMove,
-								state.chessStudy,
-								state.repertoire,
-							);
 							return;
 						}
 						candidate = get_variation_next(candidate);
@@ -112,11 +107,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					const parent = rightmost_neo_node(next_move);
 					parent.right = neo_move_from_user_move(m, null, null);
 					state.currentChessStudyMove = parent.right;
-					state.currentRepertoireMove = get_target_move(
-						state.currentChessStudyMove,
-						state.chessStudy,
-						state.repertoire,
-					);
 				} else {
 					// The move will be added as the next Main Line move
 					const new_move = neo_move_from_user_move(m, null, null);
@@ -126,11 +116,6 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					);
 					target.left = new_move;
 					state.currentChessStudyMove = new_move;
-					state.currentRepertoireMove = get_target_move(
-						state.currentChessStudyMove,
-						state.chessStudy,
-						state.repertoire,
-					);
 				}
 			} else {
 				// console.lg('There is no current move');
@@ -139,22 +124,12 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					const move = neo_move_from_user_move(m, null, null);
 					state.chessStudy.root = move;
 					state.currentChessStudyMove = move;
-					state.currentRepertoireMove = get_target_move(
-						state.currentChessStudyMove,
-						state.chessStudy,
-						state.repertoire,
-					);
 				} else {
 					// console.lg('The root is defined');
 					const first_move = first_neo_move(state.chessStudy) as NeoMove;
 					state.currentChessStudyMove = ensure_move_is_neo_move_or_variation(
 						m,
 						first_move,
-					);
-					state.currentRepertoireMove = get_target_move(
-						state.currentChessStudyMove,
-						state.chessStudy,
-						state.repertoire,
 					);
 				}
 			}
@@ -185,10 +160,19 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 * @override
 	 */
 	shapes(state: GameState): DrawShape[] {
-		if (state.currentChessStudyMove) {
-			return state.currentChessStudyMove.shapes;
+		const currentRepertoireMove = get_target_move(
+			state.currentChessStudyMove,
+			state.chessStudy,
+			state.repertoire,
+		);
+		if (currentRepertoireMove) {
+			return currentRepertoireMove.shapes;
 		} else {
-			return state.chessStudy.shapes;
+			if (state.currentChessStudyMove) {
+				return state.currentChessStudyMove.shapes;
+			} else {
+				return state.chessStudy.shapes;
+			}
 		}
 	}
 }

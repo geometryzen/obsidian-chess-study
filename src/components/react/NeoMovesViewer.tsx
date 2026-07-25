@@ -12,10 +12,12 @@ import { Controls } from './Controls';
 import { MoveIndicator } from './MoveIndicator';
 import { MoveItem } from './MoveItem';
 import { NeoMovesViewerProps } from './NeoMovesViewerProps';
+import { get_target_move } from '../../lib/neo/get_target_move';
 
 export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	const {
-		study,
+		chessStudy,
+		repertoire,
 		// neoMoves,
 		currentMoveId,
 		// initialPlayer,
@@ -33,9 +35,11 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	// I think useImmerReducer may be problematic.
 	const { data, rows } = useMemo(() => {
 		// console.lg('useMemo called.');
-		const currentMove = currentMoveId
-			? get_neo_move_by_id(study, currentMoveId)
+		const currentChessStudyMove = currentMoveId
+			? get_neo_move_by_id(chessStudy, currentMoveId)
 			: null;
+		// In future we might use the corresponding repertoire move (if it exists).
+		get_target_move(currentChessStudyMove, chessStudy, repertoire);
 		const data: {
 			[id: string]: {
 				moveNumber: number;
@@ -44,15 +48,19 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 				depth: number;
 			};
 		} = {};
-		if (study.root) {
-			data[study.root.moveId] = {
+		if (chessStudy.root) {
+			data[chessStudy.root.moveId] = {
 				moveNumber: rootMoveNumber,
-				ancestor: is_prior_move(study.root, study.root, currentMove),
-				mainline: is_main_line(study.root, currentMove),
-				depth: get_variation_depth(study.root, study.root),
+				ancestor: is_prior_move(
+					chessStudy.root,
+					chessStudy.root,
+					currentChessStudyMove,
+				),
+				mainline: is_main_line(chessStudy.root, currentChessStudyMove),
+				depth: get_variation_depth(chessStudy.root, chessStudy.root),
 			};
 		}
-		const nodes = dfsGeneratorRL(study.root);
+		const nodes = dfsGeneratorRL(chessStudy.root);
 		const rows: { key: string; white: NeoMove | null; black: NeoMove | null }[] =
 			[];
 		for (const node of nodes) {
@@ -75,10 +83,10 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 					rows.push({ key: node.moveId, white: null, black: node });
 				}
 			}
-			const ancestor = is_prior_move(study.root, node, currentMove);
-			const mainline = is_main_line(node, currentMove);
-			const depth = get_variation_depth(study.root, node);
-			const parent = find_parent(study.root, node);
+			const ancestor = is_prior_move(chessStudy.root, node, currentChessStudyMove);
+			const mainline = is_main_line(node, currentChessStudyMove);
+			const depth = get_variation_depth(chessStudy.root, node);
+			const parent = find_parent(chessStudy.root, node);
 			if (parent) {
 				const parent_move_number: number = data[parent.moveId].moveNumber;
 				if (get_variation_next(parent) === node) {
@@ -97,7 +105,7 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 			}
 		}
 		return { data, rows };
-	}, [study, rootMoveNumber, currentMoveId]);
+	}, [chessStudy, repertoire, rootMoveNumber, currentMoveId]);
 	return (
 		<div className="height-width-100">
 			{isVisible && (

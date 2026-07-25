@@ -14,7 +14,6 @@ import { update_board_view_from_position } from '../../lib/ui-state/update_board
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { get_next_move } from '../../lib/neo/get_next_move';
 import { has_next_moves } from '../../lib/neo/has_next_moves';
-import { get_target_move } from '../../lib/neo/get_target_move';
 import { GameState } from './GameState';
 export function random_element<T>(xs: T[]): T {
 	return xs[Math.floor(Math.random() * xs.length)];
@@ -67,11 +66,6 @@ function update_board_view_following_move(
 	update_board_view_from_position(chessView, pos);
 	setChessLogic(pos);
 	state.currentChessStudyMove = chessStudyMove;
-	state.currentRepertoireMove = get_target_move(
-		state.currentChessStudyMove,
-		state.chessStudy,
-		state.repertoire,
-	);
 	state.isCommentsHidden = has_next_moves(chessStudyMove);
 	state.isNavigationHidden = has_next_moves(chessStudyMove);
 	state.isNotationHidden = has_next_moves(chessStudyMove);
@@ -258,11 +252,6 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 		state.currentChessStudyMove = initial_move_from_neo_study(
 			state.chessStudy,
 			initialPosition,
-		);
-		state.currentRepertoireMove = get_target_move(
-			state.currentChessStudyMove,
-			state.chessStudy,
-			state.repertoire,
 		);
 		state.isCommentsHidden = true;
 		state.isNavigationHidden = true;

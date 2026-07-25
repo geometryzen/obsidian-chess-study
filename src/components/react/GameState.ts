@@ -7,10 +7,6 @@ export interface GameState {
 	 */
 	currentChessStudyMove: NeoMove | null;
 	/**
-	 * The current move in the repertoire property.
-	 */
-	currentRepertoireMove: NeoMove | null;
-	/**
 	 *
 	 */
 	chessStudy: NeoStudy;

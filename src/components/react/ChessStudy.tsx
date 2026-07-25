@@ -51,10 +51,10 @@ import { createChessStudyEventHandler } from './createChessStudyEventHandler';
 import { get_current_chessstudy_move } from './get_current_chessstudy_move';
 import { has_no_moves } from './has_no_moves';
 import { NeoMovesViewer } from './NeoMovesViewer';
-import { get_target_move } from '../../lib/neo/get_target_move';
 import StarterKit from '@tiptap/starter-kit';
 import { GameState } from './GameState';
 import { comment_from_game_state } from './comment_from_game_state';
+import { get_target_move } from '../../lib/neo/get_target_move';
 export type ChessStudyConfig = ChessgroundProps;
 
 interface AppProps {
@@ -120,6 +120,7 @@ export const ChessStudy = ({
 		chessStudyKind,
 		viewComments,
 		chessStudyId,
+		repertoireId,
 	} = parse_user_config(pluginSettings, source);
 
 	// Setup Chessground API
@@ -165,10 +166,6 @@ export const ChessStudy = ({
 		 *
 		 */
 		currentChessStudyMove: initial_move(),
-		currentRepertoireMove: initial_move_from_neo_study(
-			repertoire,
-			initialPosition,
-		),
 		/**
 		 * Placing this here to illustrate how the game state can migrate toward the tree model.
 		 */
@@ -224,29 +221,14 @@ export const ChessStudy = ({
 						);
 						if (get_next_move(currentMove)) {
 							state.currentChessStudyMove = handler.gotoNextMove(state);
-							state.currentRepertoireMove = get_target_move(
-								state.currentChessStudyMove,
-								state.chessStudy,
-								state.repertoire,
-							);
 						}
 					} else {
 						state.currentChessStudyMove = handler.gotoNextMove(state);
-						state.currentRepertoireMove = get_target_move(
-							state.currentChessStudyMove,
-							state.chessStudy,
-							state.repertoire,
-						);
 					}
 					break;
 				}
 				case 'GOTO_PREV_MOVE': {
 					state.currentChessStudyMove = handler.gotoPrevMove(state);
-					state.currentRepertoireMove = get_target_move(
-						state.currentChessStudyMove,
-						state.chessStudy,
-						state.repertoire,
-					);
 					break;
 				}
 				case 'DELETE_MOVE': {
@@ -265,11 +247,6 @@ export const ChessStudy = ({
 									parent.right = target.right;
 								}
 								state.currentChessStudyMove = parent;
-								state.currentRepertoireMove = get_target_move(
-									state.currentChessStudyMove,
-									state.chessStudy,
-									state.repertoire,
-								);
 								const pos = new ChessPosition(parent.after);
 								update_board_view_from_position(chessView, pos);
 								setChessLogic(pos);
@@ -277,11 +254,6 @@ export const ChessStudy = ({
 								// We must be deleting the root node
 								state.chessStudy.root = null;
 								state.currentChessStudyMove = null;
-								state.currentRepertoireMove = get_target_move(
-									state.currentChessStudyMove,
-									state.chessStudy,
-									state.repertoire,
-								);
 								const pos = new ChessPosition(state.chessStudy.rootFEN);
 								update_board_view_from_position(chessView, pos);
 								setChessLogic(pos);
@@ -298,11 +270,6 @@ export const ChessStudy = ({
 					// When a move is clicked in the user interface, the identifier is from the chessStudy.
 					const chessStudyMove = handler.gotoMove(state, event.moveId);
 					state.currentChessStudyMove = chessStudyMove;
-					state.currentRepertoireMove = get_target_move(
-						chessStudyMove,
-						state.chessStudy,
-						state.repertoire,
-					);
 					break;
 				}
 				case 'RESET': {
@@ -311,17 +278,22 @@ export const ChessStudy = ({
 				}
 				case 'SYNC_SHAPES': {
 					state.chessStudy = neo_clone(state.chessStudy);
-					const move = get_current_chessstudy_move(state);
-					if (move) {
-						move.shapes = event.shapes;
-						// Isn't this redundant? Didn't we just get the current move?
-						// Caution: The issue may be that we have changed the comment of the current move.
-						state.currentChessStudyMove = move;
-						state.currentRepertoireMove = get_target_move(
-							state.currentChessStudyMove,
+					const currentChessStudyMove = get_current_chessstudy_move(state);
+					if (currentChessStudyMove) {
+						const currentRepertoireMove = get_target_move(
+							currentChessStudyMove,
 							state.chessStudy,
 							state.repertoire,
 						);
+						if (currentRepertoireMove) {
+							currentRepertoireMove.shapes = event.shapes;
+							currentChessStudyMove.shapes = [];
+						} else {
+							currentChessStudyMove.shapes = event.shapes;
+						}
+						// Isn't this redundant? Didn't we just get the current move?
+						// Caution: The issue may be that we have changed the comment of the current move.
+						state.currentChessStudyMove = currentChessStudyMove;
 					} else {
 						// We should be allowed to have shapes in the
 						state.chessStudy.shapes = event.shapes;
@@ -330,31 +302,40 @@ export const ChessStudy = ({
 				}
 				case 'SYNC_COMMENT': {
 					state.chessStudy = neo_clone(state.chessStudy);
-					const move = get_current_chessstudy_move(state);
-					if (move) {
+					const currentChessStudyMove = get_current_chessstudy_move(state);
+					if (currentChessStudyMove) {
+						const currentRepertoireMove = get_target_move(
+							currentChessStudyMove,
+							state.chessStudy,
+							state.repertoire,
+						);
 						if (event.comment) {
 							const strval = generateText(event.comment, [StarterKit]);
 							if (strval.trim().length > 0) {
 								// The comment is genuine is visible to the user.
-								// const repertoireMove = get_target_move(move, state.chessStudy,state.repertoire)
-								move.comment = event.comment;
+								if (currentRepertoireMove) {
+									currentRepertoireMove.comment = event.comment;
+									currentChessStudyMove.comment = null;
+								} else {
+									currentChessStudyMove.comment = event.comment;
+								}
 							} else {
 								// The comment is a blank string.
 								// TODO: Experiment with undefined in order to remove the property and make the file compact.
-								move.comment = null;
+								if (currentRepertoireMove) {
+									currentRepertoireMove.comment = null;
+									currentChessStudyMove.comment = null;
+								} else {
+									currentChessStudyMove.comment = null;
+								}
 							}
 						} else {
 							// the comment is null or perhaps undefined
-							move.comment = null;
+							currentChessStudyMove.comment = null;
 						}
 						// Isn't this redundant? Didn't we just get the current move?
 						// Caution: The issue may be that we have changed the comment of the current move.
-						state.currentChessStudyMove = move;
-						state.currentRepertoireMove = get_target_move(
-							state.currentChessStudyMove,
-							state.chessStudy,
-							state.repertoire,
-						);
+						state.currentChessStudyMove = currentChessStudyMove;
 					} else {
 						// When there is no current move then we apply the comment to the game itself.
 						if (event.comment) {
@@ -522,11 +503,20 @@ export const ChessStudy = ({
 	const onSaveButtonClick = useCallback(async () => {
 		try {
 			await studyLoader.saveNeoStudy(gameState.chessStudy, chessStudyId);
+			if (gameState.repertoire) {
+				await studyLoader.saveNeoStudy(gameState.repertoire, repertoireId);
+			}
 			new Notice('Save successfull!');
 		} catch (e) {
 			new Notice(`Something went wrong during saving: Cause: ${e}`, 0);
 		}
-	}, [chessStudyId, studyLoader, gameState.chessStudy]);
+	}, [
+		chessStudyId,
+		repertoireId,
+		studyLoader,
+		gameState.chessStudy,
+		gameState.repertoire,
+	]);
 
 	return (
 		<div className="chess-study">
@@ -551,7 +541,8 @@ export const ChessStudy = ({
 				{
 					<div className="pgn-container">
 						<NeoMovesViewer
-							study={gameState.chessStudy}
+							chessStudy={gameState.chessStudy}
+							repertoire={gameState.repertoire}
 							currentMoveId={gameState.currentChessStudyMove?.moveId ?? null}
 							initialPlayer={initialPlayer}
 							rootMoveNumber={rootMoveNumber}

@@ -12,7 +12,6 @@ import { update_board_view_from_position } from '../../lib/ui-state/update_board
 import { GameState } from './GameState';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { initialize_position } from '../../lib/chess-logic/initialize_position';
-import { get_target_move } from '../../lib/neo/get_target_move';
 
 function play_mainline_move(
 	user_move: NeoMove,
@@ -26,22 +25,12 @@ function play_mainline_move(
 		update_board_view_from_position(chessView, pos);
 		setChessLogic(pos);
 		state.currentChessStudyMove = mainline_move;
-		state.currentRepertoireMove = get_target_move(
-			state.currentChessStudyMove,
-			state.chessStudy,
-			state.repertoire,
-		);
 		state.isNotationHidden = has_next_moves(mainline_move);
 	} else {
 		const pos = new ChessPosition(user_move.after);
 		update_board_view_from_position(chessView, pos);
 		setChessLogic(pos);
 		state.currentChessStudyMove = user_move;
-		state.currentRepertoireMove = get_target_move(
-			state.currentChessStudyMove,
-			state.chessStudy,
-			state.repertoire,
-		);
 		state.isNotationHidden = false;
 	}
 }
@@ -164,11 +153,6 @@ export class MemorizeChessStudyEventHandler implements ChessStudyEventHandler {
 		state.currentChessStudyMove = initial_move_from_neo_study(
 			state.chessStudy,
 			initialPosition,
-		);
-		state.currentRepertoireMove = get_target_move(
-			state.currentChessStudyMove,
-			state.chessStudy,
-			state.repertoire,
 		);
 		state.isNotationHidden = true;
 	}
