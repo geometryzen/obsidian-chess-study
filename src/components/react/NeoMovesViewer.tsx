@@ -12,7 +12,10 @@ import { Controls } from './Controls';
 import { MoveIndicator } from './MoveIndicator';
 import { MoveItem } from './MoveItem';
 import { NeoMovesViewerProps } from './NeoMovesViewerProps';
-import { get_target_move } from '../../lib/neo/get_target_move';
+import {
+	get_target_move,
+	get_target_move_else_source,
+} from '../../lib/neo/get_target_move';
 
 export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	const {
@@ -39,7 +42,7 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 			? get_neo_move_by_id(chessStudy, currentMoveId)
 			: null;
 		// In future we might use the corresponding repertoire move (if it exists).
-		get_target_move(currentChessStudyMove, chessStudy, repertoire);
+		get_target_move(currentChessStudyMove, chessStudy, repertoire, null);
 		const data: {
 			[id: string]: {
 				moveNumber: number;
@@ -124,7 +127,11 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 									/>
 									<MoveItem
 										san={white ? white.san : '...'}
-										nags={white ? white.nags : []}
+										nags={
+											white
+												? get_target_move_else_source(white, chessStudy, repertoire).nags
+												: []
+										}
 										isCurrentMove={white ? white.moveId === currentMoveId : false}
 										ancestor={white ? data[white.moveId].ancestor : false}
 										mainline={white ? data[white.moveId].mainline : false}
@@ -135,7 +142,11 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 									/>
 									<MoveItem
 										san={black ? black.san : '...'}
-										nags={black ? black.nags : []}
+										nags={
+											black
+												? get_target_move_else_source(black, chessStudy, repertoire).nags
+												: []
+										}
 										isCurrentMove={black ? black.moveId === currentMoveId : false}
 										ancestor={black ? data[black.moveId].ancestor : false}
 										mainline={black ? data[black.moveId].mainline : false}

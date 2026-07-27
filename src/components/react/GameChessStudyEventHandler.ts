@@ -164,6 +164,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 			state.currentChessStudyMove,
 			state.chessStudy,
 			state.repertoire,
+			null,
 		);
 		if (currentRepertoireMove) {
 			return currentRepertoireMove.shapes;

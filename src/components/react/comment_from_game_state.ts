@@ -20,6 +20,7 @@ export function comment_from_game_state(
 			state.currentChessStudyMove,
 			state.chessStudy,
 			state.repertoire,
+			null,
 		);
 		if (currentRepertoireMove) {
 			if (currentRepertoireMove.comment) {

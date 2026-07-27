@@ -7,12 +7,26 @@ export function get_target_move(
 	sourceMove: NeoMove | null,
 	sourceStudy: NeoStudy,
 	targetStudy: NeoStudy | null,
-) {
+	defaultMove: NeoMove | null,
+): NeoMove | null {
 	const sans = path_from_move(sourceStudy.root, sourceMove);
 	const moves = moves_from_path(targetStudy?.root, sans);
 	if (moves.length == sans.length) {
 		return moves[moves.length - 1];
 	} else {
-		return null;
+		return defaultMove;
+	}
+}
+export function get_target_move_else_source(
+	sourceMove: NeoMove,
+	sourceStudy: NeoStudy,
+	targetStudy: NeoStudy | null,
+): NeoMove {
+	const sans = path_from_move(sourceStudy.root, sourceMove);
+	const moves = moves_from_path(targetStudy?.root, sans);
+	if (moves.length == sans.length) {
+		return moves[moves.length - 1];
+	} else {
+		return sourceMove;
 	}
 }

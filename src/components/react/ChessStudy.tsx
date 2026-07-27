@@ -54,7 +54,10 @@ import { NeoMovesViewer } from './NeoMovesViewer';
 import StarterKit from '@tiptap/starter-kit';
 import { GameState } from './GameState';
 import { comment_from_game_state } from './comment_from_game_state';
-import { get_target_move } from '../../lib/neo/get_target_move';
+import {
+	get_target_move,
+	get_target_move_else_source,
+} from '../../lib/neo/get_target_move';
 export type ChessStudyConfig = ChessgroundProps;
 
 interface AppProps {
@@ -284,6 +287,7 @@ export const ChessStudy = ({
 							currentChessStudyMove,
 							state.chessStudy,
 							state.repertoire,
+							null,
 						);
 						if (currentRepertoireMove) {
 							currentRepertoireMove.shapes = event.shapes;
@@ -308,6 +312,7 @@ export const ChessStudy = ({
 							currentChessStudyMove,
 							state.chessStudy,
 							state.repertoire,
+							null,
 						);
 						if (event.comment) {
 							const strval = generateText(event.comment, [StarterKit]);
@@ -366,23 +371,36 @@ export const ChessStudy = ({
 				}
 				case 'ANNOTATE_MOVE': {
 					state.chessStudy = neo_clone(state.chessStudy);
-					const move = get_current_chessstudy_move(state);
-					if (move) {
+					const currentChessStudyMove = get_current_chessstudy_move(state);
+					if (currentChessStudyMove) {
+						const move = get_target_move_else_source(
+							currentChessStudyMove,
+							chessStudy,
+							repertoire,
+						);
 						switch (event.glyph) {
 							case NAG_null: {
-								move.nags = annotate_move_correct(move.nags);
+								currentChessStudyMove.nags = move.nags = annotate_move_correct(
+									move.nags,
+								);
 								break;
 							}
 							case NAG_questionable_move: {
-								move.nags = annotate_move_inaccurate(move.nags);
+								currentChessStudyMove.nags = move.nags = annotate_move_inaccurate(
+									move.nags,
+								);
 								break;
 							}
 							case NAG_poor_move: {
-								move.nags = annotate_move_mistake(move.nags);
+								currentChessStudyMove.nags = move.nags = annotate_move_mistake(
+									move.nags,
+								);
 								break;
 							}
 							case NAG_very_poor_move: {
-								move.nags = annotate_move_blunder(move.nags);
+								currentChessStudyMove.nags = move.nags = annotate_move_blunder(
+									move.nags,
+								);
 								break;
 							}
 							default: {
@@ -396,15 +414,24 @@ export const ChessStudy = ({
 				}
 				case 'EVALUATE_MOVE': {
 					state.chessStudy = neo_clone(state.chessStudy);
-					const move = get_current_chessstudy_move(state);
-					if (move) {
+					const currentChessStudyMove = get_current_chessstudy_move(state);
+					if (currentChessStudyMove) {
+						const move = get_target_move_else_source(
+							currentChessStudyMove,
+							chessStudy,
+							repertoire,
+						);
 						switch (event.direction) {
 							case 1: {
-								move.nags = increase_move_evaluation(move.nags);
+								currentChessStudyMove.nags = move.nags = increase_move_evaluation(
+									move.nags,
+								);
 								break;
 							}
 							case -1: {
-								move.nags = decrease_move_evaluation(move.nags);
+								currentChessStudyMove.nags = move.nags = decrease_move_evaluation(
+									move.nags,
+								);
 								break;
 							}
 							default: {
@@ -416,15 +443,24 @@ export const ChessStudy = ({
 				}
 				case 'EVALUATE_POSITION': {
 					state.chessStudy = neo_clone(state.chessStudy);
-					const move = get_current_chessstudy_move(state);
-					if (move) {
+					const currentChessStudyMove = get_current_chessstudy_move(state);
+					if (currentChessStudyMove) {
+						const move = get_target_move_else_source(
+							currentChessStudyMove,
+							chessStudy,
+							repertoire,
+						);
 						switch (event.direction) {
 							case 1: {
-								move.nags = increase_position_evaluation(move.nags);
+								currentChessStudyMove.nags = move.nags = increase_position_evaluation(
+									move.nags,
+								);
 								break;
 							}
 							case -1: {
-								move.nags = decrease_position_evaluation(move.nags);
+								currentChessStudyMove.nags = move.nags = decrease_position_evaluation(
+									move.nags,
+								);
 								break;
 							}
 							default: {
