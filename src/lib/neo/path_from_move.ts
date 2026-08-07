@@ -1,6 +1,12 @@
-import { find_parent } from './find_parent';
+import { get_prev_move } from './get_prev_move';
 import { NeoMove } from './NeoMove';
 
+/**
+ *
+ * @param root
+ * @param move
+ * @returns
+ */
 export function path_from_move(
 	root: NeoMove | null,
 	move: NeoMove | null,
@@ -9,7 +15,9 @@ export function path_from_move(
 	let x: NeoMove | null = move;
 	while (x) {
 		path.push(x.san);
-		x = find_parent(root, x);
+		// x = find_parent(root, x);
+		// TODO
+		x = get_prev_move(root, x);
 	}
 	path.reverse();
 	return path;

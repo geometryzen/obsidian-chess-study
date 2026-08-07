@@ -4,16 +4,20 @@ import { NeoMove } from './NeoMove';
 
 export function get_prev_move(
 	root: NeoMove | null,
-	move: NeoMove,
+	move: NeoMove | null,
 ): NeoMove | null {
-	const parent = find_parent(root, move);
-	if (!parent) {
-		return null;
-	} else {
-		if (get_next_move(parent) === move) {
-			return parent;
+	if (move) {
+		const parent = find_parent(root, move);
+		if (!parent) {
+			return null;
 		} else {
-			return get_prev_move(root, parent);
+			if (get_next_move(parent)?.moveId === move.moveId) {
+				return parent;
+			} else {
+				return get_prev_move(root, parent);
+			}
 		}
+	} else {
+		return null;
 	}
 }

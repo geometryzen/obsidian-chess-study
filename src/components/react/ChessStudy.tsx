@@ -19,7 +19,7 @@ import { get_variation_prev } from '../../lib/neo/get_variation_prev.js';
 import { has_neo_move_by_id } from '../../lib/neo/has_neo_move_by_id.js';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study.js';
 //import { moves_from_path } from '../../lib/neo/move_from_path';
-import { neo_clone } from '../../lib/neo/neo_clone.js';
+import { neo_clone_study } from '../../lib/neo/neo_clone_study.js';
 import { NeoStudy } from '../../lib/neo/NeoStudy.js';
 //import { path_from_move } from '../../lib/neo/path_from_move';
 import {
@@ -240,7 +240,7 @@ export const ChessStudy = ({
 						// const moveId = state.currentMove.moveId;
 						// For some reason we get two events so we must be idempotent.
 						if (has_neo_move_by_id(state.chessStudy, event.moveId)) {
-							state.chessStudy = neo_clone(state.chessStudy);
+							state.chessStudy = neo_clone_study(state.chessStudy);
 							const target = get_neo_move_by_id(state.chessStudy, event.moveId);
 							const parent = find_parent(state.chessStudy.root, target);
 							if (parent) {
@@ -280,7 +280,7 @@ export const ChessStudy = ({
 					break;
 				}
 				case 'SYNC_SHAPES': {
-					state.chessStudy = neo_clone(state.chessStudy);
+					state.chessStudy = neo_clone_study(state.chessStudy);
 					const currentChessStudyMove = get_current_chessstudy_move(state);
 					if (currentChessStudyMove) {
 						const currentRepertoireMove = get_target_move(
@@ -305,7 +305,7 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'SYNC_COMMENT': {
-					state.chessStudy = neo_clone(state.chessStudy);
+					state.chessStudy = neo_clone_study(state.chessStudy);
 					const currentChessStudyMove = get_current_chessstudy_move(state);
 					if (currentChessStudyMove) {
 						const currentRepertoireMove = get_target_move(
@@ -320,7 +320,7 @@ export const ChessStudy = ({
 								// The comment is genuine is visible to the user.
 								if (currentRepertoireMove) {
 									currentRepertoireMove.comment = event.comment;
-									currentChessStudyMove.comment = null;
+									currentChessStudyMove.comment = event.comment;
 								} else {
 									currentChessStudyMove.comment = event.comment;
 								}
@@ -370,7 +370,9 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'ANNOTATE_MOVE': {
-					state.chessStudy = neo_clone(state.chessStudy);
+					// This is dead code.
+					// We are currently incrementing/decrementing the move annotations.
+					state.chessStudy = neo_clone_study(state.chessStudy);
 					const currentChessStudyMove = get_current_chessstudy_move(state);
 					if (currentChessStudyMove) {
 						const move = get_target_move_else_source(
@@ -413,13 +415,13 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'EVALUATE_MOVE': {
-					state.chessStudy = neo_clone(state.chessStudy);
+					state.chessStudy = neo_clone_study(state.chessStudy);
 					const currentChessStudyMove = get_current_chessstudy_move(state);
 					if (currentChessStudyMove) {
 						const move = get_target_move_else_source(
 							currentChessStudyMove,
-							chessStudy,
-							repertoire,
+							state.chessStudy,
+							state.repertoire,
 						);
 						switch (event.direction) {
 							case 1: {
@@ -442,13 +444,13 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'EVALUATE_POSITION': {
-					state.chessStudy = neo_clone(state.chessStudy);
+					state.chessStudy = neo_clone_study(state.chessStudy);
 					const currentChessStudyMove = get_current_chessstudy_move(state);
 					if (currentChessStudyMove) {
 						const move = get_target_move_else_source(
 							currentChessStudyMove,
-							chessStudy,
-							repertoire,
+							state.chessStudy,
+							state.repertoire,
 						);
 						switch (event.direction) {
 							case 1: {
@@ -471,7 +473,7 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'PROMOTE_LINE': {
-					state.chessStudy = neo_clone(state.chessStudy);
+					state.chessStudy = neo_clone_study(state.chessStudy);
 					const move = get_current_chessstudy_move(state);
 					if (move) {
 						const other = get_variation_prev(state.chessStudy.root, move);
@@ -498,7 +500,7 @@ export const ChessStudy = ({
 					return state;
 				}
 				case 'DEMOTE_LINE': {
-					state.chessStudy = neo_clone(state.chessStudy);
+					state.chessStudy = neo_clone_study(state.chessStudy);
 					const move = get_current_chessstudy_move(state);
 					if (move) {
 						const other = get_variation_next(move);

@@ -72,7 +72,9 @@ function comment_from_commands(
 function append_text_comments(base: string, move: JgnMove): string {
 	if (move.comment) {
 		try {
-			const text = generateText(move.comment, [StarterKit]);
+			const text = generateText(move.comment, [StarterKit])
+				.replaceAll('{', '[')
+				.replaceAll('}', ']');
 			return `${base} { ${text} }`;
 		} catch (e) {
 			console.warn(e);
@@ -163,7 +165,11 @@ export function jgn_to_pgn_string(study: JgnStudy): string {
 	const seven_tags_string = seven_tag_keys
 		.map((key, index) => {
 			if (study.headers) {
-				return `[${key} "${study.headers[key]}"]`;
+				if (study.headers[key]) {
+					return `[${key} "${study.headers[key]}"]`;
+				} else {
+					return `[${key} "${seven_tag_defaults[index]}"]`;
+				}
 			} else {
 				return `[${key} "${seven_tag_defaults[index]}"]`;
 			}
@@ -197,5 +203,5 @@ export function jgn_to_pgn_string(study: JgnStudy): string {
 	const rootMoveNumber = root.moveNumber();
 	// console.lg('rootMoveNumber', rootMoveNumber);
 	const moves_string = moves_to_string(study.moves, indexOffset, rootMoveNumber);
-	return `${tags_string}\n\n${gameComment ? `{${gameComment}}\n` : ''}${moves_string} ${result}`;
+	return `${tags_string}\n\n${gameComment ? `{${gameComment}}\n` : ''}${moves_string} ${result ? result : '*'}`;
 }

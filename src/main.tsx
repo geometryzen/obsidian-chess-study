@@ -32,6 +32,7 @@ import {
 	COMPLETED_POSITION_YAML_NAME,
 	CompletedPosition,
 } from './lib/config/CompletedPosition';
+import { ensure_target_moves } from './lib/neo/ensure_target_moves';
 
 type FEN = string;
 type PGN = string;
@@ -188,6 +189,8 @@ export default class ChessStudyPlugin extends Plugin {
 						try {
 							const repertoire: NeoStudy =
 								await this.#studyLoader.loadNeoStudy(repertoireId);
+
+							ensure_target_moves(chessStudy, repertoire);
 
 							ctx.addChild(
 								new ChessStudyMarkdownRenderChild(

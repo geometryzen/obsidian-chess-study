@@ -17,6 +17,7 @@ import { GameState } from './GameState.js';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler.js';
 import { get_variation_next } from '../../lib/neo/get_variation_next.js';
 import { get_target_move } from '../../lib/neo/get_target_move.js';
+import { ensure_target_moves } from '../../lib/neo/ensure_target_moves.js';
 
 export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
@@ -147,6 +148,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					root,
 					study.rootFEN,
 				);
+				ensure_target_moves(state.chessStudy, state.repertoire);
 			}
 		}
 	}
