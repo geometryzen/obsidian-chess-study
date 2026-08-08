@@ -39,6 +39,9 @@ type PGN = string;
 export type ChessString = FEN | PGN;
 export type BoardOrientation = 'white' | 'black';
 export type BoardColor = 'green' | 'brown';
+const CHESSSTUDY_ID_YAML_NAME = 'chessStudyId';
+const REPERTOIRE_ID_YAML_NAME = 'repertoireId';
+const SPACE = ' ';
 
 // TODO:
 // 1) Allow to show the root position
@@ -106,7 +109,8 @@ export default class ChessStudyPlugin extends Plugin {
 							case CHESS_STUDY_KIND_MEMORIZE: {
 								// The first instance of the chess study is the puzzle.
 								parts.push(`${BACKTICKS}chessStudy`);
-								parts.push(`chessStudyId: ${id}`);
+								parts.push(`${CHESSSTUDY_ID_YAML_NAME}: ${id}`);
+								parts.push(`${REPERTOIRE_ID_YAML_NAME}:${SPACE}`);
 								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}`);
 								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
 								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
@@ -121,7 +125,8 @@ export default class ChessStudyPlugin extends Plugin {
 								parts.push('?');
 								// The second instance of the chess study is the solution, which is fully editable.
 								parts.push(`${BACKTICKS}chessStudy`);
-								parts.push(`chessStudyId: ${id}`);
+								parts.push(`${CHESSSTUDY_ID_YAML_NAME}: ${id}`);
+								parts.push(`${REPERTOIRE_ID_YAML_NAME}:${SPACE}`);
 								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${CHESS_STUDY_KIND_GAME}`);
 								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
 								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
@@ -136,7 +141,8 @@ export default class ChessStudyPlugin extends Plugin {
 							}
 							default: {
 								parts.push(`${BACKTICKS}chessStudy`);
-								parts.push(`chessStudyId: ${id}`);
+								parts.push(`${CHESSSTUDY_ID_YAML_NAME}: ${id}`);
+								parts.push(`${REPERTOIRE_ID_YAML_NAME}:${SPACE}`);
 								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}`);
 								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
 								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
