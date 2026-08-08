@@ -16,6 +16,7 @@ import {
 	get_target_move,
 	get_target_move_else_source,
 } from '../../lib/neo/get_target_move';
+import { NumericAnnotationGlyph } from '../../lib/NumericAnnotationGlyphs';
 
 export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	const {
@@ -129,7 +130,8 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 										san={white ? white.san : '...'}
 										nags={
 											white
-												? get_target_move_else_source(white, chessStudy, repertoire).nags
+												? (get_target_move_else_source(white, chessStudy, repertoire)
+														.nags as NumericAnnotationGlyph[])
 												: []
 										}
 										isCurrentMove={white ? white.moveId === currentMoveId : false}
@@ -144,7 +146,8 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 										san={black ? black.san : '...'}
 										nags={
 											black
-												? get_target_move_else_source(black, chessStudy, repertoire).nags
+												? (get_target_move_else_source(black, chessStudy, repertoire)
+														.nags as NumericAnnotationGlyph[])
 												: []
 										}
 										isCurrentMove={black ? black.moveId === currentMoveId : false}

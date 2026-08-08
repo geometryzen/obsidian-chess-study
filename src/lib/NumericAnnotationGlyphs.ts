@@ -76,7 +76,7 @@ export type NumericAnnotationGlyph =
 	| typeof NAG_white_has_a_crushing_advantage
 	| typeof NAG_black_has_a_crushing_advantage;
 
-export function nags_to_dollars(nags: NumericAnnotationGlyph[]): string {
+export function nags_to_dollars(nags: number[]): string {
 	if (Array.isArray(nags)) {
 		return nags
 			.map((nag) => {

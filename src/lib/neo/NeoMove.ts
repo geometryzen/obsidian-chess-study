@@ -1,6 +1,5 @@
 import { JSONContent } from '@tiptap/react';
 import { DrawShape } from 'chessground/draw';
-import { NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
 
 export class NeoMove {
 	readonly after: string;
@@ -10,7 +9,7 @@ export class NeoMove {
 	readonly evaluation: number | undefined;
 	readonly from: string;
 	readonly moveId: string;
-	nags: NumericAnnotationGlyph[];
+	nags: number[];
 	readonly promotion: 'b' | 'p' | 'n' | 'r' | 'q' | 'k' | undefined;
 	readonly san: string;
 	shapes: DrawShape[];
@@ -31,7 +30,7 @@ export class NeoMove {
 		evaluation: number | undefined,
 		from: string,
 		id: string,
-		nags: NumericAnnotationGlyph[],
+		nags: number[],
 		promotion: 'b' | 'p' | 'n' | 'r' | 'q' | 'k' | undefined,
 		san: string,
 		shapes: DrawShape[],

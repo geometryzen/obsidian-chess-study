@@ -383,25 +383,25 @@ export const ChessStudy = ({
 						switch (event.glyph) {
 							case NAG_null: {
 								currentChessStudyMove.nags = move.nags = annotate_move_correct(
-									move.nags,
+									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
 							}
 							case NAG_questionable_move: {
 								currentChessStudyMove.nags = move.nags = annotate_move_inaccurate(
-									move.nags,
+									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
 							}
 							case NAG_poor_move: {
 								currentChessStudyMove.nags = move.nags = annotate_move_mistake(
-									move.nags,
+									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
 							}
 							case NAG_very_poor_move: {
 								currentChessStudyMove.nags = move.nags = annotate_move_blunder(
-									move.nags,
+									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
 							}
@@ -426,13 +426,13 @@ export const ChessStudy = ({
 						switch (event.direction) {
 							case 1: {
 								currentChessStudyMove.nags = move.nags = increase_move_evaluation(
-									move.nags,
+									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
 							}
 							case -1: {
 								currentChessStudyMove.nags = move.nags = decrease_move_evaluation(
-									move.nags,
+									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
 							}
@@ -455,13 +455,13 @@ export const ChessStudy = ({
 						switch (event.direction) {
 							case 1: {
 								currentChessStudyMove.nags = move.nags = increase_position_evaluation(
-									move.nags,
+									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
 							}
 							case -1: {
 								currentChessStudyMove.nags = move.nags = decrease_position_evaluation(
-									move.nags,
+									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
 							}

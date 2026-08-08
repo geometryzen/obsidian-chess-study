@@ -21,10 +21,7 @@ const seven_tag_keys = [
 	'Result',
 ];
 
-function move_san_and_nags_to_pgn_string(
-	san: string,
-	nags: NumericAnnotationGlyph[],
-): string {
+function move_san_and_nags_to_pgn_string(san: string, nags: number[]): string {
 	if (Array.isArray(nags)) {
 		if (nags.length > 0) {
 			return `${san} ${nags_to_dollars(nags)}`;

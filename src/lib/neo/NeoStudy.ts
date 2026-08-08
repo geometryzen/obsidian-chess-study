@@ -36,7 +36,8 @@ export class NeoStudy {
 		rootFEN: string,
 	) {
 		this.comment = comment;
-		((this.shapes = shapes), (this.headers = headers));
+		this.shapes = shapes;
+		this.headers = headers;
 		this.root = root;
 		this.rootFEN = rootFEN;
 	}

@@ -1,6 +1,5 @@
 import { JSONContent } from '@tiptap/react';
 import { DrawShape } from 'chessground/draw';
-import { NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
 
 /**
  * This interface is part of the serialization structure and should not be changed.
@@ -34,7 +33,7 @@ export interface JgnMove {
 	/**
 	 * Numeric Annotation Glyphs
 	 */
-	nags: NumericAnnotationGlyph[];
+	nags: number[];
 	/**
 	 *
 	 */
