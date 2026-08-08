@@ -262,9 +262,9 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 	 */
 	shapes(state: GameState): DrawShape[] {
 		if (state.currentChessStudyMove) {
-			return state.currentChessStudyMove.shapes;
+			return state.currentChessStudyMove.shapes as DrawShape[];
 		} else {
-			return state.chessStudy.shapes;
+			return state.chessStudy.shapes as DrawShape[];
 		}
 	}
 }

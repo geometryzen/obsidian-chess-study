@@ -1,6 +1,5 @@
 import { JSONContent } from '@tiptap/react';
 import { NeoMove } from './NeoMove';
-import { DrawShape } from 'chessground/draw';
 
 /**
  * A version, headers, comment (top level), moves, and a rootFEN.
@@ -18,7 +17,7 @@ export class NeoStudy {
 	/**
 	 * The top-level shapes.
 	 */
-	shapes: DrawShape[];
+	shapes: unknown[];
 	/**
 	 * The moves that follow from the root FEN.
 	 */
@@ -30,7 +29,7 @@ export class NeoStudy {
 
 	constructor(
 		comment: JSONContent | null,
-		shapes: DrawShape[],
+		shapes: unknown[],
 		headers: Record<string, string>,
 		root: NeoMove | null,
 		rootFEN: string,

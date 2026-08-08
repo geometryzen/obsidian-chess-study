@@ -1,5 +1,4 @@
 import { JSONContent } from '@tiptap/react';
-import { DrawShape } from 'chessground/draw';
 
 export class NeoMove {
 	readonly after: string;
@@ -12,7 +11,7 @@ export class NeoMove {
 	nags: number[];
 	readonly promotion: 'b' | 'p' | 'n' | 'r' | 'q' | 'k' | undefined;
 	readonly san: string;
-	shapes: DrawShape[];
+	shapes: unknown[];
 	readonly to: string;
 	/**
 	 * The left leg of the tree is the next move.
@@ -33,7 +32,7 @@ export class NeoMove {
 		nags: number[],
 		promotion: 'b' | 'p' | 'n' | 'r' | 'q' | 'k' | undefined,
 		san: string,
-		shapes: DrawShape[],
+		shapes: unknown[],
 		to: string,
 		left: NeoMove | null,
 		right: NeoMove | null,

@@ -169,12 +169,12 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 			null,
 		);
 		if (currentRepertoireMove) {
-			return currentRepertoireMove.shapes;
+			return currentRepertoireMove.shapes as DrawShape[];
 		} else {
 			if (state.currentChessStudyMove) {
-				return state.currentChessStudyMove.shapes;
+				return state.currentChessStudyMove.shapes as DrawShape[];
 			} else {
-				return state.chessStudy.shapes;
+				return state.chessStudy.shapes as DrawShape[];
 			}
 		}
 	}

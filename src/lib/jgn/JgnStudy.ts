@@ -1,6 +1,5 @@
 import { JSONContent } from '@tiptap/react';
 import { JgnMove } from './JgnMove';
-import { DrawShape } from 'chessground/draw';
 
 /**
  * A version, headers, comment (top level), moves, and a rootFEN.
@@ -18,7 +17,7 @@ export interface JgnStudy {
 	/**
 	 * The top-level shapes.
 	 */
-	shapes: DrawShape[];
+	shapes: unknown[];
 	/**
 	 * The moves that follow from the root FEN.
 	 */

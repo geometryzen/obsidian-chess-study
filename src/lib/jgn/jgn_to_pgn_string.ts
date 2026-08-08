@@ -1,10 +1,7 @@
 import { generateText } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Chess } from 'chess.js';
-import {
-	nags_to_dollars,
-	NumericAnnotationGlyph,
-} from '../NumericAnnotationGlyphs';
+import { nags_to_dollars } from '../NumericAnnotationGlyphs';
 import { JgnMove, JgnVariation } from './JgnMove';
 import { JgnStudy } from './JgnStudy';
 
