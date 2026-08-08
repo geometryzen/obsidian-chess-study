@@ -5,7 +5,7 @@ import { serializePreOrder } from './serializePreOrder';
 /**
  *
  */
-export function neo_clone_move_shallow(move: NeoMove | null): NeoMove | null {
+export function clone_move_shallow(move: NeoMove | null): NeoMove | null {
 	const clone = deserializePreOrder(serializePreOrder(move));
 	if (clone) {
 		clone.left = null;

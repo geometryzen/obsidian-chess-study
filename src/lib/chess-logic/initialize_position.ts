@@ -1,5 +1,5 @@
 import { first_neo_move } from '../neo/first_neo_move';
-import { get_neo_main_line } from '../neo/get_neo_main_line';
+import { get_main_line } from '../neo/get_main_line';
 import { get_prev_move } from '../neo/get_prev_move';
 import { initial_move_from_neo_study } from '../neo/initial_node_from_neo_study';
 import { NeoMove } from '../neo/NeoMove';
@@ -14,7 +14,7 @@ export function initialize_position(
 	const rootMoveNumber = pos.moveNumber();
 	switch (initialPosition) {
 		case 'end': {
-			get_neo_main_line(study).forEach((move) => {
+			get_main_line(study).forEach((move) => {
 				pos.move({
 					from: move.from,
 					to: move.to,

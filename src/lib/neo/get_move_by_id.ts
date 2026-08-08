@@ -1,7 +1,7 @@
 import { NeoMove } from './NeoMove';
 import { NeoStudy } from './NeoStudy';
 
-export function get_neo_move_by_id(
+export function get_move_by_id(
 	study: Readonly<NeoStudy>,
 	moveId: string,
 ): NeoMove {

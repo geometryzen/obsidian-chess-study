@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 import { NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
 import { NeoMove } from './NeoMove';
 
-export function neo_move_from_user_move(
+export function move_from_user_move(
 	m: Move,
 	left: NeoMove | null,
 	right: NeoMove | null,

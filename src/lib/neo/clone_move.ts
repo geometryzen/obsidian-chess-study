@@ -5,6 +5,6 @@ import { serializePreOrder } from './serializePreOrder';
 /**
  *
  */
-export function neo_clone_move(move: NeoMove | null): NeoMove | null {
+export function clone_move(move: NeoMove | null): NeoMove | null {
 	return deserializePreOrder(serializePreOrder(move));
 }

@@ -1,7 +1,7 @@
 import { Move } from 'chess.js';
 import { NeoMove } from './NeoMove';
-import { neo_move_from_user_move } from './neo_move_from_user_move';
-import { rightmost_neo_node } from './rightmost_neo_node';
+import { move_from_user_move } from './move_from_user_move';
+import { rightmost_node } from './rightmost_node';
 
 /**
  * Ensures that the played move exists in the specified scope move.
@@ -28,9 +28,9 @@ export function ensure_move_is_neo_move_or_variation(
 			right = right.right;
 		}
 		// The move does not exist in any existing variation so we create a new variation.
-		const move = neo_move_from_user_move(m, null, null);
+		const move = move_from_user_move(m, null, null);
 		// The important thing is to make sure we don't step on existing variations.
-		const last_variation = rightmost_neo_node(neoMove);
+		const last_variation = rightmost_node(neoMove);
 		last_variation.right = move;
 		return move;
 	}

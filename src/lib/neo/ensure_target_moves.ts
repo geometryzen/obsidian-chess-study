@@ -4,7 +4,7 @@ import { find_parent } from './find_parent';
 import { get_target_move } from './get_target_move';
 import { is_left_child_of_parent } from './is_left_child_of_parent';
 import { is_right_child_of_parent } from './is_right_child_of_parent';
-import { neo_clone_move_shallow } from './neo_clone_move_shallow';
+import { clone_move_shallow } from './clone_move_shallow';
 import { NeoStudy } from './NeoStudy';
 
 /**
@@ -21,7 +21,7 @@ export function ensure_target_moves(
 			if (exists_target_move(source_move, sourceStudy, targetStudy)) {
 				// We already have the source move in the target study.
 			} else {
-				const target_move = neo_clone_move_shallow(source_move);
+				const target_move = clone_move_shallow(source_move);
 				// We do not have the source move in the target study.
 				const source_move_parent = find_parent(sourceStudy.root, source_move);
 				if (source_move_parent) {

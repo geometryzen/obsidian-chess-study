@@ -1,4 +1,4 @@
-import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
+import { get_move_by_id } from '../../lib/neo/get_move_by_id';
 import { NeoMove } from '../../lib/neo/NeoMove';
 import { GameState } from './GameState';
 
@@ -10,7 +10,7 @@ export function get_current_chessstudy_move(
 		const moveId = currentMove.moveId;
 
 		if (moveId) {
-			return get_neo_move_by_id(state.chessStudy, moveId);
+			return get_move_by_id(state.chessStudy, moveId);
 		} else {
 			return null;
 		}

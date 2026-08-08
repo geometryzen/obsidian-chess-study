@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { dfsGeneratorRL } from '../../lib/neo/dfsGeneratorRL';
 import { find_parent } from '../../lib/neo/find_parent';
 import { get_next_move } from '../../lib/neo/get_next_move';
-import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
+import { get_move_by_id } from '../../lib/neo/get_move_by_id';
 import { get_variation_depth } from '../../lib/neo/get_variation_depth';
 import { get_variation_next } from '../../lib/neo/get_variation_next';
 import { is_main_line, is_prior_move } from '../../lib/neo/is_parent';
@@ -39,7 +39,7 @@ export const NeoMovesViewer = React.memo((props: NeoMovesViewerProps) => {
 	const { data, rows } = useMemo(() => {
 		// console.lg('useMemo called.');
 		const currentChessStudyMove = currentMoveId
-			? get_neo_move_by_id(chessStudy, currentMoveId)
+			? get_move_by_id(chessStudy, currentMoveId)
 			: null;
 		// In future we might use the corresponding repertoire move (if it exists).
 		get_target_move(currentChessStudyMove, chessStudy, repertoire, null);

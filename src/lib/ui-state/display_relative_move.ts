@@ -1,8 +1,8 @@
 import { Chess } from 'chess.js';
 import { Api as ChessgroundApi } from 'chessground/api';
 import { first_neo_move } from '../neo/first_neo_move';
-import { get_neo_move_from_offset } from '../neo/get_neo_move_from_offset';
-import { last_neo_move } from '../neo/last_neo_move';
+import { get_move_from_offset } from '../neo/get_move_from_offset';
+import { last_move } from '../neo/last_move';
 import { NeoMove } from '../neo/NeoMove';
 import { update_board_view_from_position } from './update_board_view_from_position';
 import { GameState } from '../../components/react/GameState';
@@ -28,7 +28,7 @@ export function display_relative_move(
 	const currentMove = state.currentChessStudyMove;
 
 	if (currentMove) {
-		nodeToDisplay = get_neo_move_from_offset(
+		nodeToDisplay = get_move_from_offset(
 			state.chessStudy,
 			currentMove.moveId,
 			offset,
@@ -36,7 +36,7 @@ export function display_relative_move(
 	} else {
 		if (offset < 0) {
 			// If we are going backwards
-			nodeToDisplay = last_neo_move(state.chessStudy);
+			nodeToDisplay = last_move(state.chessStudy);
 		} else {
 			// An offset of +1 always means that the user wants to go "Forward".
 			// There will be no selected move.

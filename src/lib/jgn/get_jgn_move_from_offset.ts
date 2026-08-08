@@ -7,13 +7,13 @@ export function get_jgn_move_from_offset(
 	moveId: string,
 	offset: 1 | -1,
 ) {
-	return get_move_from_offset(study.moves, moveId, offset);
+	return get_jgn_move_from_offset_recursive(study.moves, moveId, offset);
 }
 
 /**
  * Recursive helper function.
  */
-function get_move_from_offset(
+function get_jgn_move_from_offset_recursive(
 	moves: JgnMove[],
 	moveId: string,
 	offset: 1 | -1,
@@ -33,7 +33,7 @@ function get_move_from_offset(
 		if (moveIndex === 0 && offset === -1) {
 			// If we are the first move in the variation and we are going backwards,
 			// then the move we want is the Main Line move prior to the Main Line move that contains the variation.
-			return get_move_from_offset(moves, mainLineMove.moveId, -1);
+			return get_jgn_move_from_offset_recursive(moves, mainLineMove.moveId, -1);
 		}
 
 		if (typeof variation.moves[moveIndex + offset] !== 'undefined') {

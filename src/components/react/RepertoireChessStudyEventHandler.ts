@@ -4,7 +4,7 @@ import { DrawShape } from 'chessground/draw';
 import { Dispatch, SetStateAction } from 'react';
 import { initialize_position } from '../../lib/chess-logic/initialize_position';
 import { first_neo_move } from '../../lib/neo/first_neo_move';
-import { get_neo_move_by_id } from '../../lib/neo/get_neo_move_by_id';
+import { get_move_by_id } from '../../lib/neo/get_move_by_id';
 import { get_next_moves } from '../../lib/neo/get_next_moves';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
 import { NeoMove } from '../../lib/neo/NeoMove';
@@ -129,7 +129,7 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 	gotoMove(state: Readonly<GameState>, moveId: string): NeoMove | null {
 		if (!this.#chessView) return null;
 
-		const neoMove: NeoMove = get_neo_move_by_id(state.chessStudy, moveId);
+		const neoMove: NeoMove = get_move_by_id(state.chessStudy, moveId);
 		const pos = new ChessPosition(neoMove.after);
 		this.#setChessLogic(pos);
 		update_board_view_from_position(this.#chessView, pos);
@@ -145,7 +145,7 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 		if (!this.#chessView) return;
 		const root = state.chessStudy.root;
 		if (state.currentChessStudyMove) {
-			const current_move = get_neo_move_by_id(
+			const current_move = get_move_by_id(
 				state.chessStudy,
 				state.currentChessStudyMove.moveId,
 			);
