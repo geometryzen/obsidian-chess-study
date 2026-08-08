@@ -1,9 +1,6 @@
-import { JSONContent } from '@tiptap/react';
 import { Move } from 'chess.js';
-import { DrawShape } from 'chessground/draw';
 import { nanoid } from 'nanoid';
-import { NumericAnnotationGlyph } from '../NumericAnnotationGlyphs';
-import { NeoMove } from './NeoMove';
+import { NeoMove } from '../../lib/neo/NeoMove';
 
 export function move_from_user_move(
 	m: Move,
@@ -11,10 +8,10 @@ export function move_from_user_move(
 	right: NeoMove | null,
 ): NeoMove {
 	const clock: string | undefined = void 0;
-	const comment: JSONContent | null = null;
+	const comment: unknown | null = null;
 	const evaluation: number | undefined = void 0;
-	const nags: NumericAnnotationGlyph[] = [];
-	const shapes: DrawShape[] = [];
+	const nags: number[] = [];
+	const shapes: unknown[] = [];
 	return new NeoMove(
 		m.after,
 		clock,

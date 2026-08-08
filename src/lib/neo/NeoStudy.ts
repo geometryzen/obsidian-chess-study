@@ -1,4 +1,3 @@
-import { JSONContent } from '@tiptap/react';
 import { NeoMove } from './NeoMove';
 
 /**
@@ -13,7 +12,7 @@ export class NeoStudy {
 	/**
 	 * The top-level comment.
 	 */
-	comment: JSONContent | null;
+	comment: unknown | null;
 	/**
 	 * The top-level shapes.
 	 */
@@ -28,7 +27,7 @@ export class NeoStudy {
 	readonly rootFEN: string;
 
 	constructor(
-		comment: JSONContent | null,
+		comment: unknown | null,
 		shapes: unknown[],
 		headers: Record<string, string>,
 		root: NeoMove | null,

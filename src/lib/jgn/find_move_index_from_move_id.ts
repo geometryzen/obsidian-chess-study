@@ -1,5 +1,5 @@
 import { JgnMove } from './JgnMove';
-import { MoveIndex } from './MoveIndex';
+import { JgnMoveIndex } from './JgnMoveIndex';
 
 /**
  *
@@ -10,7 +10,7 @@ import { MoveIndex } from './MoveIndex';
 export function find_move_index_from_move_id(
 	moves: JgnMove[],
 	moveId: string,
-): MoveIndex {
+): JgnMoveIndex {
 	for (const [iMainLine, move] of moves.entries()) {
 		if (move.moveId === moveId) {
 			// The case when the move is in the main line returns only a single number.

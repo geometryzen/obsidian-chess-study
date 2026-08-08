@@ -1,5 +1,3 @@
-import { JSONContent } from '@tiptap/react';
-
 /**
  * This interface is part of the serialization structure and should not be changed.
  */
@@ -22,7 +20,7 @@ export interface JgnMove {
 	moveId: string;
 	variants: JgnVariation[];
 	shapes: unknown[];
-	comment: JSONContent | null;
+	comment: unknown | null;
 	color: 'w' | 'b';
 	san: string;
 	after: string;

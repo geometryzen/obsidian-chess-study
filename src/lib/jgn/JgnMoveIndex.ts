@@ -1,7 +1,7 @@
 /**
  *
  */
-export interface MoveIndex {
+export interface JgnMoveIndex {
 	/**
 	 * If this property is null, then the index corresponds to the moves array in the chess study (Main Line).
 	 * Otherwise, this property identifies the Main Line move index and the index of the variation.

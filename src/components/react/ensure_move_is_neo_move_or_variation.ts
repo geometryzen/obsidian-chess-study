@@ -1,7 +1,7 @@
 import { Move } from 'chess.js';
-import { NeoMove } from './NeoMove';
+import { NeoMove } from '../../lib/neo/NeoMove';
 import { move_from_user_move } from './move_from_user_move';
-import { rightmost_node } from './rightmost_node';
+import { rightmost_node } from '../../lib/neo/rightmost_node';
 
 /**
  * Ensures that the played move exists in the specified scope move.
