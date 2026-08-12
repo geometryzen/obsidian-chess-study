@@ -15,8 +15,6 @@ export function path_from_move(
 	let x: NeoMove | null = move;
 	while (x) {
 		path.push(x.san);
-		// x = find_parent(root, x);
-		// TODO
 		x = get_prev_move(root, x);
 	}
 	path.reverse();
