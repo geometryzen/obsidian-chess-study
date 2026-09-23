@@ -105,20 +105,26 @@ export class ChessStudyInsertModal extends Modal {
 						if (isFEN(value)) {
 							const study = compile_fen(value);
 							this.cboChessStudyKind.setValue(CHESS_STUDY_KIND_PUZZLE);
+							this.#chessStudyKind = CHESS_STUDY_KIND_PUZZLE;
 							if (study.rootFEN.contains(' w ')) {
 								this.cboBoardOrientation.setValue('white');
+								this.#boardOrientation = 'white';
 							} else if (study.rootFEN.contains(' b ')) {
 								this.cboBoardOrientation.setValue('black');
+								this.#boardOrientation = 'black';
 							} else {
 								// TODO
 							}
 						} else if (isPGN(value)) {
 							const study = compile_pgn(value);
 							this.cboChessStudyKind.setValue(CHESS_STUDY_KIND_GAME);
+							this.#chessStudyKind = CHESS_STUDY_KIND_GAME;
 							if (study.rootFEN.contains(' w ')) {
 								this.cboBoardOrientation.setValue('white');
+								this.#boardOrientation = 'white';
 							} else if (study.rootFEN.contains(' b ')) {
 								this.cboBoardOrientation.setValue('black');
+								this.#boardOrientation = 'black';
 							} else {
 								// TODO
 							}
