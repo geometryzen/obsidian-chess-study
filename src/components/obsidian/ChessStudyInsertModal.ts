@@ -18,18 +18,20 @@ import {
 	ChessStudyKind,
 } from '../../lib/config/ChessStudyKind';
 import {
+	COMPLETED_POSITION_END,
+	COMPLETED_POSITION_YAML_NAME,
+	CompletedPosition,
+} from '../../lib/config/CompletedPosition';
+import {
 	INITIAL_POSITION_BEGIN,
 	INITIAL_POSITION_END,
 	INITIAL_POSITION_FIRST,
 	INITIAL_POSITION_YAML_NAME,
 	InitialPosition,
 } from '../../lib/config/InitialPosition';
+import { isFEN, isPGN } from '../../lib/fen-or-pgn';
+import { compile_fen, compile_pgn } from '../../lib/parsing/compile_pgn_or_fen';
 import { BoardOrientation, ChessString } from '../../main';
-import {
-	COMPLETED_POSITION_END,
-	COMPLETED_POSITION_YAML_NAME,
-	CompletedPosition,
-} from '../../lib/config/CompletedPosition';
 
 /**
  * The Modal Dialog that pops up when creating a new Chess Study.
@@ -45,6 +47,9 @@ export class ChessStudyInsertModal extends Modal {
 	#completedPosition: CompletedPosition = COMPLETED_POSITION_END;
 	#readOnly = false;
 	#viewComments = true;
+
+	private cboChessStudyKind: DropdownComponent;
+	private cboBoardOrientation: DropdownComponent;
 
 	onSubmit: (
 		pgn: string,
@@ -97,24 +102,49 @@ export class ChessStudyInsertModal extends Modal {
 					.setValue('')
 					.setPlaceholder('Paste PGN or FEN. Leave empty for a new game.')
 					.onChange((value) => {
+						if (isFEN(value)) {
+							const study = compile_fen(value);
+							this.cboChessStudyKind.setValue(CHESS_STUDY_KIND_PUZZLE);
+							if (study.rootFEN.contains(' w ')) {
+								this.cboBoardOrientation.setValue('white');
+							} else if (study.rootFEN.contains(' b ')) {
+								this.cboBoardOrientation.setValue('black');
+							} else {
+								// TODO
+							}
+						} else if (isPGN(value)) {
+							const study = compile_pgn(value);
+							this.cboChessStudyKind.setValue(CHESS_STUDY_KIND_GAME);
+							if (study.rootFEN.contains(' w ')) {
+								this.cboBoardOrientation.setValue('white');
+							} else if (study.rootFEN.contains(' b ')) {
+								this.cboBoardOrientation.setValue('black');
+							} else {
+								// TODO
+							}
+						} else {
+							// TODO
+						}
 						this.#chessString = value;
 					})
-					.inputEl.setCssStyles({ width: '100%', height: '250px' }),
+					.inputEl.setCssStyles({ width: '100%', height: '200px' }),
 			);
 
 		new Setting(contentEl)
 			// TODO: Humanize/Translation the YAML name.
 			.setName(CHESS_STUDY_KIND_YAML_NAME)
-			.addDropdown((dropdown: DropdownComponent) => {
+			.addDropdown((cboChessStudyKind: DropdownComponent) => {
+				this.cboChessStudyKind = cboChessStudyKind;
 				// TODO: Humanize the option display string
-				dropdown.addOption(CHESS_STUDY_KIND_GAME, 'Game');
-				dropdown.addOption(CHESS_STUDY_KIND_POSITION, 'Position');
-				dropdown.addOption(CHESS_STUDY_KIND_PUZZLE, 'Puzzle');
-				dropdown.addOption(CHESS_STUDY_KIND_REPERTOIRE, 'Repertoire');
-				dropdown.addOption(CHESS_STUDY_KIND_LEGACY, 'Legacy');
-				dropdown.addOption(CHESS_STUDY_KIND_MEMORIZE, 'Memorize');
-				dropdown.setValue(this.#chessStudyKind);
-				dropdown.onChange((type) => {
+				// TODO: Let's rationalize the options. Game and Puzzle would be most useful.
+				cboChessStudyKind.addOption(CHESS_STUDY_KIND_GAME, 'Game');
+				cboChessStudyKind.addOption(CHESS_STUDY_KIND_POSITION, 'Position');
+				cboChessStudyKind.addOption(CHESS_STUDY_KIND_PUZZLE, 'Puzzle');
+				cboChessStudyKind.addOption(CHESS_STUDY_KIND_REPERTOIRE, 'Repertoire');
+				cboChessStudyKind.addOption(CHESS_STUDY_KIND_LEGACY, 'Legacy');
+				cboChessStudyKind.addOption(CHESS_STUDY_KIND_MEMORIZE, 'Memorize');
+				cboChessStudyKind.setValue(this.#chessStudyKind);
+				cboChessStudyKind.onChange((type) => {
 					this.#chessStudyKind = type as ChessStudyKind;
 				});
 			});
@@ -122,11 +152,12 @@ export class ChessStudyInsertModal extends Modal {
 		new Setting(contentEl)
 			// TODO: Humanize/Translation the YAML name.
 			.setName('boardOrientation')
-			.addDropdown((dropdown: DropdownComponent) => {
-				dropdown.addOption('white', 'White');
-				dropdown.addOption('black', 'Black');
-				dropdown.setValue(this.#boardOrientation);
-				dropdown.onChange((boardOrientation) => {
+			.addDropdown((cboBoardOrientation: DropdownComponent) => {
+				this.cboBoardOrientation = cboBoardOrientation;
+				cboBoardOrientation.addOption('white', 'White');
+				cboBoardOrientation.addOption('black', 'Black');
+				cboBoardOrientation.setValue(this.#boardOrientation);
+				cboBoardOrientation.onChange((boardOrientation) => {
 					this.#boardOrientation =
 						boardOrientation === 'white' ? boardOrientation : 'black';
 				});

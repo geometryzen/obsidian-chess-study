@@ -385,12 +385,12 @@ function pgn_moves_to_chess_study_moves(
 	return moves;
 }
 
-function compile_fen(fen: string): JgnStudy {
+export function compile_fen(fen: string): JgnStudy {
 	const chess = new Chess(fen);
 	return chess_to_study(chess, 'FEN', fen);
 }
 
-function compile_pgn(pgn: string): JgnStudy {
+export function compile_pgn(pgn: string): JgnStudy {
 	const game = parse(pgn, { startRule: 'game' }) as ParseTree;
 	// console.lg(JSON.stringify(game, null, 2));
 	// The messages contain statements about the parsing.
