@@ -115,7 +115,8 @@ export default class ChessStudyPlugin extends Plugin {
 								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
 								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
 								parts.push(`boardOrientation: ${boardOrientation}`);
-								parts.push('disableCopy: true');
+								// Having copy makes it easier to check against a chess engine.
+								parts.push('disableCopy: false');
 								parts.push('disableNavigation: true');
 								parts.push('disableSave: true');
 								parts.push(`readOnly: true`);

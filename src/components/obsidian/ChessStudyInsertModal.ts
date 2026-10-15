@@ -144,11 +144,11 @@ export class ChessStudyInsertModal extends Modal {
 				// TODO: Humanize the option display string
 				// TODO: Let's rationalize the options. Game and Puzzle would be most useful.
 				cboChessStudyKind.addOption(CHESS_STUDY_KIND_GAME, 'Game');
-				cboChessStudyKind.addOption(CHESS_STUDY_KIND_POSITION, 'Position');
+				// cboChessStudyKind.addOption(CHESS_STUDY_KIND_POSITION, 'Position');
 				cboChessStudyKind.addOption(CHESS_STUDY_KIND_PUZZLE, 'Puzzle');
-				cboChessStudyKind.addOption(CHESS_STUDY_KIND_REPERTOIRE, 'Repertoire');
-				cboChessStudyKind.addOption(CHESS_STUDY_KIND_LEGACY, 'Legacy');
-				cboChessStudyKind.addOption(CHESS_STUDY_KIND_MEMORIZE, 'Memorize');
+				// cboChessStudyKind.addOption(CHESS_STUDY_KIND_REPERTOIRE, 'Repertoire');
+				// cboChessStudyKind.addOption(CHESS_STUDY_KIND_LEGACY, 'Legacy');
+				// cboChessStudyKind.addOption(CHESS_STUDY_KIND_MEMORIZE, 'Memorize');
 				cboChessStudyKind.setValue(this.#chessStudyKind);
 				cboChessStudyKind.onChange((type) => {
 					this.#chessStudyKind = type as ChessStudyKind;
