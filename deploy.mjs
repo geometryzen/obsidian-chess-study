@@ -13,7 +13,7 @@ const target = process.env.CHESS_STUDY_VAULT_PLUGIN_DIR;
 
 if (!target) {
 	console.error(
-		'Set CHESS_STUDY_VAULT_PLUGIN_DIR to <vault>/.obsidian/plugins/chess-study first.',
+		'CHESS_STUDY_VAULT_PLUGIN_DIR must be defined. e.g. <path-to-vault>/.obsidian/plugins/chess-study. See deploy.mjs file.',
 	);
 	process.exit(1);
 }

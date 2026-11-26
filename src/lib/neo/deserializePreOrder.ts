@@ -10,7 +10,6 @@ function deserializePreOrderRecursive(
 		return null;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	const node = node_from_move_and_links(arr[i[0]]!, null, null);
 	i[0]++;
 

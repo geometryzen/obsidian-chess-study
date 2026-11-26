@@ -102,7 +102,7 @@ export const ChessgroundWrapper = React.memo(
 		}, [api, shapes]);
 
 		return (
-			<div className={`${boardColor}-board height-width-100 table`}>
+			<div className={`cs-board ${boardColor}-board height-width-100 table`}>
 				<div ref={ref} className={`height-width-100`} />
 			</div>
 		);

@@ -15,6 +15,7 @@ export const DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS: ChessStudyPluginSettings = {
 	initialPosition: INITIAL_POSITION_BEGIN,
 	completedPosition: COMPLETED_POSITION_END,
 	readOnly: false,
+	showEvaluation: false,
 	chessStudyKind: CHESS_STUDY_KIND_GAME,
 	viewComments: true,
 };

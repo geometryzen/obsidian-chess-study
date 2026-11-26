@@ -17,5 +17,6 @@ export interface ChessStudyPluginSettings {
 	initialPosition: InitialPosition;
 	completedPosition: CompletedPosition;
 	readOnly: true | false;
+	showEvaluation: true | false;
 	viewComments: true | false;
 }

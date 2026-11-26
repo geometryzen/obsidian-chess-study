@@ -9,11 +9,7 @@ import {
 } from 'obsidian';
 import {
 	CHESS_STUDY_KIND_GAME,
-	CHESS_STUDY_KIND_LEGACY,
-	CHESS_STUDY_KIND_MEMORIZE,
-	CHESS_STUDY_KIND_POSITION,
 	CHESS_STUDY_KIND_PUZZLE,
-	CHESS_STUDY_KIND_REPERTOIRE,
 	CHESS_STUDY_KIND_YAML_NAME,
 	ChessStudyKind,
 } from '../../lib/config/ChessStudyKind';
@@ -31,13 +27,13 @@ import {
 } from '../../lib/config/InitialPosition';
 import { isFEN, isPGN } from '../../lib/fen-or-pgn';
 import { compile_fen, compile_pgn } from '../../lib/parsing/compile_pgn_or_fen';
-import { BoardOrientation, ChessString } from '../../main';
+import { BoardOrientation } from '../../main';
 
 /**
  * The Modal Dialog that pops up when creating a new Chess Study.
  */
 export class ChessStudyInsertModal extends Modal {
-	#chessString: ChessString;
+	#chessString: string;
 	#chessStudyKind: ChessStudyKind = CHESS_STUDY_KIND_PUZZLE;
 	#boardOrientation: BoardOrientation = 'white';
 	#disableCopy = false;
@@ -46,6 +42,7 @@ export class ChessStudyInsertModal extends Modal {
 	#initialPosition: InitialPosition = INITIAL_POSITION_BEGIN;
 	#completedPosition: CompletedPosition = COMPLETED_POSITION_END;
 	#readOnly = false;
+	#showEvaluation = false;
 	#viewComments = true;
 
 	private cboChessStudyKind: DropdownComponent;
@@ -60,6 +57,7 @@ export class ChessStudyInsertModal extends Modal {
 		initialPosition: InitialPosition,
 		completedPosition: CompletedPosition,
 		readOnly: boolean,
+		showEvaluation: boolean,
 		chessStudyKind: ChessStudyKind,
 		viewComments: boolean,
 	) => void;
@@ -75,6 +73,7 @@ export class ChessStudyInsertModal extends Modal {
 			initialPosition: InitialPosition,
 			completedPosition: CompletedPosition,
 			readOnly: boolean,
+			showEvaluation: boolean,
 			chessStudyKind: ChessStudyKind,
 			viewComments: boolean,
 		) => void,
@@ -193,6 +192,20 @@ export class ChessStudyInsertModal extends Modal {
 
 		new Setting(contentEl)
 			// TODO: Humanize/Translation the YAML name.
+			.setName('showEvaluation')
+			.addToggle((toggle: ToggleComponent) => {
+				toggle.setValue(this.#showEvaluation);
+				toggle.setTooltip(
+					'Determines whether the engine evaluation is visible',
+					{},
+				);
+				toggle.onChange((showEvaluation) => {
+					this.#showEvaluation = showEvaluation;
+				});
+			});
+
+		new Setting(contentEl)
+			// TODO: Humanize/Translation the YAML name.
 			.setName('disableSave')
 			.addToggle((toggle: ToggleComponent) => {
 				toggle.setValue(this.#disableSave);
@@ -264,6 +277,7 @@ export class ChessStudyInsertModal extends Modal {
 						this.#initialPosition,
 						this.#completedPosition,
 						this.#readOnly,
+						this.#showEvaluation,
 						this.#chessStudyKind,
 						this.#viewComments,
 					);

@@ -1,36 +1,35 @@
-/* General */
-.chess-study button:active {
-	transform: translateY(1px);
-}
-
-.chess-study .vertical-align {
-	display: flex;
-	align-items: center;
-}
-
-.chess-study .center {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.chess-study .height-width-100 {
-	width: 100%;
-	height: 100%;
-}
-
-.chess-study .table {
-	display: table;
-}
+/* ------------------------------------------------------------------ *
+ * General                                                 
+ * ------------------------------------------------------------------ */
 
 .chess-study {
+	--cs-radius: 10px;
+	--cs-gap: 10px;
+	--cs-border: var(--background-modifier-border);
+
 	height: 100%;
-	max-width: 800px;
+	max-width: 80%;
+	padding: var(--cs-gap);
+	background-color: var(--background-secondary);
+	border: 1px solid var(--cs-border);
+	border-radius: var(--cs-radius);
 	line-height: 1.5;
 	-webkit-font-smoothing: antialiased;
-	background-color: var(--background-secondary);
-	border: 1px solid var(--background-secondary-alt);
-	border-radius: 5px;
+	/* Lets the layout and the board coordinates respond to the widget's own
+	   width rather than the width of the note. */
+	container-type: inline-size;
+	/*
+	 * The gutter the board coordinates sit in. A flat px rather than a
+	 * container unit: it is read both by the wrapper's padding and by the
+	 * coordinates inside it, and those two sit in different query containers -
+	 * the same expression would resolve to two different widths and the labels
+	 * would drift out of their gutter.
+	 */
+	--cs-coords: 19px;
+	/* Breathing room between the board's edge and the gutter, so the labels do
+	   not read as part of the border. */
+	--cs-coord-gap: 3px;
+	--cs-coord-offset: calc(var(--cs-coords) + var(--cs-coord-gap));
 }
 
 .chess-study *,
@@ -60,18 +59,87 @@
 	overflow-wrap: break-word;
 }
 
-/* Container */
-.chess-study .chessground-pgn-container {
-	display: flex;
-	height: 480px;
+/* ------------------------------------------------------------------ *
+ * Helpers                                                 
+ * ------------------------------------------------------------------ */
+
+.chess-study button:active {
+	transform: translateY(1px);
 }
 
-.chess-study .chessground-pgn-container .chessground-container {
-	flex: 0 0 480px;
+.chess-study .vertical-align {
+	display: flex;
+	align-items: center;
+}
+
+.chess-study .center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.chess-study .height-width-100 {
+	width: 100%;
 	height: 100%;
 }
 
-.chess-study .chessground-pgn-container .pgn-container {
+.chess-study .table {
+	display: table;
+}
+
+/* TODO What is cs-empty-state? */
+.chess-study .cs-empty-state {
+	padding: 10px 4px;
+	color: var(--text-faint);
+	font-size: 14px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Layout                                                
+ * ------------------------------------------------------------------ */
+
+.chess-study .cs-main {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(150px, 0.52fr);
+	gap: var(--cs-gap);
+}
+
+.chess-study .cs-board-wrap {
+	width: 100%;
+	/* Room down the left and along the bottom for the coordinates. Nothing is
+	   clipped here any more, or they would be cut off in their own gutter. */
+	padding: 0 0 var(--cs-coord-offset) var(--cs-coord-offset);
+	overflow: visible;
+	/* Board coordinates size themselves off this. */
+	container-type: inline-size;
+}
+
+/* The board and, when it is shown, the evaluation bar on its left, outside
+   the rank labels. A flex row rather than a two-column grid: with the bar
+   gone - in a drill, or turned off - a grid would put the board in the bar's
+   column. */
+.chess-study .cs-board-row {
+	display: flex;
+	gap: 4px;
+	min-width: 0;
+}
+
+.chess-study .cs-board-row > .cs-board-wrap {
+	flex: 1 1 0;
+	min-width: 0;
+}
+
+/* The square the board actually occupies, now that the wrapper is padded.
+   Positioned so the promotion picker below can place itself in percentages
+   of this box instead of measuring pixels. */
+.chess-study .cs-board {
+	position: relative;
+	display: block;
+	width: 100%;
+	aspect-ratio: 1 / 1;
+}
+
+.chess-study .cs-board-row .pgn-container {
 	flex: 1;
 	height: 100%;
 }
@@ -91,7 +159,82 @@
 	height: 32px;
 }
 
-/* Move Items */
+/* ------------------------------------------------------------------ *
+ * Evaluation bar
+ * ------------------------------------------------------------------ */
+
+/*
+ * Fixed board colours rather than theme ones: the two halves stand for the
+ * two sides, and a theme's background and text colours would make "White"
+ * dark in a dark theme.
+ */
+.chess-study .cs-eval-bar {
+	position: relative;
+	/* Wide enough for "10.5" in the interface font, which is narrower than
+	   the monospace one some themes give the note. */
+	flex: 0 0 22px;
+	/* Level with the board, not with its coordinate gutter underneath. */
+	margin-bottom: var(--cs-coord-offset);
+	overflow: hidden;
+	border: 1px solid var(--cs-border);
+	border-radius: 4px;
+	background-color: #403d39;
+}
+
+.chess-study .cs-eval-fill {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #f0eee9;
+	transition: height 0.25s ease-out;
+}
+
+/* White's share fills from the side the board is turned for White at. */
+.chess-study .cs-eval-bar.is-black .cs-eval-fill {
+	top: 0;
+	bottom: auto;
+}
+
+/* Searching the next position: the last answer stays, a little quieter. */
+.chess-study .cs-eval-bar.is-pending .cs-eval-label {
+	opacity: 0.55;
+}
+
+.chess-study .cs-eval-label {
+	position: absolute;
+	left: 0;
+	right: 0;
+	font-family: var(--font-interface);
+	font-size: 9px;
+	white-space: nowrap;
+	font-weight: 700;
+	line-height: 1;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.02em;
+}
+
+.chess-study .cs-eval-label.is-bottom {
+	bottom: 4px;
+}
+
+.chess-study .cs-eval-label.is-top {
+	top: 4px;
+}
+
+/* On its own side's colour, so it reads as that side's number. */
+.chess-study .cs-eval-label.is-white {
+	color: #403d39;
+}
+
+.chess-study .cs-eval-label.is-black {
+	color: #f0eee9;
+}
+
+/* ------------------------------------------------------------------ *
+ * Move Items                                                 
+ * ------------------------------------------------------------------ */
 
 .chess-study .move-item-container {
 	display: grid;
@@ -274,29 +417,89 @@
 	font-weight: normal;
 }
 
-/* Comment Section */
+/* ------------------------------------------------------------------ *
+ * Notes
+ * ------------------------------------------------------------------ */
 
-.chess-study .editor-input {
-	min-height: 150px;
-	resize: none;
-	font-size: 15px;
-	caret-color: rgb(5, 5, 5);
-	position: relative;
-	tab-size: 1;
-	outline: 0;
-	padding: 15px 10px;
-	caret-color: #444;
+.chess-study .cs-notes {
+	border: 1px solid var(--cs-border);
+	border-radius: 8px;
+	background-color: var(--background-primary);
+	overflow: hidden;
 }
 
-.chess-study .CommentSection {
-	height: 400px;
-	padding-top: 5px;
-	overflow: scroll;
-	border-top: 1px solid var(--background-secondary-alt);
-}
-
-.chess-study .ProseMirror,
-.chess-study .CommentSection > div {
+.chess-study .cs-notes-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
 	width: 100%;
-	height: 100%;
+	height: auto;
+	padding: 6px 10px;
+	border: none;
+	border-radius: 0;
+	background-color: transparent;
+	box-shadow: none;
+	color: var(--text-muted);
+	text-align: left;
+	cursor: pointer;
+}
+
+.chess-study .cs-notes-header:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.chess-study .cs-notes-title {
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.chess-study .cs-notes-chip {
+	padding: 1px 7px;
+	border-radius: 999px;
+	background-color: var(--background-modifier-hover);
+	color: var(--text-normal);
+	font-family: var(--font-monospace);
+	font-size: 13px;
+}
+
+.chess-study .cs-notes-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background-color: var(--text-accent);
+}
+
+.chess-study .cs-notes-body {
+	min-height: 76px;
+	max-height: 40vh;
+	padding: 8px 10px;
+	border-top: 1px solid var(--cs-border);
+	overflow-y: auto;
+}
+
+.chess-study .ProseMirror {
+	outline: none;
+	min-height: 56px;
+	caret-color: var(--text-normal);
+	color: var(--text-normal);
+}
+
+.chess-study .ProseMirror p {
+	margin: 0 0 0.4em;
+}
+
+/*
+ * Placeholder. An "empty" ProseMirror paragraph still holds a trailing <br>,
+ * so `:empty` does not catch it and neither does anything else CSS can ask
+ * about the markup. Tiptap's Placeholder extension decides what is empty and
+ * marks it, and what to say is in the extension's own configuration.
+ */
+.chess-study .ProseMirror > p.is-empty:only-child::before {
+	content: attr(data-placeholder);
+	float: left;
+	height: 0;
+	color: var(--text-faint);
+	pointer-events: none;
 }

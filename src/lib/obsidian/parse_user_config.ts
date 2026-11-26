@@ -20,6 +20,6 @@ export const parse_user_config = (
 			...parseYaml(content),
 		};
 	} catch (e) {
-		throw Error('Something went wrong during parsing. :(');
+		throw new Error('Something went wrong during parsing. :(', { cause: e });
 	}
 };

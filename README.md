@@ -87,6 +87,7 @@ Here are the available settings for a `chessStudy` code block:
 | `initialPosition`   | `begin` \| `end`                             | Determines the initial position                  |
 | `completedPosition` | Forsyth-Edwards Notation                     | A FEN that indicates when the puzzle is solved   |
 | `readOnly`          | `true`  \| `false`                           | Determines whether the study can be changed      |
+| `showEvaluation`    | `true`  \| `false`                           | Determines whether the engine evaluation is shown|
 | `chessStudyKind`    | `game`  \| `position` \| `puzzle`\| `legacy` | Determines how the plugin works                  |
 | `viewComments`      | `true`  \| `false`                           | Whether to display the comments section          |
 

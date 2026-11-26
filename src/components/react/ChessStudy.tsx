@@ -47,6 +47,7 @@ import { update_board_view_from_position } from '../../lib/ui-state/update_board
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { CommentSection } from './CommentSection';
+import { EvalBar } from './EvalBar';
 import { createChessStudyEventHandler } from './createChessStudyEventHandler';
 import { get_current_chessstudy_move } from './get_current_chessstudy_move';
 import { has_no_moves } from './has_no_moves';
@@ -58,6 +59,15 @@ import {
 	get_target_move,
 	get_target_move_else_source,
 } from '../../lib/neo/get_target_move';
+import {
+	CLASSIFICATIONS,
+	DRAW_MARK,
+	MoveClassification,
+	badgeSvg,
+	classificationForKey,
+	readClassification,
+} from '../../lib/classification';
+
 export type ChessStudyConfig = ChessgroundProps;
 
 interface AppProps {
@@ -82,6 +92,15 @@ export interface MoveToken {
 }
 */
 
+/** Named rather than inlined below, where prettier's indentation of a wide
+ *  union member trips no-mixed-spaces-and-tabs. */
+interface ClassifyAction {
+	type: 'SET_CLASSIFICATION';
+	classification: MoveClassification | null;
+	/** Defaults to the current move; the context menu passes an explicit one. */
+	moveId?: string;
+}
+
 export type GameEvent =
 	| { type: 'PLAY_MOVE'; move: Move }
 	| { type: 'DELETE_MOVE'; moveId: string }
@@ -90,14 +109,15 @@ export type GameEvent =
 	| { type: 'GOTO_PREV_MOVE' }
 	| { type: 'GOTO_END_POSITION' }
 	| { type: 'GOTO_MOVE'; moveId: string }
+	| { type: 'SYNC_COMMENT'; comment: JSONContent | null }
+	| ClassifyAction
 	| { type: 'ANNOTATE_MOVE'; glyph: NumericAnnotationGlyph }
 	| { type: 'EVALUATE_MOVE'; direction: 1 | -1 }
 	| { type: 'EVALUATE_POSITION'; direction: 1 | -1 }
 	| { type: 'PROMOTE_LINE' }
 	| { type: 'DEMOTE_LINE' }
 	| { type: 'RESET' }
-	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] }
-	| { type: 'SYNC_COMMENT'; comment: JSONContent | null };
+	| { type: 'SYNC_SHAPES'; shapes: DrawShape[] };
 
 /**
  * This is the top-level React component in our Markdown renderer.
@@ -120,6 +140,7 @@ export const ChessStudy = ({
 		disableSave,
 		// initialPosition: ignoreMe,
 		readOnly,
+		showEvaluation,
 		chessStudyKind,
 		viewComments,
 		chessStudyId,
@@ -360,6 +381,25 @@ export const ChessStudy = ({
 					}
 					return state;
 				}
+				case 'SET_CLASSIFICATION': {
+					if (has_no_moves(state)) return state;
+
+					// The keyboard shortcut labels the current move; the context menu
+					// names the one it was opened on.
+					/*
+					const moveId = event.moveId ?? draft.currentMove?.moveId;
+					const path = moveId ? findMovePathById(draft.repertoire, moveId) : null;
+					const move = path && getMoveAtPath(draft.repertoire, path);
+
+					if (!move) return draft;
+
+					move.classification = action.classification;
+
+					if (draft.currentMove?.moveId === moveId) draft.currentMove = move;
+					*/
+
+					return state;
+				}
 				case 'PLAY_MOVE': {
 					handler.playMove(
 						state,
@@ -555,26 +595,42 @@ export const ChessStudy = ({
 		gameState.chessStudy,
 		gameState.repertoire,
 	]);
-
+	/*
+	const moveLabel = useMemo(
+		() =>
+			getMoveLabel(
+				gameState.repertoire,
+				currentMoveId,
+				firstPlayer,
+				initialMoveNumber
+			),
+		[currentMoveId, firstPlayer, gameState.repertoire, initialMoveNumber]
+	);
+	*/
 	return (
 		<div className="chess-study">
-			<div className="chessground-pgn-container">
-				<div className="chessground-container">
-					<ChessgroundWrapper
-						api={chessView}
-						setApi={setChessView}
-						config={{
-							orientation: boardOrientation,
-						}}
-						boardColor={boardColor}
-						chess={chessLogic}
-						onMove={(move: Move) => dispatch({ type: 'PLAY_MOVE', move })}
-						isViewOnly={gameState.isViewOnly}
-						syncShapes={(shapes: DrawShape[]) =>
-							dispatch({ type: 'SYNC_SHAPES', shapes })
-						}
-						shapes={handler.shapes(gameState)}
-					/>
+			<div className="cs-main">
+				<div className="cs-board-row">
+					{showEvaluation /*!trainer.isActive &&*/ && (
+						<EvalBar fen={chessLogic.fen()} orientation={boardOrientation} />
+					)}
+					<div className="cs-board-wrap">
+						<ChessgroundWrapper
+							api={chessView}
+							setApi={setChessView}
+							config={{
+								orientation: boardOrientation,
+							}}
+							boardColor={boardColor}
+							chess={chessLogic}
+							onMove={(move: Move) => dispatch({ type: 'PLAY_MOVE', move })}
+							isViewOnly={gameState.isViewOnly}
+							syncShapes={(shapes: DrawShape[]) =>
+								dispatch({ type: 'SYNC_SHAPES', shapes })
+							}
+							shapes={handler.shapes(gameState)}
+						/>
+					</div>
 				</div>
 				{
 					<div className="pgn-container">
@@ -676,17 +732,24 @@ export const ChessStudy = ({
 						/>
 					</div>
 				}
-			</div>
-			{!gameState.isCommentsHidden && (
-				<Box className="CommentSection">
+				{!gameState.isCommentsHidden && (
 					<CommentSection
 						currentComment={comment_from_game_state(gameState)}
 						setComments={(comment: JSONContent) =>
 							dispatch({ type: 'SYNC_COMMENT', comment: comment })
 						}
+						moveLabel={/*moveLabel*/ null}
+						defaultOpen={viewComments}
+						classification={
+							/*gameState.currentChessStudyMove?.classification ?? null*/ null
+						}
+						onClassify={(classification: MoveClassification | null) =>
+							dispatch({ type: 'SET_CLASSIFICATION', classification })
+						}
+						isLocked={/*isLocked*/ false}
 					/>
-				</Box>
-			)}
+				)}
+			</div>
 		</div>
 	);
 };

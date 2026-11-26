@@ -1,9 +1,18 @@
-import { Editor, Notice, Plugin, normalizePath } from 'obsidian';
+import {
+	App,
+	Editor,
+	Notice,
+	Platform,
+	Plugin,
+	PluginManifest,
+	normalizePath,
+} from 'obsidian';
 import { ChessStudyInsertModal } from './components/obsidian/ChessStudyInsertModal';
 import { ChessStudyMarkdownRenderChild } from './components/obsidian/ChessStudyMarkdownRenderChild';
 import { ChessStudyPluginSettingsTab } from './components/obsidian/ChessStudyPluginSettingsTab';
 
 // these styles must be imported somewhere
+import '../assets/board/themes.css';
 import 'chessground/assets/chessground.base.css';
 import 'chessground/assets/chessground.brown.css';
 import 'chessground/assets/chessground.cburnett.css';
@@ -23,6 +32,7 @@ import {
 	INITIAL_POSITION_YAML_NAME,
 	InitialPosition,
 } from './lib/config/InitialPosition';
+import { shutdownEngine } from './components/react/EvalBar/engine';
 import { JgnStudy } from './lib/jgn/JgnStudy';
 import { ChessStudyLoader } from './lib/obsidian/ChessStudyLoader';
 import { parse_user_config } from './lib/obsidian/parse_user_config';
@@ -34,9 +44,6 @@ import {
 } from './lib/config/CompletedPosition';
 import { ensure_target_moves } from './lib/neo/ensure_target_moves';
 
-type FEN = string;
-type PGN = string;
-export type ChessString = FEN | PGN;
 export type BoardOrientation = 'white' | 'black';
 export type BoardColor = 'green' | 'brown';
 const CHESSSTUDY_ID_YAML_NAME = 'chessStudyId';
@@ -49,127 +56,56 @@ const SPACE = ' ';
 
 export default class ChessStudyPlugin extends Plugin {
 	settings: ChessStudyPluginSettings;
+
 	#studyLoader: ChessStudyLoader;
 	readonly #studiesPath = normalizePath(
 		`${this.app.vault.configDir}/plugins/${this.manifest.id}/studies/`,
 	);
 
+	constructor(app: App, manifest: PluginManifest) {
+		super(app, manifest);
+		// Initializing the settings keeps the compiler happy.
+		// The settings will be loaded asynchronously in the onload() method.
+		this.settings = {
+			boardOrientation: 'white',
+			boardColor: 'brown',
+			chessStudyKind: 'game',
+			completedPosition: '',
+			disableCopy: false,
+			disableNavigation: false,
+			disableSave: false,
+			initialPosition: '',
+			readOnly: false,
+			showEvaluation: false,
+			viewComments: true,
+		};
+	}
+
 	/**
 	 * @override
 	 */
 	async onload(): Promise<void> {
-		// Load Settings
+		// Load Settings.
 		await this.loadSettings();
 
-		// Register Data Adapter
+		// Register Data Adapter.
 		this.#studyLoader = new ChessStudyLoader(
 			this.app.vault.adapter,
 			this.#studiesPath,
 		);
 
-		await this.#studyLoader.createStudiesFolderIfNotExists();
+		if (!Platform.isMobile) {
+			await this.#studyLoader.createStudiesFolderIfNotExists();
+			// TODO
+			// await this.runMigrations();
+		}
 
-		// Add settings tab
+		// Add settings tab.
 		this.addSettingTab(new ChessStudyPluginSettingsTab(this.app, this));
 
-		// Add command
-		this.addCommand({
-			id: 'insert-chess-study',
-			name: 'Insert FEN/PGN-Editor at cursor position',
-			editorCallback: (editor: Editor) => {
-				const cursorPosition = editor.getCursor();
-
-				const onSubmit = async (
-					chessString: ChessString | undefined,
-					boardOrientation: BoardOrientation,
-					disableCopy: boolean,
-					disableNavigation: boolean,
-					disableSave: boolean,
-					initialPosition: InitialPosition,
-					completedPosition: CompletedPosition,
-					readOnly: boolean,
-					chessStudyKind: ChessStudyKind,
-					viewComments: boolean,
-				) => {
-					try {
-						const chessStringTrimmed = chessString?.trim() ?? '';
-						const chessStringOrStartPos =
-							chessStringTrimmed.length > 0 ? chessStringTrimmed : ROOT_FEN;
-
-						const jgnStudy: JgnStudy = compile_pgn_or_fen(chessStringOrStartPos);
-
-						this.#studyLoader.createStudiesFolderIfNotExists();
-
-						const id = await this.#studyLoader.saveJgnStudy(jgnStudy);
-
-						const BACKTICKS = '```';
-						const parts: string[] = [];
-						switch (chessStudyKind) {
-							case CHESS_STUDY_KIND_PUZZLE:
-							case CHESS_STUDY_KIND_MEMORIZE: {
-								// The first instance of the chess study is the puzzle.
-								parts.push(`${BACKTICKS}chessStudy`);
-								parts.push(`${CHESSSTUDY_ID_YAML_NAME}: ${id}`);
-								parts.push(`${REPERTOIRE_ID_YAML_NAME}:${SPACE}`);
-								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}`);
-								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
-								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
-								parts.push(`boardOrientation: ${boardOrientation}`);
-								// Having copy makes it easier to check against a chess engine.
-								parts.push('disableCopy: false');
-								parts.push('disableNavigation: true');
-								parts.push('disableSave: true');
-								parts.push(`readOnly: true`);
-								parts.push(`viewComments: false`);
-								parts.push(BACKTICKS);
-								// Using spaced repetition Question Mark as separator.
-								parts.push('?');
-								// The second instance of the chess study is the solution, which is fully editable.
-								parts.push(`${BACKTICKS}chessStudy`);
-								parts.push(`${CHESSSTUDY_ID_YAML_NAME}: ${id}`);
-								parts.push(`${REPERTOIRE_ID_YAML_NAME}:${SPACE}`);
-								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${CHESS_STUDY_KIND_GAME}`);
-								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
-								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
-								parts.push(`boardOrientation: ${boardOrientation}`);
-								parts.push(`disableCopy: false`);
-								parts.push(`disableNavigation: false`);
-								parts.push(`disableSave: false`);
-								parts.push(`readOnly: false`);
-								parts.push(`viewComments: true`);
-								parts.push(BACKTICKS);
-								break;
-							}
-							default: {
-								parts.push(`${BACKTICKS}chessStudy`);
-								parts.push(`${CHESSSTUDY_ID_YAML_NAME}: ${id}`);
-								parts.push(`${REPERTOIRE_ID_YAML_NAME}:${SPACE}`);
-								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}`);
-								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
-								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
-								parts.push(`boardOrientation: ${boardOrientation}`);
-								parts.push(`disableCopy: ${disableCopy ? 'true' : 'false'}`);
-								parts.push(
-									`disableNavigation: ${disableNavigation ? 'true' : 'false'}`,
-								);
-								parts.push(`disableSave: ${disableSave ? 'true' : 'false'}`);
-								parts.push(`readOnly: ${readOnly ? 'true' : 'false'}`);
-								parts.push(`viewComments: ${viewComments ? 'true' : 'false'}`);
-								parts.push(BACKTICKS);
-							}
-						}
-						editor.replaceRange(parts.join('\n'), cursorPosition);
-					} catch (e) {
-						new Notice(
-							`Oops?? There was an error during PGN parsing. Cause: ${e}`,
-							0,
-						);
-					}
-				};
-
-				new ChessStudyInsertModal(this.app, onSubmit).open();
-			},
-		});
+		if (!Platform.isMobile) {
+			this.registerEditingCommands();
+		}
 
 		// Add chess study code block processor
 		this.registerMarkdownCodeBlockProcessor(
@@ -241,11 +177,116 @@ export default class ChessStudyPlugin extends Plugin {
 		// console.lg('Chess Study Plugin successfully loaded');
 	}
 
+	private registerEditingCommands() {
+		// Add command
+		this.addCommand({
+			id: 'insert-chess-study',
+			name: 'Insert FEN/PGN-Editor at cursor position',
+			editorCallback: (editor: Editor) => {
+				const cursorPosition = editor.getCursor();
+
+				const onSubmit = async (
+					chessString: string | undefined,
+					boardOrientation: BoardOrientation,
+					disableCopy: boolean,
+					disableNavigation: boolean,
+					disableSave: boolean,
+					initialPosition: InitialPosition,
+					completedPosition: CompletedPosition,
+					readOnly: boolean,
+					showEvaluation: boolean,
+					chessStudyKind: ChessStudyKind,
+					viewComments: boolean,
+				) => {
+					try {
+						const chessStringTrimmed = chessString?.trim() ?? '';
+						const chessStringOrStartPos =
+							chessStringTrimmed.length > 0 ? chessStringTrimmed : ROOT_FEN;
+
+						const jgnStudy: JgnStudy = compile_pgn_or_fen(chessStringOrStartPos);
+
+						this.#studyLoader.createStudiesFolderIfNotExists();
+
+						const id = await this.#studyLoader.saveJgnStudy(jgnStudy);
+
+						const BACKTICKS = '```';
+						const parts: string[] = [];
+						switch (chessStudyKind) {
+							case CHESS_STUDY_KIND_PUZZLE:
+							case CHESS_STUDY_KIND_MEMORIZE: {
+								// The first instance of the chess study is the puzzle.
+								parts.push(`${BACKTICKS}chessStudy`);
+								parts.push(`${CHESSSTUDY_ID_YAML_NAME}: ${id}`);
+								parts.push(`${REPERTOIRE_ID_YAML_NAME}:${SPACE}`);
+								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}`);
+								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
+								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
+								parts.push(`boardOrientation: ${boardOrientation}`);
+								// Having copy makes it easier to check against a chess engine.
+								parts.push('disableCopy: false');
+								parts.push('disableNavigation: true');
+								parts.push('disableSave: true');
+								parts.push(`readOnly: true`);
+								parts.push(`showEvaluation: false`);
+								parts.push(`viewComments: false`);
+								parts.push(BACKTICKS);
+								// Using spaced repetition Question Mark as separator.
+								parts.push('?');
+								// The second instance of the chess study is the solution, which is fully editable.
+								parts.push(`${BACKTICKS}chessStudy`);
+								parts.push(`${CHESSSTUDY_ID_YAML_NAME}: ${id}`);
+								parts.push(`${REPERTOIRE_ID_YAML_NAME}:${SPACE}`);
+								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${CHESS_STUDY_KIND_GAME}`);
+								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
+								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
+								parts.push(`boardOrientation: ${boardOrientation}`);
+								parts.push(`disableCopy: false`);
+								parts.push(`disableNavigation: false`);
+								parts.push(`disableSave: false`);
+								parts.push(`readOnly: false`);
+								parts.push(`showEvaluation: true`);
+								parts.push(`viewComments: true`);
+								parts.push(BACKTICKS);
+								break;
+							}
+							default: {
+								parts.push(`${BACKTICKS}chessStudy`);
+								parts.push(`${CHESSSTUDY_ID_YAML_NAME}: ${id}`);
+								parts.push(`${REPERTOIRE_ID_YAML_NAME}:${SPACE}`);
+								parts.push(`${CHESS_STUDY_KIND_YAML_NAME}: ${chessStudyKind}`);
+								parts.push(`${INITIAL_POSITION_YAML_NAME}: ${initialPosition}`);
+								parts.push(`${COMPLETED_POSITION_YAML_NAME}: ${completedPosition}`);
+								parts.push(`boardOrientation: ${boardOrientation}`);
+								parts.push(`disableCopy: ${disableCopy ? 'true' : 'false'}`);
+								parts.push(
+									`disableNavigation: ${disableNavigation ? 'true' : 'false'}`,
+								);
+								parts.push(`disableSave: ${disableSave ? 'true' : 'false'}`);
+								parts.push(`readOnly: ${readOnly ? 'true' : 'false'}`);
+								parts.push(`viewComments: ${viewComments ? 'true' : 'false'}`);
+								parts.push(BACKTICKS);
+							}
+						}
+						editor.replaceRange(parts.join('\n'), cursorPosition);
+					} catch (e) {
+						new Notice(
+							`Oops?? There was an error during PGN parsing. Cause: ${e}`,
+							0,
+						);
+					}
+				};
+
+				new ChessStudyInsertModal(this.app, onSubmit).open();
+			},
+		});
+	}
+
 	/**
 	 * @override
 	 */
-	async onunload(): Promise<void> {
+	onunload(): void {
 		// console.lg('Chess Study Plugin successfully unloaded');
+		shutdownEngine();
 	}
 
 	async loadSettings(): Promise<void> {

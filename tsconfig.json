@@ -1,12 +1,12 @@
 {
 	"compilerOptions": {
-		"target": "es2020",
-		"module": "nodenext",
+		"target": "es2022",
+		"module": "esnext",
 		"strict": false,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"moduleResolution": "nodenext",
+		"moduleResolution": "node",
 		"jsx": "react",
 		"outDir": "./dist",
 		"rootDir": "./src",
@@ -22,7 +22,7 @@
 		"isolatedModules": true,
 		"removeComments": true,
 		"strictNullChecks": true,
-		"lib": ["DOM", "ES5", "ES2015", "ES2016", "ES2017", "ES2021"]
+		"lib": ["DOM", "ES5", "ES2015", "ES2016", "ES2017", "ES2021", "ES2022"]
 	},
 	"include": ["**/*.ts", "src/**/*.tsx"],
 	"exclude": ["node-modules"]

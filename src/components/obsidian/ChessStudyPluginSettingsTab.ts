@@ -97,6 +97,20 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
+			.setName('Show Evaluation')
+			.setDesc('Sets the default value of the showEvaluation property')
+			.addDropdown((dropdown) => {
+				dropdown.addOption('true', 'True');
+				dropdown.addOption('false', 'False');
+				dropdown
+					.setValue(this.#plugin.settings.showEvaluation.toString())
+					.onChange((showEvaluation) => {
+						this.#plugin.settings.showEvaluation = showEvaluation === 'true';
+						this.#plugin.saveSettings();
+					});
+			});
+
+		new Setting(containerEl)
 			.setName('Disable Save')
 			.setDesc('Sets the default value of the disableSave property')
 			.addDropdown((dropdown) => {
