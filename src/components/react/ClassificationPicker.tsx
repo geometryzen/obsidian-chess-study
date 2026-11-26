@@ -4,7 +4,7 @@ import {
 	CLASSIFICATION_ORDER,
 	CLASSIFICATIONS,
 	MoveClassification,
-} from '../../../lib/classification';
+} from '../../lib/classification';
 
 interface ClassificationPickerProps {
 	classification: MoveClassification | null;
@@ -35,7 +35,7 @@ export const ClassificationPicker = ({
 						title={`${label} (${shortcut})`}
 						aria-label={label}
 						aria-pressed={isActive}
-						disabled={disabled}
+						disabled={/*disabled*/ false}
 						// Clicking the active label removes it, so one button both sets
 						// and unsets.
 						onClick={() => onClassify(isActive ? null : key)}

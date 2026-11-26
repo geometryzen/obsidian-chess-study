@@ -36,7 +36,7 @@ export const CommentSection = React.memo(
 		// which of the two it is, since the placeholder can only speak for the
 		// first: it is read when the editor is built, so it cannot answer for a
 		// lock put on afterwards.
-		const isEditable = Boolean(moveLabel) && !isLocked;
+		const isEditable = (Boolean(moveLabel) && !isLocked) || true;
 
 		const editor = useEditor({
 			extensions: [
@@ -106,7 +106,7 @@ export const CommentSection = React.memo(
 						<ClassificationPicker
 							classification={classification}
 							onClassify={onClassify}
-							disabled={!isEditable}
+							disabled={/*!isEditable*/ false}
 						/>
 						<div className={`cs-notes-body${isEditable ? '' : ' is-disabled'}`}>
 							<EditorContent editor={editor} />

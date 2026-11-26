@@ -595,18 +595,27 @@ export const ChessStudy = ({
 		gameState.chessStudy,
 		gameState.repertoire,
 	]);
-	/*
+
 	const moveLabel = useMemo(
-		() =>
+		() => {
+			const move = get_current_chessstudy_move(gameState);
+			if (move) {
+				return move?.san;
+			} else {
+				return null;
+			}
+		},
+		/*
 			getMoveLabel(
 				gameState.repertoire,
 				currentMoveId,
 				firstPlayer,
 				initialMoveNumber
-			),
-		[currentMoveId, firstPlayer, gameState.repertoire, initialMoveNumber]
+			)},
+			*/
+		[gameState],
 	);
-	*/
+
 	return (
 		<div className="chess-study">
 			<div className="cs-main">
@@ -738,7 +747,7 @@ export const ChessStudy = ({
 						setComments={(comment: JSONContent) =>
 							dispatch({ type: 'SYNC_COMMENT', comment: comment })
 						}
-						moveLabel={/*moveLabel*/ null}
+						moveLabel={moveLabel}
 						defaultOpen={viewComments}
 						classification={
 							/*gameState.currentChessStudyMove?.classification ?? null*/ null

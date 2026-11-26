@@ -788,3 +788,124 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 	color: var(--text-faint);
 	pointer-events: none;
 }
+.chess-study .cs-resize-handle {
+	position: absolute;
+	right: 2px;
+	bottom: 2px;
+	width: 14px;
+	height: 14px;
+	border-bottom-right-radius: var(--cs-radius);
+	opacity: 0.3;
+	cursor: nwse-resize;
+	touch-action: none;
+	background: linear-gradient(
+		135deg,
+		transparent 0 46%,
+		var(--text-muted) 46% 56%,
+		transparent 56% 70%,
+		var(--text-muted) 70% 80%,
+		transparent 80%
+	);
+}
+.chess-study:hover .cs-resize-handle,
+.chess-study .cs-resize-handle:hover {
+	opacity: 0.75;
+}
+.chess-study .cs-notes-body.is-disabled {
+	opacity: 0.7;
+}
+.chess-study .cs-move-marker {
+	flex: 0 0 auto;
+	display: inline-block;
+	width: 5px;
+	height: 5px;
+	margin-left: 5px;
+	border-radius: 50%;
+	vertical-align: middle;
+}
+.chess-study .cs-move-marker--note {
+	background-color: var(--text-accent);
+}
+.chess-study .cs-move-marker--shape {
+	background-color: var(--color-green, #47a065);
+}
+.chess-study .cs-move-marker--excluded {
+	background-color: transparent;
+	border: 1px solid var(--text-faint);
+}
+.chess-study .cs-move-classification {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 28px;
+	height: 26px;
+	margin-left: 5px;
+	padding: 0 4px;
+	border-radius: 5px;
+	background-color: color-mix(
+		in srgb,
+		var(--cs-classification) 22%,
+		transparent
+	);
+	color: var(--cs-classification);
+	font-family: var(--font-monospace);
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1;
+	vertical-align: middle;
+}
+.chess-study .cs-classification-picker {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+	padding: 0 10px 7px;
+}
+.chess-study .cs-classification-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 30px;
+	padding: 0;
+	border: 1px solid transparent;
+	border-radius: 5px;
+	background-color: color-mix(
+		in srgb,
+		var(--cs-classification) 16%,
+		transparent
+	);
+	box-shadow: none;
+	color: var(--cs-classification);
+	font-family: var(--font-monospace);
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1;
+	cursor: pointer;
+}
+.chess-study .cs-classification-button:hover:not(:disabled) {
+	background-color: color-mix(
+		in srgb,
+		var(--cs-classification) 32%,
+		transparent
+	);
+}
+.chess-study .cs-classification-button.is-active {
+	border-color: var(--cs-classification);
+	background-color: var(--cs-classification);
+	color: #ffffff;
+}
+.chess-study .cs-classification-button:disabled {
+	opacity: 0.4;
+	cursor: default;
+}
+.chess-study .cs-classification-button--clear {
+	--cs-classification: var(--text-faint);
+	margin-left: auto;
+	background-color: transparent;
+	color: var(--text-muted);
+}
+.chess-study .cs-classification-button--clear:hover:not(:disabled) {
+	background-color: var(--background-modifier-hover);
+}
