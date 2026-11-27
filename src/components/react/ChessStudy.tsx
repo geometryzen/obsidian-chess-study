@@ -748,24 +748,24 @@ export const ChessStudy = ({
 						/>
 					</div>
 				}
-				{!gameState.isCommentsHidden && (
-					<CommentSection
-						currentComment={comment_from_game_state(gameState)}
-						setComments={(comment: JSONContent) =>
-							dispatch({ type: 'SYNC_COMMENT', comment: comment })
-						}
-						moveLabel={moveLabel}
-						defaultOpen={viewComments}
-						classification={
-							/*gameState.currentChessStudyMove?.classification ?? null*/ null
-						}
-						onClassify={(classification: MoveClassification | null) =>
-							dispatch({ type: 'SET_CLASSIFICATION', classification })
-						}
-						isLocked={/*isLocked*/ false}
-					/>
-				)}
 			</div>
+			{!gameState.isCommentsHidden && (
+				<CommentSection
+					currentComment={comment_from_game_state(gameState)}
+					setComments={(comment: JSONContent) =>
+						dispatch({ type: 'SYNC_COMMENT', comment: comment })
+					}
+					moveLabel={moveLabel}
+					defaultOpen={viewComments}
+					classification={
+						/*gameState.currentChessStudyMove?.classification ?? null*/ null
+					}
+					onClassify={(classification: MoveClassification | null) =>
+						dispatch({ type: 'SET_CLASSIFICATION', classification })
+					}
+					isLocked={/*isLocked*/ false}
+				/>
+			)}
 		</div>
 	);
 };
