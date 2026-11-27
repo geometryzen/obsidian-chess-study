@@ -20,7 +20,7 @@ export function display_relative_move(
 	setChessLogic: React.Dispatch<React.SetStateAction<Chess>>,
 	options: { offset: 1 | -1 },
 ): NeoMove | null {
-	let nodeToDisplay: NeoMove | null = null;
+	let nodeToDisplay: NeoMove | null;
 
 	const { offset } = options;
 

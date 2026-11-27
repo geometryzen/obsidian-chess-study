@@ -6,7 +6,7 @@ import { Chess, Square, SQUARES } from 'chess.js';
  * @see https://github.com/ornicar/chessground-examples
  */
 export function legal_moves(chess: Chess): Map<Square, Square[]> {
-	const dests = new Map();
+	const dests = new Map<Square, Square[]>();
 	SQUARES.forEach((s) => {
 		const ms = chess.moves({ square: s, verbose: true });
 		if (ms.length)

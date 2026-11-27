@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box';
 import { generateText, JSONContent } from '@tiptap/react';
 import { Chess as ChessPosition, Move } from 'chess.js';
 import { Api as ChessView } from 'chessground/api';
@@ -666,12 +665,14 @@ export const ChessStudy = ({
 							onForwardButtonClick={() => dispatch({ type: 'GOTO_NEXT_MOVE' })}
 							onEndButtonClick={() => dispatch({ type: 'GOTO_END_POSITION' })}
 							onCopyFenButtonClick={() => {
-								try {
-									navigator.clipboard.writeText(chessLogic.fen());
-									new Notice('Copied FEN to clipboard!');
-								} catch (e) {
-									new Notice('Could not copy FEN to clipboard:', e);
-								}
+								navigator.clipboard
+									.writeText(chessLogic.fen())
+									.then(() => {
+										new Notice('Copied FEN to clipboard!');
+									})
+									.catch((e) => {
+										new Notice(`Could not copy FEN to clipboard. Cause: ${e}`);
+									});
 							}}
 							onCopyPgnButtonClick={() => {
 								try {
@@ -680,12 +681,18 @@ export const ChessStudy = ({
 									// TODO: neo_to_pgn_string function.
 									const jgn = jgn_from_neo(gameState.chessStudy);
 									const pgn_string = jgn_to_pgn_string(jgn);
-									navigator.clipboard.writeText(pgn_string);
-									new Notice('Copied PGN to clipboard!');
+									navigator.clipboard
+										.writeText(pgn_string)
+										.then(() => {
+											new Notice('Copied PGN to clipboard!');
+										})
+										.catch((e) => {
+											new Notice(`Could not copy PGN to clipboard. Cause: ${e}`);
+										});
 								} catch (e) {
 									console.warn(e);
 									console.warn(JSON.stringify(gameState.chessStudy, null, 2));
-									new Notice('Could not copy PGN to clipboard:', e);
+									new Notice(`Could not copy PGN to clipboard. Cause: ${e}`);
 								}
 							}}
 							onSaveButtonClick={onSaveButtonClick}
@@ -728,14 +735,14 @@ export const ChessStudy = ({
 								try {
 									new Notice("I'm afraid I can't do that Dave!");
 								} catch (e) {
-									new Notice('Something is rotten in Denmark:', e);
+									new Notice(`Something is rotten in Denmark. Cause: ${e}`);
 								}
 							}}
 							onSettingsButtonClick={() => {
 								try {
 									new Notice("I'm afraid I can't do that Dave!");
 								} catch (e) {
-									new Notice('Something is rotten in Denmark:', e);
+									new Notice(`Something is rotten in Denmark. Cause: ${e}`);
 								}
 							}}
 						/>

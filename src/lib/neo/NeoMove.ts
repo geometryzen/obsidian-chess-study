@@ -1,3 +1,5 @@
+import { JSONContent } from '@tiptap/react';
+
 export class NeoMove {
 	/**
 	 * The position in FEN notation after this move was made.
@@ -14,7 +16,7 @@ export class NeoMove {
 	/**
 	 * The comment after this move was made.
 	 */
-	comment: unknown | null;
+	comment: JSONContent | null;
 	/**
 	 * The evaluation of the position after this move has been made.
 	 */
@@ -71,7 +73,7 @@ export class NeoMove {
 		/**
 		 * The comment after this move was made.
 		 */
-		comment: unknown | null,
+		comment: JSONContent | null,
 		/**
 		 * The evaluation of the position after this move has been made.
 		 */

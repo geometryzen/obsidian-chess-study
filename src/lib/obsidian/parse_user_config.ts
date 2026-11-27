@@ -17,7 +17,7 @@ export const parse_user_config = (
 	try {
 		return {
 			...chessStudyConfig,
-			...parseYaml(content),
+			...(parseYaml(content) as ChessStudyAppConfig),
 		};
 	} catch (e) {
 		throw new Error('Something went wrong during parsing. :(', { cause: e });

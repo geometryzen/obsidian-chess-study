@@ -148,7 +148,7 @@ export default class ChessStudyPlugin extends Plugin {
 							);
 						} catch (e) {
 							new Notice(
-								`There was an error while trying to load the repertoire file ${repertoireId}.json. You can check the plugin folder if the file exist and if not add one via the 'Insert PGN-Editor at cursor position' command.`,
+								`There was an error while trying to load the repertoire file ${repertoireId}.json. You can check the plugin folder if the file exist and if not add one via the 'Insert PGN-Editor at cursor position' command. Cause: ${e}`,
 								0,
 							);
 						}
@@ -167,7 +167,7 @@ export default class ChessStudyPlugin extends Plugin {
 					}
 				} catch (e) {
 					new Notice(
-						`There was an error while trying to load the chessStudy file ${chessStudyId}.json. You can check the plugin folder if the file exist and if not add one via the 'Insert PGN-Editor at cursor position' command.`,
+						`There was an error while trying to load the chessStudy file ${chessStudyId}.json. You can check the plugin folder if the file exist and if not add one via the 'Insert PGN-Editor at cursor position' command. Cause: ${e}`,
 						0,
 					);
 				}
@@ -205,7 +205,7 @@ export default class ChessStudyPlugin extends Plugin {
 
 						const jgnStudy: JgnStudy = compile_pgn_or_fen(chessStringOrStartPos);
 
-						this.#studyLoader.createStudiesFolderIfNotExists();
+						await this.#studyLoader.createStudiesFolderIfNotExists();
 
 						const id = await this.#studyLoader.saveJgnStudy(jgnStudy);
 
@@ -244,7 +244,8 @@ export default class ChessStudyPlugin extends Plugin {
 								parts.push(`disableNavigation: false`);
 								parts.push(`disableSave: false`);
 								parts.push(`readOnly: false`);
-								parts.push(`showEvaluation: true`);
+								// We don't want evaluation to be shown the first time that we encounter a puzzle.
+								parts.push(`showEvaluation: false`);
 								parts.push(`viewComments: true`);
 								parts.push(BACKTICKS);
 								break;
@@ -294,7 +295,7 @@ export default class ChessStudyPlugin extends Plugin {
 			{},
 			DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS,
 			await this.loadData(),
-		);
+		) as ChessStudyPluginSettings;
 	}
 
 	async saveSettings(): Promise<void> {

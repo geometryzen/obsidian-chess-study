@@ -60,7 +60,7 @@ export class ChessStudyInsertModal extends Modal {
 		showEvaluation: boolean,
 		chessStudyKind: ChessStudyKind,
 		viewComments: boolean,
-	) => void;
+	) => Promise<void>;
 
 	constructor(
 		app: App,
@@ -76,7 +76,7 @@ export class ChessStudyInsertModal extends Modal {
 			showEvaluation: boolean,
 			chessStudyKind: ChessStudyKind,
 			viewComments: boolean,
-		) => void,
+		) => Promise<void>,
 	) {
 		super(app);
 		this.onSubmit = onSubmit;
@@ -224,7 +224,7 @@ export class ChessStudyInsertModal extends Modal {
 				dropdown.addOption(INITIAL_POSITION_END, 'End');
 				dropdown.setValue(this.#initialPosition);
 				dropdown.onChange((initialPosition) => {
-					this.#initialPosition = initialPosition as InitialPosition;
+					this.#initialPosition = initialPosition;
 				});
 			});
 
@@ -235,7 +235,7 @@ export class ChessStudyInsertModal extends Modal {
 				dropdown.addOption(COMPLETED_POSITION_END, 'End');
 				dropdown.setValue(this.#completedPosition);
 				dropdown.onChange((completedPosition) => {
-					this.#initialPosition = completedPosition as InitialPosition;
+					this.#initialPosition = completedPosition;
 				});
 			});
 
@@ -266,9 +266,9 @@ export class ChessStudyInsertModal extends Modal {
 				// TODO: Translation.
 				.setButtonText('Submit')
 				.setCta()
-				.onClick(() => {
+				.onClick(async () => {
 					this.close();
-					this.onSubmit(
+					await this.onSubmit(
 						this.#chessString,
 						this.#boardOrientation,
 						this.#disableCopy,

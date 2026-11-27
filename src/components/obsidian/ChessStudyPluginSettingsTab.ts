@@ -13,13 +13,11 @@ import {
 	INITIAL_POSITION_END,
 	INITIAL_POSITION_FIRST,
 	INITIAL_POSITION_YAML_NAME,
-	InitialPosition,
 } from '../../lib/config/InitialPosition';
 import ChessStudyPlugin, { BoardColor, BoardOrientation } from '../../main';
 import {
 	COMPLETED_POSITION_END,
 	COMPLETED_POSITION_YAML_NAME,
-	CompletedPosition,
 } from '../../lib/config/CompletedPosition';
 
 export class ChessStudyPluginSettingsTab extends PluginSettingTab {
@@ -47,9 +45,9 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 
 				dropdown
 					.setValue(this.#plugin.settings.boardOrientation)
-					.onChange((orientation) => {
+					.onChange(async (orientation) => {
 						this.#plugin.settings.boardOrientation = orientation as BoardOrientation;
-						this.#plugin.saveSettings();
+						await this.#plugin.saveSettings();
 					});
 			});
 
@@ -62,9 +60,9 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 
 				dropdown
 					.setValue(this.#plugin.settings.boardColor)
-					.onChange((boardColor) => {
+					.onChange(async (boardColor) => {
 						this.#plugin.settings.boardColor = boardColor as BoardColor;
-						this.#plugin.saveSettings();
+						await this.#plugin.saveSettings();
 					});
 			});
 
@@ -76,9 +74,9 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 				dropdown.addOption('false', 'False');
 				dropdown
 					.setValue(this.#plugin.settings.disableCopy.toString())
-					.onChange((disableCopy) => {
+					.onChange(async (disableCopy) => {
 						this.#plugin.settings.disableCopy = disableCopy === 'true';
-						this.#plugin.saveSettings();
+						await this.#plugin.saveSettings();
 					});
 			});
 
@@ -90,9 +88,9 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 				dropdown.addOption('false', 'False');
 				dropdown
 					.setValue(this.#plugin.settings.disableNavigation.toString())
-					.onChange((disableNavigation) => {
+					.onChange(async (disableNavigation) => {
 						this.#plugin.settings.disableNavigation = disableNavigation === 'true';
-						this.#plugin.saveSettings();
+						await this.#plugin.saveSettings();
 					});
 			});
 
@@ -104,9 +102,9 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 				dropdown.addOption('false', 'False');
 				dropdown
 					.setValue(this.#plugin.settings.showEvaluation.toString())
-					.onChange((showEvaluation) => {
+					.onChange(async (showEvaluation) => {
 						this.#plugin.settings.showEvaluation = showEvaluation === 'true';
-						this.#plugin.saveSettings();
+						await this.#plugin.saveSettings();
 					});
 			});
 
@@ -118,9 +116,9 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 				dropdown.addOption('false', 'False');
 				dropdown
 					.setValue(this.#plugin.settings.disableSave.toString())
-					.onChange((disableSave) => {
+					.onChange(async (disableSave) => {
 						this.#plugin.settings.disableSave = disableSave === 'true';
-						this.#plugin.saveSettings();
+						await this.#plugin.saveSettings();
 					});
 			});
 
@@ -135,10 +133,9 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 				dropdown.addOption(INITIAL_POSITION_END, 'End');
 				dropdown
 					.setValue(this.#plugin.settings.initialPosition)
-					.onChange((initialPosition) => {
-						this.#plugin.settings.initialPosition =
-							initialPosition as InitialPosition;
-						this.#plugin.saveSettings();
+					.onChange(async (initialPosition) => {
+						this.#plugin.settings.initialPosition = initialPosition;
+						await this.#plugin.saveSettings();
 					});
 			});
 
@@ -151,10 +148,9 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 				dropdown.addOption(COMPLETED_POSITION_END, 'End');
 				dropdown
 					.setValue(this.#plugin.settings.completedPosition)
-					.onChange((completedPosition) => {
-						this.#plugin.settings.completedPosition =
-							completedPosition as CompletedPosition;
-						this.#plugin.saveSettings();
+					.onChange(async (completedPosition) => {
+						this.#plugin.settings.completedPosition = completedPosition;
+						await this.#plugin.saveSettings();
 					});
 			});
 
@@ -166,9 +162,9 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 				dropdown.addOption('false', 'False');
 				dropdown
 					.setValue(this.#plugin.settings.readOnly.toString())
-					.onChange((readOnly) => {
+					.onChange(async (readOnly) => {
 						this.#plugin.settings.readOnly = readOnly === 'true';
-						this.#plugin.saveSettings();
+						await this.#plugin.saveSettings();
 					});
 			});
 
@@ -187,9 +183,9 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 				dropdown.addOption(CHESS_STUDY_KIND_MEMORIZE, 'Memorize');
 				dropdown
 					.setValue(this.#plugin.settings.chessStudyKind)
-					.onChange((chessStudyKind) => {
+					.onChange(async (chessStudyKind) => {
 						this.#plugin.settings.chessStudyKind = chessStudyKind as ChessStudyKind;
-						this.#plugin.saveSettings();
+						await this.#plugin.saveSettings();
 					});
 			});
 
@@ -201,9 +197,9 @@ export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 				dropdown.addOption('false', 'False');
 				dropdown
 					.setValue(this.#plugin.settings.viewComments.toString())
-					.onChange((viewComments) => {
+					.onChange(async (viewComments) => {
 						this.#plugin.settings.viewComments = viewComments === 'true';
-						this.#plugin.saveSettings();
+						await this.#plugin.saveSettings();
 					});
 			});
 	}

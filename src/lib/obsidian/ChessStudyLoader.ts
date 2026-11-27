@@ -107,7 +107,7 @@ export class ChessStudyLoader {
 
 		if (!folderExists) {
 			// console.lg(`Creating studies folder at: ${this.#studiesPath}`);
-			this.#adapter.mkdir(this.#studiesPath);
+			await this.#adapter.mkdir(this.#studiesPath);
 		}
 	}
 }

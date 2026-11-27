@@ -37,7 +37,7 @@ function play_mainline_move(
 
 export class MemorizeChessStudyEventHandler implements ChessStudyEventHandler {
 	readonly #chessView: ChessView | null;
-	readonly #chessLogic: ChessPosition;
+	// readonly #chessLogic: ChessPosition;
 	readonly #setChessLogic: Dispatch<SetStateAction<ChessPosition>>;
 	constructor(
 		chessView: ChessView | null,
@@ -45,7 +45,7 @@ export class MemorizeChessStudyEventHandler implements ChessStudyEventHandler {
 		setChessLogic: Dispatch<SetStateAction<ChessPosition>>,
 	) {
 		this.#chessView = chessView;
-		this.#chessLogic = chessLogic;
+		// this.#chessLogic = chessLogic;
 		this.#setChessLogic = setChessLogic;
 	}
 	/**

@@ -1,3 +1,4 @@
+import { JSONContent } from '@tiptap/react';
 import { JgnMove } from './JgnMove';
 
 /**
@@ -12,7 +13,7 @@ export interface JgnStudy {
 	/**
 	 * The top-level comment.
 	 */
-	comment: unknown | null;
+	comment: JSONContent | null;
 	/**
 	 * The top-level shapes.
 	 */

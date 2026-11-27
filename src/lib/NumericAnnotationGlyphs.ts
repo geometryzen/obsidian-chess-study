@@ -93,8 +93,6 @@ export function nags_to_dollars(nags: number[]): string {
  */
 export function nag_to_human(nag: NumericAnnotationGlyph): string {
 	switch (nag) {
-		case NAG_null:
-			return '';
 		case NAG_good_move:
 			return '!';
 		case NAG_poor_move:
@@ -131,9 +129,9 @@ export function nag_to_human(nag: NumericAnnotationGlyph): string {
 			return 'Black has a crushing advantage.';
 		case NAG_unclear_position:
 			return '∞';
-		default: {
-			return `${nag}`;
-		}
+		default:
+			// NAG_null
+			return '';
 	}
 }
 

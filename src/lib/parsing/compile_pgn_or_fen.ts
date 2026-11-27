@@ -48,7 +48,7 @@ function chess_to_study(
 		const cs = findComment(ROOT_FEN);
 		if (Array.isArray(cs)) {
 			if (cs.length > 0) {
-				return cs[0];
+				return cs[0] as JSONContent;
 			}
 		}
 		return null;
@@ -360,10 +360,6 @@ function pgn_moves_to_chess_study_moves(
 		chess.move(pgnMove.notation.notation);
 		const history = chess.history({ verbose: true });
 		const chessMove = history[history.length - 1];
-		pgnMove.variations;
-		pgnMove.commentDiag;
-		pgnMove.drawOffer;
-		pgnMove.commentMove;
 		const moveId = nanoid();
 		const move: JgnMove = {
 			moveId,
@@ -395,7 +391,6 @@ export function compile_pgn(pgn: string): JgnStudy {
 	// console.lg(JSON.stringify(game, null, 2));
 	// The messages contain statements about the parsing.
 	// These could be returned in a different data structure.
-	game.messages;
 	const fileContent: JgnStudy = {
 		headers: tags_to_headers(game.tags),
 		comment: game_comment_to_json_comment(game.gameComment),
