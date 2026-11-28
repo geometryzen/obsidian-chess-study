@@ -681,7 +681,7 @@ export const ChessStudy = ({
 		<div className="chess-study">
 			<div className="cs-main">
 				<div className="cs-board-row">
-					{showEvaluation /*!trainer.isActive &&*/ && (
+					{showEvaluation && (
 						<EvalBar fen={chessLogic.fen()} orientation={boardOrientation} />
 					)}
 					<div className="cs-board-wrap">
