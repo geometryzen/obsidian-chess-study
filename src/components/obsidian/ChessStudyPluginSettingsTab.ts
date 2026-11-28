@@ -10,15 +10,16 @@ import {
 	ChessStudyKind,
 } from '../../lib/config/ChessStudyKind';
 import {
+	COMPLETED_POSITION_END,
+	COMPLETED_POSITION_YAML_NAME,
+} from '../../lib/config/CompletedPosition';
+import {
 	INITIAL_POSITION_END,
 	INITIAL_POSITION_FIRST,
 	INITIAL_POSITION_YAML_NAME,
 } from '../../lib/config/InitialPosition';
-import ChessStudyPlugin, { BoardColor, BoardOrientation } from '../../main';
-import {
-	COMPLETED_POSITION_END,
-	COMPLETED_POSITION_YAML_NAME,
-} from '../../lib/config/CompletedPosition';
+import ChessStudyPlugin from '../../main';
+import { BoardColor, BoardOrientation } from '../../settings';
 
 export class ChessStudyPluginSettingsTab extends PluginSettingTab {
 	#plugin: ChessStudyPlugin;

@@ -7,7 +7,7 @@ import {
 } from '../../lib/obsidian/parse_user_config';
 import { ChessStudyLoader } from '../../lib/obsidian/ChessStudyLoader';
 import { ChessStudy } from '../react/ChessStudy';
-import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
+import { ChessStudyPluginSettings } from '../../settings';
 import { NeoStudy } from '../../lib/neo/NeoStudy';
 
 /**

@@ -27,7 +27,7 @@ import {
 } from '../../lib/config/InitialPosition';
 import { isFEN, isPGN } from '../../lib/fen-or-pgn';
 import { compile_fen, compile_pgn } from '../../lib/parsing/compile_pgn_or_fen';
-import { BoardOrientation } from '../../main';
+import { BoardOrientation } from '../../settings';
 
 /**
  * The Modal Dialog that pops up when creating a new Chess Study.

@@ -1,117 +1,3 @@
-.chess-study .cs-board,
-.cs-map-board {
-	--cs-sq-light: #e9edf6;
-	--cs-sq-dark: #4b7399;
-	--cs-hl: 255, 210, 46;
-	--cs-dot: 0, 0, 0;
-}
-.chess-study .blue-board,
-.cs-map-board.blue-board {
-	--cs-sq-light: #e9edf6;
-	--cs-sq-dark: #4b7399;
-}
-.chess-study .blue-soft-board,
-.cs-map-board.blue-soft-board {
-	--cs-sq-light: #dee3e6;
-	--cs-sq-dark: #8ca2ad;
-}
-.chess-study .green-board,
-.cs-map-board.green-board {
-	--cs-sq-light: #ebecd0;
-	--cs-sq-dark: #779556;
-}
-.chess-study .brown-board,
-.cs-map-board.brown-board {
-	--cs-sq-light: #f0d9b5;
-	--cs-sq-dark: #b58863;
-}
-.chess-study .cs-board cg-board {
-	background-color: var(--cs-sq-light);
-	background-image: conic-gradient(
-		var(--cs-sq-dark) 0 25%,
-		var(--cs-sq-light) 0 50%,
-		var(--cs-sq-dark) 0 75%,
-		var(--cs-sq-light) 0
-	);
-	background-size: 25% 25%;
-}
-.chess-study .cs-board cg-board square.last-move {
-	background-color: rgba(var(--cs-hl), 0.45);
-}
-.chess-study .cs-board cg-board square.selected {
-	background-color: rgba(var(--cs-hl), 0.6);
-}
-.chess-study .cs-board cg-board square.move-dest {
-	background: radial-gradient(
-		rgba(var(--cs-dot), 0.18) 19%,
-		rgba(var(--cs-dot), 0) 20%
-	);
-}
-.chess-study .cs-board cg-board square.move-dest:hover {
-	background: rgba(var(--cs-dot), 0.14);
-}
-.chess-study .cs-board cg-board square.oc.move-dest {
-	background: radial-gradient(
-		transparent 0%,
-		transparent 78%,
-		rgba(var(--cs-dot), 0.18) 79%
-	);
-}
-.chess-study .cs-board cg-board square.check {
-	background: radial-gradient(
-		ellipse at center,
-		red,
-		#e70000 25%,
-		#a9000000 89%,
-		#9e000000
-	);
-}
-.chess-study .cs-board .cg-wrap coords {
-	position: absolute;
-	display: flex;
-	pointer-events: none;
-	opacity: 1 !important;
-	color: var(--text-muted);
-	font-family: inherit;
-	font-size: clamp(10px, 2.3cqw, 15px);
-	font-weight: 600;
-	line-height: 1;
-}
-.chess-study .cs-board .cg-wrap coords coord {
-	color: var(--cs-coord-color, var(--text-muted)) !important;
-	flex: 1 0 0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0;
-	transform: none;
-}
-.chess-study .cs-board .cg-wrap coords.ranks,
-.chess-study .cs-board .cg-wrap coords.ranks.left {
-	left: calc(var(--cs-coord-offset) * -1);
-	top: 0;
-	width: var(--cs-coords);
-	height: 100%;
-	flex-flow: column-reverse;
-}
-.chess-study .cs-board .cg-wrap coords.ranks.black {
-	flex-flow: column;
-}
-.chess-study .cs-board .cg-wrap coords.files {
-	left: 0;
-	bottom: calc(var(--cs-coord-offset) * -1);
-	width: 100%;
-	height: var(--cs-coords);
-	flex-flow: row;
-	text-transform: lowercase;
-}
-.chess-study .cs-board .cg-wrap coords.files.black {
-	flex-flow: row-reverse;
-}
-.chess-study .cs-board cg-board {
-	border-radius: 6px;
-	box-shadow: 0 1px 4px #0003;
-}
 .cg-wrap {
 	box-sizing: content-box;
 	position: relative;
@@ -399,6 +285,120 @@ coords.squares:nth-of-type(2n) :nth-child(2n) {
 }
 .green-board cg-board {
 	background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4PSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIgogICAgIHZpZXdCb3g9IjAgMCA4IDgiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+CjxnIGlkPSJhIj4KICA8ZyBpZD0iYiI+CiAgICA8ZyBpZD0iYyI+CiAgICAgIDxnIGlkPSJkIj4KICAgICAgICA8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjZmZmZmRkIiBpZD0iZSIvPgogICAgICAgIDx1c2UgeD0iMSIgeT0iMSIgaHJlZj0iI2UiIHg6aHJlZj0iI2UiLz4KICAgICAgICA8cmVjdCB5PSIxIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODZhNjY2IiBpZD0iZiIvPgogICAgICAgIDx1c2UgeD0iMSIgeT0iLTEiIGhyZWY9IiNmIiB4OmhyZWY9IiNmIi8+CiAgICAgIDwvZz4KICAgICAgPHVzZSB4PSIyIiBocmVmPSIjZCIgeDpocmVmPSIjZCIvPgogICAgPC9nPgogICAgPHVzZSB4PSI0IiBocmVmPSIjYyIgeDpocmVmPSIjYyIvPgogIDwvZz4KICA8dXNlIHk9IjIiIGhyZWY9IiNiIiB4OmhyZWY9IiNiIi8+CjwvZz4KPHVzZSB5PSI0IiBocmVmPSIjYSIgeDpocmVmPSIjYSIvPgo8L3N2Zz4K);
+}
+.chess-study .cs-board,
+.cs-map-board {
+	--cs-sq-light: #e9edf6;
+	--cs-sq-dark: #4b7399;
+	--cs-hl: 255, 210, 46;
+	--cs-dot: 0, 0, 0;
+}
+.chess-study .blue-board,
+.cs-map-board.blue-board {
+	--cs-sq-light: #e9edf6;
+	--cs-sq-dark: #4b7399;
+}
+.chess-study .blue-soft-board,
+.cs-map-board.blue-soft-board {
+	--cs-sq-light: #dee3e6;
+	--cs-sq-dark: #8ca2ad;
+}
+.chess-study .green-board,
+.cs-map-board.green-board {
+	--cs-sq-light: #ebecd0;
+	--cs-sq-dark: #779556;
+}
+.chess-study .brown-board,
+.cs-map-board.brown-board {
+	--cs-sq-light: #f0d9b5;
+	--cs-sq-dark: #b58863;
+}
+.chess-study .cs-board cg-board {
+	background-color: var(--cs-sq-light);
+	background-image: conic-gradient(
+		var(--cs-sq-dark) 0 25%,
+		var(--cs-sq-light) 0 50%,
+		var(--cs-sq-dark) 0 75%,
+		var(--cs-sq-light) 0
+	);
+	background-size: 25% 25%;
+}
+.chess-study .cs-board cg-board square.last-move {
+	background-color: rgba(var(--cs-hl), 0.45);
+}
+.chess-study .cs-board cg-board square.selected {
+	background-color: rgba(var(--cs-hl), 0.6);
+}
+.chess-study .cs-board cg-board square.move-dest {
+	background: radial-gradient(
+		rgba(var(--cs-dot), 0.18) 19%,
+		rgba(var(--cs-dot), 0) 20%
+	);
+}
+.chess-study .cs-board cg-board square.move-dest:hover {
+	background: rgba(var(--cs-dot), 0.14);
+}
+.chess-study .cs-board cg-board square.oc.move-dest {
+	background: radial-gradient(
+		transparent 0%,
+		transparent 78%,
+		rgba(var(--cs-dot), 0.18) 79%
+	);
+}
+.chess-study .cs-board cg-board square.check {
+	background: radial-gradient(
+		ellipse at center,
+		red,
+		#e70000 25%,
+		#a9000000 89%,
+		#9e000000
+	);
+}
+.chess-study .cs-board .cg-wrap coords {
+	position: absolute;
+	display: flex;
+	pointer-events: none;
+	opacity: 1 !important;
+	color: var(--text-muted);
+	font-family: inherit;
+	font-size: clamp(10px, 2.3cqw, 15px);
+	font-weight: 600;
+	line-height: 1;
+}
+.chess-study .cs-board .cg-wrap coords coord {
+	color: var(--cs-coord-color, var(--text-muted)) !important;
+	flex: 1 0 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	transform: none;
+}
+.chess-study .cs-board .cg-wrap coords.ranks,
+.chess-study .cs-board .cg-wrap coords.ranks.left {
+	left: calc(var(--cs-coord-offset) * -1);
+	top: 0;
+	width: var(--cs-coords);
+	height: 100%;
+	flex-flow: column-reverse;
+}
+.chess-study .cs-board .cg-wrap coords.ranks.black {
+	flex-flow: column;
+}
+.chess-study .cs-board .cg-wrap coords.files {
+	left: 0;
+	bottom: calc(var(--cs-coord-offset) * -1);
+	width: 100%;
+	height: var(--cs-coords);
+	flex-flow: row;
+	text-transform: lowercase;
+}
+.chess-study .cs-board .cg-wrap coords.files.black {
+	flex-flow: row-reverse;
+}
+.chess-study .cs-board cg-board {
+	border-radius: 6px;
+	box-shadow: 0 1px 4px #0003;
 }
 .chess-study {
 	--cs-radius: 10px;

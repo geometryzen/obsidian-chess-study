@@ -12,14 +12,13 @@ import { ChessStudyMarkdownRenderChild } from './components/obsidian/ChessStudyM
 import { ChessStudyPluginSettingsTab } from './components/obsidian/ChessStudyPluginSettingsTab';
 
 // these styles must be imported somewhere
-import '../assets/board/themes.css';
 import 'chessground/assets/chessground.base.css';
 import 'chessground/assets/chessground.brown.css';
 import 'chessground/assets/chessground.cburnett.css';
 import '../assets/board/green.css';
-import { ChessStudyPluginSettings } from './components/obsidian/ChessStudyPluginSettings';
+import '../assets/board/themes.css';
 import { DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS } from './components/obsidian/DEFAULT_CHESS_STUDY_PLUGIN_SETTINGS';
-import { compile_pgn_or_fen } from './lib/parsing/compile_pgn_or_fen';
+import { shutdownEngine } from './components/react/EvalBar/engine';
 import { ROOT_FEN } from './lib/chess-logic/ROOT_FEN';
 import {
 	CHESS_STUDY_KIND_GAME,
@@ -29,31 +28,21 @@ import {
 	ChessStudyKind,
 } from './lib/config/ChessStudyKind';
 import {
-	INITIAL_POSITION_YAML_NAME,
-	InitialPosition,
-} from './lib/config/InitialPosition';
-import { shutdownEngine } from './components/react/EvalBar/engine';
-import { JgnStudy } from './lib/jgn/JgnStudy';
-import { ChessStudyLoader } from './lib/obsidian/ChessStudyLoader';
-import { parse_user_config } from './lib/obsidian/parse_user_config';
-import './main.css';
-import { NeoStudy } from './lib/neo/NeoStudy';
-import {
 	COMPLETED_POSITION_YAML_NAME,
 	CompletedPosition,
 } from './lib/config/CompletedPosition';
+import {
+	INITIAL_POSITION_YAML_NAME,
+	InitialPosition,
+} from './lib/config/InitialPosition';
+import { JgnStudy } from './lib/jgn/JgnStudy';
 import { ensure_target_moves } from './lib/neo/ensure_target_moves';
-
-export type BoardOrientation = 'white' | 'black';
-
-export const BOARD_COLORS = {
-	blue: 'Blue',
-	'blue-soft': 'Blue (soft)',
-	green: 'Green',
-	brown: 'Brown',
-} as const;
-
-export type BoardColor = keyof typeof BOARD_COLORS;
+import { NeoStudy } from './lib/neo/NeoStudy';
+import { ChessStudyLoader } from './lib/obsidian/ChessStudyLoader';
+import { parse_user_config } from './lib/obsidian/parse_user_config';
+import { compile_pgn_or_fen } from './lib/parsing/compile_pgn_or_fen';
+import './main.css';
+import { BoardOrientation, ChessStudyPluginSettings } from './settings';
 
 const CHESSSTUDY_ID_YAML_NAME = 'chessStudyId';
 const REPERTOIRE_ID_YAML_NAME = 'repertoireId';

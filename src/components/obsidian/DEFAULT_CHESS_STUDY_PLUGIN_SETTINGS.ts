@@ -1,7 +1,7 @@
 import { CHESS_STUDY_KIND_GAME } from '../../lib/config/ChessStudyKind';
 import { COMPLETED_POSITION_END } from '../../lib/config/CompletedPosition';
 import { INITIAL_POSITION_BEGIN } from '../../lib/config/InitialPosition';
-import { ChessStudyPluginSettings } from './ChessStudyPluginSettings';
+import { ChessStudyPluginSettings } from '../../settings';
 
 /**
  * The values used when there is no corresponding setting.

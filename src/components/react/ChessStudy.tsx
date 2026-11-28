@@ -6,7 +6,7 @@ import { App, Notice } from 'obsidian';
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useImmerReducer } from 'use-immer';
-import { ChessStudyPluginSettings } from '../../components/obsidian/ChessStudyPluginSettings';
+import { ChessStudyPluginSettings } from '../../settings';
 import { initialize_position } from '../../lib/chess-logic/initialize_position';
 import { InitialPosition } from '../../lib/config/InitialPosition';
 import { jgn_to_pgn_string } from '../../lib/jgn/jgn_to_pgn_string';
