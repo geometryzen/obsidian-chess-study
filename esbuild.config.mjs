@@ -34,12 +34,13 @@ const context = await esbuild.context({
 		...builtins,
 	],
 	format: 'cjs',
-	target: 'es2020',
+	target: 'es2021',
 	logLevel: 'info',
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
 	outfile: 'main.js',
 	plugins: [renameStyles],
+	minify: prod,
 });
 
 if (prod) {

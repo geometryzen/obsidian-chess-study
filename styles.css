@@ -1,4 +1,3 @@
-/* assets/board/themes.css */
 .chess-study .cs-board,
 .cs-map-board {
 	--cs-sq-light: #e9edf6;
@@ -61,10 +60,10 @@
 .chess-study .cs-board cg-board square.check {
 	background: radial-gradient(
 		ellipse at center,
-		rgba(255, 0, 0, 1) 0%,
-		rgba(231, 0, 0, 1) 25%,
-		rgba(169, 0, 0, 0) 89%,
-		rgba(158, 0, 0, 0) 100%
+		red,
+		#e70000 25%,
+		#a9000000 89%,
+		#9e000000
 	);
 }
 .chess-study .cs-board .cg-wrap coords {
@@ -111,10 +110,8 @@
 }
 .chess-study .cs-board cg-board {
 	border-radius: 6px;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 1px 4px #0003;
 }
-
-/* node_modules/chessground/assets/chessground.base.css */
 .cg-wrap {
 	box-sizing: content-box;
 	position: relative;
@@ -185,8 +182,8 @@ piece.fading {
 .cg-wrap piece svg {
 	overflow: hidden;
 	position: relative;
-	top: 0px;
-	left: 0px;
+	top: 0;
+	left: 0;
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
@@ -198,8 +195,8 @@ piece.fading {
 .cg-wrap .cg-custom-svgs {
 	overflow: visible;
 	position: absolute;
-	top: 0px;
-	left: 0px;
+	top: 0;
+	left: 0;
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
@@ -280,47 +277,35 @@ piece.fading {
 	padding: 6% 4%;
 }
 .cg-wrap coords.squares.rank2 {
-	transform: translateX(100%);
+	transform: translate(100%);
 }
 .cg-wrap coords.squares.rank3 {
-	transform: translateX(200%);
+	transform: translate(200%);
 }
 .cg-wrap coords.squares.rank4 {
-	transform: translateX(300%);
+	transform: translate(300%);
 }
 .cg-wrap coords.squares.rank5 {
-	transform: translateX(400%);
+	transform: translate(400%);
 }
 .cg-wrap coords.squares.rank6 {
-	transform: translateX(500%);
+	transform: translate(500%);
 }
 .cg-wrap coords.squares.rank7 {
-	transform: translateX(600%);
+	transform: translate(600%);
 }
 .cg-wrap coords.squares.rank8 {
-	transform: translateX(700%);
+	transform: translate(700%);
 }
-
-/* node_modules/chessground/assets/chessground.brown.css */
 cg-board {
 	background-color: #f0d9b5;
 	background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4PSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIgogICAgIHZpZXdCb3g9IjAgMCA4IDgiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+CjxnIGlkPSJhIj4KICA8ZyBpZD0iYiI+CiAgICA8ZyBpZD0iYyI+CiAgICAgIDxnIGlkPSJkIj4KICAgICAgICA8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBpZD0iZSIgb3BhY2l0eT0iMCIvPgogICAgICAgIDx1c2UgeD0iMSIgeT0iMSIgaHJlZj0iI2UiIHg6aHJlZj0iI2UiLz4KICAgICAgICA8cmVjdCB5PSIxIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBpZD0iZiIgb3BhY2l0eT0iMC4yIi8+CiAgICAgICAgPHVzZSB4PSIxIiB5PSItMSIgaHJlZj0iI2YiIHg6aHJlZj0iI2YiLz4KICAgICAgPC9nPgogICAgICA8dXNlIHg9IjIiIGhyZWY9IiNkIiB4OmhyZWY9IiNkIi8+CiAgICA8L2c+CiAgICA8dXNlIHg9IjQiIGhyZWY9IiNjIiB4OmhyZWY9IiNjIi8+CiAgPC9nPgogIDx1c2UgeT0iMiIgaHJlZj0iI2IiIHg6aHJlZj0iI2IiLz4KPC9nPgo8dXNlIHk9IjQiIGhyZWY9IiNhIiB4OmhyZWY9IiNhIi8+Cjwvc3ZnPg==);
 }
 cg-board square.move-dest {
-	background: radial-gradient(
-		rgba(20, 85, 30, 0.5) 22%,
-		#208530 0,
-		rgba(0, 0, 0, 0.3) 0,
-		rgba(0, 0, 0, 0) 0
-	);
+	background: radial-gradient(#14551e80 22%, #208530 0, #0000004d, #0000 0);
 }
 cg-board square.premove-dest {
-	background: radial-gradient(
-		rgba(20, 30, 85, 0.5) 22%,
-		#203085 0,
-		rgba(0, 0, 0, 0.3) 0,
-		rgba(0, 0, 0, 0) 0
-	);
+	background: radial-gradient(#141e5580 22%, #203085 0, #0000004d, #0000 0);
 }
 cg-board square.oc.move-dest {
 	background: radial-gradient(
@@ -337,47 +322,45 @@ cg-board square.oc.premove-dest {
 	);
 }
 cg-board square.move-dest:hover {
-	background: rgba(20, 85, 30, 0.3);
+	background: #14551e4d;
 }
 cg-board square.premove-dest:hover {
-	background: rgba(20, 30, 85, 0.2);
+	background: #141e5533;
 }
 cg-board square.last-move {
-	background-color: rgba(155, 199, 0, 0.41);
+	background-color: #9bc70069;
 }
 cg-board square.selected {
-	background-color: rgba(20, 85, 30, 0.5);
+	background-color: #14551e80;
 }
 cg-board square.check {
 	background: radial-gradient(
 		ellipse at center,
-		rgba(255, 0, 0, 1) 0%,
-		rgba(231, 0, 0, 1) 25%,
-		rgba(169, 0, 0, 0) 89%,
-		rgba(158, 0, 0, 0) 100%
+		red,
+		#e70000 25%,
+		#a9000000 89%,
+		#9e000000
 	);
 }
 cg-board square.current-premove {
-	background-color: rgba(20, 30, 85, 0.5);
+	background-color: #141e5580;
 }
 .orientation-white .ranks :nth-child(odd),
-.orientation-white .files :nth-child(even),
-.orientation-black .ranks :nth-child(even),
+.orientation-white .files :nth-child(2n),
+.orientation-black .ranks :nth-child(2n),
 .orientation-black .files :nth-child(odd),
-coords.squares:nth-of-type(odd) :nth-child(even),
-coords.squares:nth-of-type(even) :nth-child(odd) {
-	color: rgba(72, 72, 72, 0.8);
+coords.squares:nth-of-type(odd) :nth-child(2n),
+coords.squares:nth-of-type(2n) :nth-child(odd) {
+	color: #484848cc;
 }
-.orientation-white .ranks :nth-child(even),
+.orientation-white .ranks :nth-child(2n),
 .orientation-white .files :nth-child(odd),
 .orientation-black .ranks :nth-child(odd),
-.orientation-black .files :nth-child(even),
+.orientation-black .files :nth-child(2n),
 coords.squares:nth-of-type(odd) :nth-child(odd),
-coords.squares:nth-of-type(even) :nth-child(even) {
-	color: rgba(255, 255, 255, 0.8);
+coords.squares:nth-of-type(2n) :nth-child(2n) {
+	color: #fffc;
 }
-
-/* node_modules/chessground/assets/chessground.cburnett.css */
 .cg-wrap piece.pawn.white {
 	background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==);
 }
@@ -414,13 +397,9 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 .cg-wrap piece.king.black {
 	background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMi41IDExLjYzVjYiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMjIuNSAyNXM0LjUtNy41IDMtMTAuNWMwIDAtMS0yLjUtMy0yLjVzLTMgMi41LTMgMi41Yy0xLjUgMyAzIDEwLjUgMyAxMC41IiBmaWxsPSIjMDAwIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjxwYXRoIGQ9Ik0xMS41IDM3YzUuNSAzLjUgMTUuNSAzLjUgMjEgMHYtN3M5LTQuNSA2LTEwLjVjLTQtNi41LTEzLjUtMy41LTE2IDRWMjd2LTMuNWMtMy41LTcuNS0xMy0xMC41LTE2LTQtMyA2IDUgMTAgNSAxMFYzN3oiIGZpbGw9IiMwMDAiLz48cGF0aCBkPSJNMjAgOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTMyIDI5LjVzOC41LTQgNi4wMy05LjY1QzM0LjE1IDE0IDI1IDE4IDIyLjUgMjQuNWwuMDEgMi4xLS4wMS0yLjFDMjAgMTggOS45MDYgMTQgNi45OTcgMTkuODVjLTIuNDk3IDUuNjUgNC44NTMgOSA0Ljg1MyA5IiBzdHJva2U9IiNlY2VjZWMiLz48cGF0aCBkPSJNMTEuNSAzMGM1LjUtMyAxNS41LTMgMjEgMG0tMjEgMy41YzUuNS0zIDE1LjUtMyAyMSAwbS0yMSAzLjVjNS41LTMgMTUuNS0zIDIxIDAiIHN0cm9rZT0iI2VjZWNlYyIvPjwvZz48L3N2Zz4=);
 }
-
-/* assets/board/green.css */
 .green-board cg-board {
 	background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4PSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIgogICAgIHZpZXdCb3g9IjAgMCA4IDgiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+CjxnIGlkPSJhIj4KICA8ZyBpZD0iYiI+CiAgICA8ZyBpZD0iYyI+CiAgICAgIDxnIGlkPSJkIj4KICAgICAgICA8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjZmZmZmRkIiBpZD0iZSIvPgogICAgICAgIDx1c2UgeD0iMSIgeT0iMSIgaHJlZj0iI2UiIHg6aHJlZj0iI2UiLz4KICAgICAgICA8cmVjdCB5PSIxIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODZhNjY2IiBpZD0iZiIvPgogICAgICAgIDx1c2UgeD0iMSIgeT0iLTEiIGhyZWY9IiNmIiB4OmhyZWY9IiNmIi8+CiAgICAgIDwvZz4KICAgICAgPHVzZSB4PSIyIiBocmVmPSIjZCIgeDpocmVmPSIjZCIvPgogICAgPC9nPgogICAgPHVzZSB4PSI0IiBocmVmPSIjYyIgeDpocmVmPSIjYyIvPgogIDwvZz4KICA8dXNlIHk9IjIiIGhyZWY9IiNiIiB4OmhyZWY9IiNiIi8+CjwvZz4KPHVzZSB5PSI0IiBocmVmPSIjYSIgeDpocmVmPSIjYSIvPgo8L3N2Zz4K);
 }
-
-/* src/main.css */
 .chess-study {
 	--cs-radius: 10px;
 	--cs-gap: 10px;
@@ -439,8 +418,8 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 	--cs-coord-offset: calc(var(--cs-coords) + var(--cs-coord-gap));
 }
 .chess-study *,
-.chess-study *::before,
-.chess-study *::after {
+.chess-study *:before,
+.chess-study *:after {
 	box-sizing: border-box;
 }
 .chess-study * {
@@ -589,101 +568,99 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 .chess-study .move-item {
 	padding-left: 8px;
 	user-select: none;
-	font-weight: normal;
+	font-weight: 400;
 }
 .chess-study .move-item.variation-depth-0:hover {
-	background-color: darkgray;
+	background-color: #a9a9a9;
 	color: var(--text-on-accent);
 	cursor: pointer;
 }
 .chess-study .move-item.variation-depth-1:hover {
-	background-color: darkviolet;
+	background-color: #9400d3;
 	color: var(--text-on-accent);
 	cursor: pointer;
 }
 .chess-study .move-item.variation-depth-2:hover {
-	background-color: darkblue;
+	background-color: #00008b;
 	color: var(--text-on-accent);
 	cursor: pointer;
 }
 .chess-study .move-item.variation-depth-3:hover {
-	background-color: darkgreen;
+	background-color: #006400;
 	color: var(--text-on-accent);
 	cursor: pointer;
 }
 .chess-study .move-item.variation-depth-4:hover {
-	background-color: darkgoldenrod;
+	background-color: #b8860b;
 	color: var(--text-on-accent);
 	cursor: pointer;
 }
 .chess-study .move-item.variation-depth-5:hover {
-	background-color: darksalmon;
+	background-color: #e9967a;
 	color: var(--text-on-accent);
 	cursor: pointer;
 }
 .chess-study .move-item.variation-depth-6:hover {
-	background-color: darkkhaki;
+	background-color: #bdb76b;
 	color: var(--text-on-accent);
 	cursor: pointer;
 }
 .chess-study .move-item.variation-depth-1 {
-	color: darkviolet;
+	color: #9400d3;
 }
 .chess-study .move-item.variation-depth-2 {
-	color: darkblue;
+	color: #00008b;
 }
 .chess-study .move-item.variation-depth-3 {
-	color: darkgreen;
+	color: #006400;
 }
 .chess-study .move-item.variation-depth-4 {
-	color: darkgoldenrod;
+	color: #b8860b;
 }
 .chess-study .move-item.variation-depth-5 {
-	color: darksalmon;
+	color: #e9967a;
 }
 .chess-study .move-item.variation-depth-6 {
-	color: darkkhaki;
+	color: #bdb76b;
 }
 .chess-study .move-item.active.variation-depth-0 {
-	background-color: darkgray;
+	background-color: #a9a9a9;
 	color: var(--text-on-accent);
-	font-weight: bold;
+	font-weight: 700;
 }
 .chess-study .move-item.active.variation-depth-1 {
-	background-color: darkviolet;
+	background-color: #9400d3;
 	color: var(--text-on-accent);
-	font-weight: bold;
+	font-weight: 700;
 }
 .chess-study .move-item.active.variation-depth-2 {
-	background-color: darkblue;
+	background-color: #00008b;
 	color: var(--text-on-accent);
-	font-weight: bold;
+	font-weight: 700;
 }
 .chess-study .move-item.active.variation-depth-3 {
-	background-color: darkgreen;
+	background-color: #006400;
 	color: var(--text-on-accent);
-	font-weight: bold;
+	font-weight: 700;
 }
 .chess-study .move-item.active.variation-depth-4 {
-	background-color: darkgoldenrod;
+	background-color: #b8860b;
 	color: var(--text-on-accent);
-	font-weight: bold;
+	font-weight: 700;
 }
 .chess-study .move-item.active.variation-depth-5 {
-	background-color: darksalmon;
+	background-color: #e9967a;
 	color: var(--text-on-accent);
-	font-weight: bold;
+	font-weight: 700;
 }
 .chess-study .move-item.active.variation-depth-6 {
-	background-color: darkkhaki;
+	background-color: #bdb76b;
 	color: var(--text-on-accent);
-	font-weight: bold;
+	font-weight: 700;
 }
-.chess-study .move-item.ancestor {
-	font-weight: bold;
-}
+.chess-study .move-item.ancestor,
 .chess-study .move-item.mainline {
-	font-weight: bold;
+	font-weight: 700;
 }
 .chess-study .variants-container {
 	grid-column: span 3 / auto;
@@ -719,7 +696,7 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 	color: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) - 10%));
 }
 .chess-study .variant-move-indicator {
-	font-weight: normal;
+	font-weight: 400;
 }
 .chess-study .cs-notes {
 	border: 1px solid var(--cs-border);
@@ -781,7 +758,7 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 .chess-study .ProseMirror p {
 	margin: 0 0 0.4em;
 }
-.chess-study .ProseMirror > p.is-empty:only-child::before {
+.chess-study .ProseMirror > p.is-empty:only-child:before {
 	content: attr(data-placeholder);
 	float: left;
 	height: 0;
@@ -894,7 +871,7 @@ coords.squares:nth-of-type(even) :nth-child(even) {
 .chess-study .cs-classification-button.is-active {
 	border-color: var(--cs-classification);
 	background-color: var(--cs-classification);
-	color: #ffffff;
+	color: #fff;
 }
 .chess-study .cs-classification-button:disabled {
 	opacity: 0.4;
