@@ -4,9 +4,9 @@ import { GameState } from './GameState';
 export function comment_from_chess_study(
 	state: Readonly<GameState>,
 ): JSONContent | null {
-	if (state.currentChessStudyMove) {
-		if (state.currentChessStudyMove.comment) {
-			return state.currentChessStudyMove.comment;
+	if (state.currentMove) {
+		if (state.currentMove.comment) {
+			return state.currentMove.comment;
 		} else {
 			return null;
 		}

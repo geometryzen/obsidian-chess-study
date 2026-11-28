@@ -5,8 +5,8 @@ import { GameState } from './GameState';
 export function get_current_chessstudy_move(
 	state: Readonly<GameState>,
 ): NeoMove | null {
-	if (state.currentChessStudyMove) {
-		const currentMove = state.currentChessStudyMove;
+	if (state.currentMove) {
+		const currentMove = state.currentMove;
 		const moveId = currentMove.moveId;
 
 		if (moveId) {

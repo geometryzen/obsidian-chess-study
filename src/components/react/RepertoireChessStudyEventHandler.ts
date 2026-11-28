@@ -65,7 +65,7 @@ function update_board_view_following_move(
 	const pos = new ChessPosition(chessStudyMove.after);
 	update_board_view_from_position(chessView, pos);
 	setChessLogic(pos);
-	state.currentChessStudyMove = chessStudyMove;
+	state.currentMove = chessStudyMove;
 	state.isCommentsHidden = has_next_moves(chessStudyMove);
 	state.isNavigationHidden = has_next_moves(chessStudyMove);
 	state.isNotationHidden = has_next_moves(chessStudyMove);
@@ -144,10 +144,10 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 	playMove(state: GameState, m: Move, boardOrientation: 'w' | 'b'): void {
 		if (!this.#chessView) return;
 		const root = state.chessStudy.root;
-		if (state.currentChessStudyMove) {
+		if (state.currentMove) {
 			const current_move = get_move_by_id(
 				state.chessStudy,
-				state.currentChessStudyMove.moveId,
+				state.currentMove.moveId,
 			);
 			if (m.color === boardOrientation) {
 				// The move is being made for the user side.
@@ -249,7 +249,7 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 		update_board_view_from_position(this.#chessView, pos);
 		// TODO: It seems a bit strange that the computation of the current move does not happen
 		// in a more coherent way with the initialization of the position.
-		state.currentChessStudyMove = initial_move_from_neo_study(
+		state.currentMove = initial_move_from_neo_study(
 			state.chessStudy,
 			initialPosition,
 		);
@@ -261,10 +261,10 @@ export class RepertoireChessStudyEventHandler implements ChessStudyEventHandler 
 	 * @override
 	 */
 	shapes(state: GameState): DrawShape[] {
-		if (state.currentChessStudyMove) {
-			return state.currentChessStudyMove.shapes as DrawShape[];
+		if (state.currentMove) {
+			return state.currentMove.shapes;
 		} else {
-			return state.chessStudy.shapes as DrawShape[];
+			return state.chessStudy.shapes;
 		}
 	}
 }

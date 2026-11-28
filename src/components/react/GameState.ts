@@ -4,8 +4,9 @@ import { NeoStudy } from '../../lib/neo/NeoStudy';
 export interface GameState {
 	/**
 	 * The current move in the chessStudy property.
+	 * Note that this may only be used with the chessStudy property (it cannot be used with the repertoire property).
 	 */
-	currentChessStudyMove: NeoMove | null;
+	currentMove: NeoMove | null;
 	/**
 	 *
 	 */

@@ -21,11 +21,26 @@ import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo
 import { clone_study } from '../../lib/neo/clone_study.js';
 import { NeoStudy } from '../../lib/neo/NeoStudy.js';
 //import { path_from_move } from '../../lib/neo/path_from_move';
+import StarterKit from '@tiptap/starter-kit';
+import { Key } from 'chessground/types';
 import {
-	annotate_move_blunder,
+	badgeSvg,
+	MoveAnnotation,
+	moveAnnotationMap,
+} from '../../lib/classification';
+import {
+	get_target_move,
+	get_target_move_else_source,
+} from '../../lib/neo/get_target_move';
+import { nags_annotation } from '../../lib/neo/nags-helpers';
+import {
+	annotate_move_bang,
+	annotate_move_bangbang,
+	annotate_move_bangqmark,
 	annotate_move_correct,
-	annotate_move_inaccurate,
-	annotate_move_mistake,
+	annotate_move_qmark,
+	annotate_move_qmarkbang,
+	annotate_move_qmarkqmark,
 	decrease_move_evaluation,
 	decrease_position_evaluation,
 	increase_move_evaluation,
@@ -35,6 +50,7 @@ import {
 	NAG_questionable_move,
 	NAG_very_poor_move,
 	NumericAnnotationGlyph,
+	remove_move_annotations,
 } from '../../lib/NumericAnnotationGlyphs';
 import { ChessStudyLoader } from '../../lib/obsidian/ChessStudyLoader';
 import {
@@ -45,27 +61,14 @@ import { jgn_from_neo } from '../../lib/transform/jgn_from_neo';
 import { update_board_view_from_position } from '../../lib/ui-state/update_board_view_from_position';
 import { ChessgroundProps, ChessgroundWrapper } from './ChessgroundWrapper';
 import { ChessStudyEventHandler } from './ChessStudyEventHandler';
+import { comment_from_game_state } from './comment_from_game_state';
 import { CommentSection } from './CommentSection';
-import { EvalBar } from './EvalBar';
 import { createChessStudyEventHandler } from './createChessStudyEventHandler';
+import { EvalBar } from './EvalBar';
+import { GameState } from './GameState';
 import { get_current_chessstudy_move } from './get_current_chessstudy_move';
 import { has_no_moves } from './has_no_moves';
 import { NeoMovesViewer } from './NeoMovesViewer';
-import StarterKit from '@tiptap/starter-kit';
-import { GameState } from './GameState';
-import { comment_from_game_state } from './comment_from_game_state';
-import {
-	get_target_move,
-	get_target_move_else_source,
-} from '../../lib/neo/get_target_move';
-import {
-	CLASSIFICATIONS,
-	DRAW_MARK,
-	MoveClassification,
-	badgeSvg,
-	classificationForKey,
-	readClassification,
-} from '../../lib/classification';
 
 export type ChessStudyConfig = ChessgroundProps;
 
@@ -94,8 +97,8 @@ export interface MoveToken {
 /** Named rather than inlined below, where prettier's indentation of a wide
  *  union member trips no-mixed-spaces-and-tabs. */
 interface ClassifyAction {
-	type: 'SET_CLASSIFICATION';
-	classification: MoveClassification | null;
+	type: 'SET_MOVE_ANNOTATION';
+	classification: MoveAnnotation | null;
 	/** Defaults to the current move; the context menu passes an explicit one. */
 	moveId?: string;
 }
@@ -188,7 +191,7 @@ export const ChessStudy = ({
 		/**
 		 *
 		 */
-		currentChessStudyMove: initial_move(),
+		currentMove: initial_move(),
 		/**
 		 * Placing this here to illustrate how the game state can migrate toward the tree model.
 		 */
@@ -220,7 +223,7 @@ export const ChessStudy = ({
 
 	handler.setInitialState(
 		initialState,
-		initialState.currentChessStudyMove,
+		initialState.currentMove,
 		initialState.chessStudy,
 	);
 	/*
@@ -237,26 +240,26 @@ export const ChessStudy = ({
 		(state: GameState, event: GameEvent) => {
 			switch (event.type) {
 				case 'GOTO_NEXT_MOVE': {
-					if (state.currentChessStudyMove) {
+					if (state.currentMove) {
 						const currentMove = get_move_by_id(
 							state.chessStudy,
-							state.currentChessStudyMove.moveId,
+							state.currentMove.moveId,
 						);
 						if (get_next_move(currentMove)) {
-							state.currentChessStudyMove = handler.gotoNextMove(state);
+							state.currentMove = handler.gotoNextMove(state);
 						}
 					} else {
-						state.currentChessStudyMove = handler.gotoNextMove(state);
+						state.currentMove = handler.gotoNextMove(state);
 					}
 					break;
 				}
 				case 'GOTO_PREV_MOVE': {
-					state.currentChessStudyMove = handler.gotoPrevMove(state);
+					state.currentMove = handler.gotoPrevMove(state);
 					break;
 				}
 				case 'DELETE_MOVE': {
 					if (!chessView || has_no_moves(state)) return state;
-					if (state.currentChessStudyMove) {
+					if (state.currentMove) {
 						// const moveId = state.currentMove.moveId;
 						// For some reason we get two events so we must be idempotent.
 						if (has_move_by_id(state.chessStudy, event.moveId)) {
@@ -269,14 +272,14 @@ export const ChessStudy = ({
 								} else {
 									parent.right = target.right;
 								}
-								state.currentChessStudyMove = parent;
+								state.currentMove = parent;
 								const pos = new ChessPosition(parent.after);
 								update_board_view_from_position(chessView, pos);
 								setChessLogic(pos);
 							} else {
 								// We must be deleting the root node
 								state.chessStudy.root = null;
-								state.currentChessStudyMove = null;
+								state.currentMove = null;
 								const pos = new ChessPosition(state.chessStudy.rootFEN);
 								update_board_view_from_position(chessView, pos);
 								setChessLogic(pos);
@@ -292,7 +295,7 @@ export const ChessStudy = ({
 				case 'GOTO_MOVE': {
 					// When a move is clicked in the user interface, the identifier is from the chessStudy.
 					const chessStudyMove = handler.gotoMove(state, event.moveId);
-					state.currentChessStudyMove = chessStudyMove;
+					state.currentMove = chessStudyMove;
 					break;
 				}
 				case 'RESET': {
@@ -317,7 +320,7 @@ export const ChessStudy = ({
 						}
 						// Isn't this redundant? Didn't we just get the current move?
 						// Caution: The issue may be that we have changed the comment of the current move.
-						state.currentChessStudyMove = currentChessStudyMove;
+						state.currentMove = currentChessStudyMove;
 					} else {
 						// We should be allowed to have shapes in the
 						state.chessStudy.shapes = event.shapes;
@@ -360,7 +363,7 @@ export const ChessStudy = ({
 						}
 						// Isn't this redundant? Didn't we just get the current move?
 						// Caution: The issue may be that we have changed the comment of the current move.
-						state.currentChessStudyMove = currentChessStudyMove;
+						state.currentMove = currentChessStudyMove;
 					} else {
 						// When there is no current move then we apply the comment to the game itself.
 						if (event.comment) {
@@ -380,23 +383,63 @@ export const ChessStudy = ({
 					}
 					return state;
 				}
-				case 'SET_CLASSIFICATION': {
+				case 'SET_MOVE_ANNOTATION': {
+					console.log(event.type, event.classification, event.moveId);
 					if (has_no_moves(state)) return state;
-
-					// The keyboard shortcut labels the current move; the context menu
-					// names the one it was opened on.
-					/*
-					const moveId = event.moveId ?? draft.currentMove?.moveId;
-					const path = moveId ? findMovePathById(draft.repertoire, moveId) : null;
-					const move = path && getMoveAtPath(draft.repertoire, path);
-
-					if (!move) return draft;
-
-					move.classification = action.classification;
-
-					if (draft.currentMove?.moveId === moveId) draft.currentMove = move;
-					*/
-
+					state.chessStudy = clone_study(state.chessStudy);
+					const currentChessStudyMove = get_current_chessstudy_move(state);
+					if (currentChessStudyMove) {
+						const move = get_target_move_else_source(
+							currentChessStudyMove,
+							chessStudy,
+							repertoire,
+						);
+						switch (event.classification) {
+							case 'qmarkqmark': {
+								currentChessStudyMove.nags = move.nags = annotate_move_qmarkqmark(
+									move.nags as NumericAnnotationGlyph[],
+								);
+								break;
+							}
+							case 'bangbang': {
+								currentChessStudyMove.nags = move.nags = annotate_move_bangbang(
+									move.nags as NumericAnnotationGlyph[],
+								);
+								break;
+							}
+							case 'bang': {
+								currentChessStudyMove.nags = move.nags = annotate_move_bang(
+									move.nags as NumericAnnotationGlyph[],
+								);
+								break;
+							}
+							case 'bangqmark': {
+								currentChessStudyMove.nags = move.nags = annotate_move_bangqmark(
+									move.nags as NumericAnnotationGlyph[],
+								);
+								break;
+							}
+							case 'qmarkbang': {
+								currentChessStudyMove.nags = move.nags = annotate_move_qmarkbang(
+									move.nags as NumericAnnotationGlyph[],
+								);
+								break;
+							}
+							case 'qmark': {
+								currentChessStudyMove.nags = move.nags = annotate_move_qmark(
+									move.nags as NumericAnnotationGlyph[],
+								);
+								break;
+							}
+							default: {
+								currentChessStudyMove.nags = move.nags = remove_move_annotations(
+									move.nags as NumericAnnotationGlyph[],
+								);
+							}
+						}
+					} else {
+						// Do nothing
+					}
 					return state;
 				}
 				case 'PLAY_MOVE': {
@@ -427,19 +470,19 @@ export const ChessStudy = ({
 								break;
 							}
 							case NAG_questionable_move: {
-								currentChessStudyMove.nags = move.nags = annotate_move_inaccurate(
+								currentChessStudyMove.nags = move.nags = annotate_move_qmarkbang(
 									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
 							}
 							case NAG_poor_move: {
-								currentChessStudyMove.nags = move.nags = annotate_move_mistake(
+								currentChessStudyMove.nags = move.nags = annotate_move_qmark(
 									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
 							}
 							case NAG_very_poor_move: {
-								currentChessStudyMove.nags = move.nags = annotate_move_blunder(
+								currentChessStudyMove.nags = move.nags = annotate_move_qmarkqmark(
 									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
@@ -475,9 +518,6 @@ export const ChessStudy = ({
 								);
 								break;
 							}
-							default: {
-								new Notice(`${move.san} ${event.direction}`);
-							}
 						}
 					}
 					return state;
@@ -503,9 +543,6 @@ export const ChessStudy = ({
 									move.nags as NumericAnnotationGlyph[],
 								);
 								break;
-							}
-							default: {
-								new Notice(`${move.san} ${event.direction}`);
 							}
 						}
 					}
@@ -595,6 +632,31 @@ export const ChessStudy = ({
 		gameState.repertoire,
 	]);
 
+	const autoShapes: DrawShape[] = useMemo(() => {
+		const move = get_current_chessstudy_move(gameState);
+
+		if (!move) return [];
+
+		const key = nags_annotation(move.nags);
+		if (!key) return [];
+		const mark = moveAnnotationMap[key];
+		/*
+		const mark = drawnMoveIds.has(move.moveId)
+			? DRAW_MARK
+			: classification
+			? CLASSIFICATIONS[classification]
+			: null;
+		*/
+		if (!mark) return [];
+
+		return [
+			{
+				orig: move.to as Key,
+				customSvg: badgeSvg(mark.glyph, mark.color),
+			},
+		];
+	}, [/*drawnMoveIds, */ gameState]);
+
 	const moveLabel = useMemo(
 		() => {
 			const move = get_current_chessstudy_move(gameState);
@@ -633,19 +695,22 @@ export const ChessStudy = ({
 							chess={chessLogic}
 							onMove={(move: Move) => dispatch({ type: 'PLAY_MOVE', move })}
 							isViewOnly={gameState.isViewOnly}
+							canDraw={/*drawing.enabled*/ true}
+							savesShapes={/*drawing.saved*/ true}
 							syncShapes={(shapes: DrawShape[]) =>
 								dispatch({ type: 'SYNC_SHAPES', shapes })
 							}
 							shapes={handler.shapes(gameState)}
+							autoShapes={autoShapes}
 						/>
 					</div>
 				</div>
 				{
-					<div className="pgn-container">
+					<div className="cs-pgn-container">
 						<NeoMovesViewer
 							chessStudy={gameState.chessStudy}
 							repertoire={gameState.repertoire}
-							currentMoveId={gameState.currentChessStudyMove?.moveId ?? null}
+							currentMoveId={gameState.currentMove?.moveId ?? null}
 							initialPlayer={initialPlayer}
 							rootMoveNumber={rootMoveNumber}
 							isVisible={!gameState.isNotationHidden}
@@ -695,9 +760,9 @@ export const ChessStudy = ({
 									new Notice(`Could not copy PGN to clipboard. Cause: ${e}`);
 								}
 							}}
-							onSaveButtonClick={onSaveButtonClick}
+							onSaveButtonClick={() => void onSaveButtonClick()}
 							onDeleteButtonClick={(moveId) => {
-								if (gameState.currentChessStudyMove) {
+								if (gameState.currentMove) {
 									dispatch({
 										type: 'DELETE_MOVE',
 										moveId,
@@ -758,11 +823,12 @@ export const ChessStudy = ({
 					moveLabel={moveLabel}
 					defaultOpen={viewComments}
 					classification={
-						/*gameState.currentChessStudyMove?.classification ?? null*/ null
+						gameState.currentMove ? nags_annotation(gameState.currentMove.nags) : null
 					}
-					onClassify={(classification: MoveClassification | null) =>
-						dispatch({ type: 'SET_CLASSIFICATION', classification })
-					}
+					onClassify={(classification: MoveAnnotation | null) => {
+						console.log('onClassify', classification);
+						dispatch({ type: 'SET_MOVE_ANNOTATION', classification });
+					}}
 					isLocked={/*isLocked*/ false}
 				/>
 			)}

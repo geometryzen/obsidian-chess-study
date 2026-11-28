@@ -85,11 +85,11 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 */
 	playMove(state: GameState, m: Move): void {
 		try {
-			if (state.currentChessStudyMove) {
+			if (state.currentMove) {
 				// Dereference the currentMove. In future we might grab it directly.
 				const current_move = get_move_by_id(
 					state.chessStudy,
-					state.currentChessStudyMove.moveId,
+					state.currentMove.moveId,
 				);
 				// console.lg('move', move.san);
 				const next_move = get_next_move(current_move);
@@ -99,7 +99,7 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					while (candidate) {
 						// console.lg('candidate', candidate.san);
 						if (candidate.san === m.san) {
-							state.currentChessStudyMove = candidate;
+							state.currentMove = candidate;
 							return;
 						}
 						candidate = get_variation_next(candidate);
@@ -107,16 +107,13 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					// The move will be added as a variation of the next move.
 					const parent = rightmost_node(next_move);
 					parent.right = move_from_user_move(m, null, null);
-					state.currentChessStudyMove = parent.right;
+					state.currentMove = parent.right;
 				} else {
 					// The move will be added as the next Main Line move
 					const new_move = move_from_user_move(m, null, null);
-					const target = get_move_by_id(
-						state.chessStudy,
-						state.currentChessStudyMove.moveId,
-					);
+					const target = get_move_by_id(state.chessStudy, state.currentMove.moveId);
 					target.left = new_move;
-					state.currentChessStudyMove = new_move;
+					state.currentMove = new_move;
 				}
 			} else {
 				// console.lg('There is no current move');
@@ -124,14 +121,11 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 					// console.lg('The root is null');
 					const move = move_from_user_move(m, null, null);
 					state.chessStudy.root = move;
-					state.currentChessStudyMove = move;
+					state.currentMove = move;
 				} else {
 					// console.lg('The root is defined');
 					const first_move = first_neo_move(state.chessStudy) as NeoMove;
-					state.currentChessStudyMove = ensure_move_is_neo_move_or_variation(
-						m,
-						first_move,
-					);
+					state.currentMove = ensure_move_is_neo_move_or_variation(m, first_move);
 				}
 			}
 		} finally {
@@ -163,18 +157,18 @@ export class GameChessStudyEventHandler implements ChessStudyEventHandler {
 	 */
 	shapes(state: GameState): DrawShape[] {
 		const currentRepertoireMove = get_target_move(
-			state.currentChessStudyMove,
+			state.currentMove,
 			state.chessStudy,
 			state.repertoire,
 			null,
 		);
 		if (currentRepertoireMove) {
-			return currentRepertoireMove.shapes as DrawShape[];
+			return currentRepertoireMove.shapes;
 		} else {
-			if (state.currentChessStudyMove) {
-				return state.currentChessStudyMove.shapes as DrawShape[];
+			if (state.currentMove) {
+				return state.currentMove.shapes;
 			} else {
-				return state.chessStudy.shapes as DrawShape[];
+				return state.chessStudy.shapes;
 			}
 		}
 	}

@@ -5,16 +5,19 @@
  * imports from all live in one table, so a new label is one row.
  */
 
-export type MoveClassification =
-	| 'brilliant'
-	| 'great'
-	| 'excellent'
-	| 'good'
-	| 'inaccuracy'
-	| 'mistake'
-	| 'blunder';
+import {
+	NAG_excellent_move,
+	NAG_good_move,
+	NAG_poor_move,
+	NAG_questionable_move,
+	NAG_speculative_move,
+	NAG_very_poor_move,
+} from '../NumericAnnotationGlyphs';
 
-interface ClassificationMeta {
+export type MoveAnnotation =
+	'bangbang' | 'bang' | 'bangqmark' | 'qmarkbang' | 'qmark' | 'qmarkqmark';
+
+interface MoveAnnotationInfo {
 	label: string;
 	glyph: string;
 	color: string;
@@ -27,21 +30,29 @@ interface ClassificationMeta {
 	nag: number | null;
 }
 
-export const CLASSIFICATIONS: Record<MoveClassification, ClassificationMeta> = {
-	brilliant: {
+export const moveAnnotationMap: Record<MoveAnnotation, MoveAnnotationInfo> = {
+	bangbang: {
 		label: 'Brilliant',
 		glyph: '!!',
 		color: '#26c2a3',
 		shortcut: '1',
-		nag: 3,
+		nag: NAG_excellent_move,
 	},
-	great: {
+	bang: {
 		label: 'Great',
 		glyph: '!',
 		color: '#5c8bb0',
 		shortcut: '2',
-		nag: 1,
+		nag: NAG_good_move,
 	},
+	bangqmark: {
+		label: 'Interesting',
+		glyph: '!?',
+		color: '#96af8b',
+		shortcut: '5',
+		nag: NAG_speculative_move,
+	},
+	/*
 	excellent: {
 		label: 'Excellent',
 		glyph: '★',
@@ -49,6 +60,8 @@ export const CLASSIFICATIONS: Record<MoveClassification, ClassificationMeta> = {
 		shortcut: '3',
 		nag: null,
 	},
+	*/
+	/*
 	good: {
 		label: 'Good',
 		glyph: '✓',
@@ -56,32 +69,33 @@ export const CLASSIFICATIONS: Record<MoveClassification, ClassificationMeta> = {
 		shortcut: '4',
 		nag: null,
 	},
-	inaccuracy: {
+	*/
+	qmarkbang: {
 		label: 'Inaccuracy',
 		glyph: '?!',
 		color: '#f7c631',
 		shortcut: '5',
-		nag: 6,
+		nag: NAG_questionable_move,
 	},
-	mistake: {
+	qmark: {
 		label: 'Mistake',
 		glyph: '?',
 		color: '#ffa459',
 		shortcut: '6',
-		nag: 2,
+		nag: NAG_poor_move,
 	},
-	blunder: {
+	qmarkqmark: {
 		label: 'Blunder',
 		glyph: '??',
 		color: '#fa412d',
 		shortcut: '7',
-		nag: 4,
+		nag: NAG_very_poor_move,
 	},
 };
 
 export const CLASSIFICATION_ORDER = Object.keys(
-	CLASSIFICATIONS,
-) as MoveClassification[];
+	moveAnnotationMap,
+) as MoveAnnotation[];
 
 /**
  * The mark on a move that leaves the game drawn.
@@ -99,13 +113,13 @@ export const DRAW_MARK = {
 };
 
 const BY_SHORTCUT = new Map(
-	CLASSIFICATION_ORDER.map((key) => [CLASSIFICATIONS[key].shortcut, key]),
+	CLASSIFICATION_ORDER.map((key) => [moveAnnotationMap[key].shortcut, key]),
 );
 
 /** `1`-`7` pick a label; `0` clears one. Anything else is not a shortcut. */
 export const classificationForKey = (
 	key: string,
-): { classification: MoveClassification | null } | null => {
+): { classification: MoveAnnotation | null } | null => {
 	if (key === '0') return { classification: null };
 
 	const classification = BY_SHORTCUT.get(key);
@@ -113,13 +127,12 @@ export const classificationForKey = (
 	return classification ? { classification } : null;
 };
 
-const isClassification = (value: unknown): value is MoveClassification =>
-	typeof value === 'string' && value in CLASSIFICATIONS;
+const isClassification = (value: unknown): value is MoveAnnotation =>
+	typeof value === 'string' && value in moveAnnotationMap;
 
 /** Guards against a hand-edited or future-version repertoire file. */
-export const readClassification = (
-	value: unknown,
-): MoveClassification | null => (isClassification(value) ? value : null);
+export const readClassification = (value: unknown): MoveAnnotation | null =>
+	isClassification(value) ? value : null;
 
 /**
  * Badge drawn on the destination square of the move it belongs to.
@@ -130,14 +143,19 @@ export const readClassification = (
  * overflow to keep its rounded corners, so an overhanging badge is sliced in
  * half on the h-file and the 8th rank.
  */
-export const badgeSvg = (glyph: string, color: string): string => {
+export const badgeSvg = (
+	glyph: string,
+	color: string,
+): { html: string; center?: 'orig' | 'dest' | 'label' } => {
 	// Two-character glyphs need to be set smaller to stay inside the circle.
 	const fontSize = glyph.length > 1 ? 26 : 32;
 
-	return `
+	return {
+		html: `
 		<circle cx="76" cy="24" r="21" fill="${color}" stroke="#ffffff" stroke-width="4" />
 		<text x="76" y="24" fill="#ffffff" font-size="${fontSize}" font-weight="700"
 		      font-family="Inter, system-ui, sans-serif"
 		      text-anchor="middle" dominant-baseline="central">${glyph}</text>
-	`;
+	`,
+	};
 };

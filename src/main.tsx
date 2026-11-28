@@ -45,7 +45,16 @@ import {
 import { ensure_target_moves } from './lib/neo/ensure_target_moves';
 
 export type BoardOrientation = 'white' | 'black';
-export type BoardColor = 'green' | 'brown';
+
+export const BOARD_COLORS = {
+	blue: 'Blue',
+	'blue-soft': 'Blue (soft)',
+	green: 'Green',
+	brown: 'Brown',
+} as const;
+
+export type BoardColor = keyof typeof BOARD_COLORS;
+
 const CHESSSTUDY_ID_YAML_NAME = 'chessStudyId';
 const REPERTOIRE_ID_YAML_NAME = 'repertoireId';
 const SPACE = ' ';

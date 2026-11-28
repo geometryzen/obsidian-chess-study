@@ -139,7 +139,7 @@
 	aspect-ratio: 1 / 1;
 }
 
-.chess-study .cs-board-row .pgn-container {
+.chess-study .cs-board-row .cs-pgn-container {
 	flex: 1;
 	height: 100%;
 }

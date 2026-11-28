@@ -11,7 +11,7 @@ import { ChessStudyEventHandler } from './ChessStudyEventHandler';
 import { initial_move_from_neo_study } from '../../lib/neo/initial_node_from_neo_study';
 import { initialize_position } from '../../lib/chess-logic/initialize_position';
 import { has_next_moves } from '../../lib/neo/has_next_moves';
-import { is_correct_move } from '../../lib/neo/is_questionable_move';
+import { is_correct_move } from '../../lib/neo/nags-helpers';
 import { CompletedPosition } from '../../lib/config/CompletedPosition';
 import { GameState } from './GameState';
 
@@ -28,7 +28,7 @@ function terminate_puzzle(
 	const pos = new ChessPosition(user_move.after);
 	update_board_view_from_position(chessView, pos);
 	setChessLogic(pos);
-	state.currentChessStudyMove = user_move;
+	state.currentMove = user_move;
 	state.isNotationHidden = false;
 	return;
 }
@@ -65,7 +65,7 @@ function play_response_move_or_terminate_puzzle(
 				const pos = new ChessPosition(response_move.after);
 				update_board_view_from_position(chessView, pos);
 				setChessLogic(pos);
-				state.currentChessStudyMove = response_move;
+				state.currentMove = response_move;
 				state.isNotationHidden = has_next_moves(response_move);
 			}
 		} else {
@@ -127,10 +127,10 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 	): void {
 		if (!this.#chessView) return;
 		const root = state.chessStudy.root;
-		if (state.currentChessStudyMove) {
+		if (state.currentMove) {
 			const current_move = get_move_by_id(
 				state.chessStudy,
-				state.currentChessStudyMove.moveId,
+				state.currentMove.moveId,
 			);
 			// There may be several move choices that the user is allowed to make due to variations.
 			// Make sure that the user plays only correct moves.
@@ -208,7 +208,7 @@ export class PuzzleChessStudyEventHandler implements ChessStudyEventHandler {
 		update_board_view_from_position(this.#chessView, pos);
 		// TODO: It seems a bit strange that the computation of the current move does not happen
 		// in a more coherent way with the initialization of the position.
-		state.currentChessStudyMove = initial_move_from_neo_study(
+		state.currentMove = initial_move_from_neo_study(
 			state.chessStudy,
 			initialPosition,
 		);

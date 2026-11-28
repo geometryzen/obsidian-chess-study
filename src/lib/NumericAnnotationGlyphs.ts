@@ -2,24 +2,27 @@ import { is_shallow_arrays_equal } from './lang/is_shallow_arrays_equal';
 
 export const NAG_null = 0;
 /**
- * !
+ * Good move: !
  */
 export const NAG_good_move = 1;
 /**
- * Mistake
+ * Poor move: ? (Mistake)
  */
 export const NAG_poor_move = 2;
 /**
- * !!
+ * Excellent move: !! (Brilliant)
  */
 export const NAG_excellent_move = 3;
 /**
- * Blunder
+ * Blunder: ??
  */
 export const NAG_very_poor_move = 4;
+/**
+ * Interesting move: !?
+ */
 export const NAG_speculative_move = 5;
 /**
- * Inaccuracy
+ * Dubious move: ?! (Inaccuracy)
  */
 export const NAG_questionable_move = 6;
 
@@ -152,8 +155,19 @@ export function remove_nag(
 			return nag !== target;
 		});
 	} else {
-		return nags;
+		return [...nags];
 	}
+}
+
+export function remove_move_annotations(nags: NumericAnnotationGlyph[]) {
+	return remove_nags(nags, [
+		NAG_good_move,
+		NAG_poor_move,
+		NAG_excellent_move,
+		NAG_very_poor_move,
+		NAG_speculative_move,
+		NAG_questionable_move,
+	]);
 }
 
 export function remove_nags(
@@ -360,7 +374,7 @@ export function annotate_move_correct(
 	return remove_nags(nags, move_quality_nags);
 }
 
-export function annotate_move_inaccurate(
+export function annotate_move_qmarkbang(
 	nags: NumericAnnotationGlyph[],
 ): NumericAnnotationGlyph[] {
 	const clean = remove_nags(
@@ -370,14 +384,14 @@ export function annotate_move_inaccurate(
 	return ensure_nag(clean, NAG_questionable_move);
 }
 
-export function annotate_move_mistake(
+export function annotate_move_qmark(
 	nags: NumericAnnotationGlyph[],
 ): NumericAnnotationGlyph[] {
 	const clean = remove_nags(nags, remove_nag(move_quality_nags, NAG_poor_move));
 	return ensure_nag(clean, NAG_poor_move);
 }
 
-export function annotate_move_blunder(
+export function annotate_move_qmarkqmark(
 	nags: NumericAnnotationGlyph[],
 ): NumericAnnotationGlyph[] {
 	const clean = remove_nags(
@@ -385,6 +399,33 @@ export function annotate_move_blunder(
 		remove_nag(move_quality_nags, NAG_very_poor_move),
 	);
 	return ensure_nag(clean, NAG_very_poor_move);
+}
+
+export function annotate_move_bangbang(
+	nags: NumericAnnotationGlyph[],
+): NumericAnnotationGlyph[] {
+	const clean = remove_nags(
+		nags,
+		remove_nag(move_quality_nags, NAG_excellent_move),
+	);
+	return ensure_nag(clean, NAG_excellent_move);
+}
+
+export function annotate_move_bang(
+	nags: NumericAnnotationGlyph[],
+): NumericAnnotationGlyph[] {
+	const clean = remove_nags(nags, remove_nag(move_quality_nags, NAG_good_move));
+	return ensure_nag(clean, NAG_good_move);
+}
+
+export function annotate_move_bangqmark(
+	nags: NumericAnnotationGlyph[],
+): NumericAnnotationGlyph[] {
+	const clean = remove_nags(
+		nags,
+		remove_nag(move_quality_nags, NAG_speculative_move),
+	);
+	return ensure_nag(clean, NAG_speculative_move);
 }
 
 function assert_shallow_arrays_equal<T>(actual: T[], expect: T[]) {
@@ -459,7 +500,7 @@ function assert_shallow_arrays_equal<T>(actual: T[], expect: T[]) {
 	assert_shallow_arrays_equal(actual, expect);
 }
 {
-	const actual = annotate_move_mistake([]);
+	const actual = annotate_move_qmark([]);
 	const expect = [NAG_poor_move];
 	assert_shallow_arrays_equal(actual, expect);
 }

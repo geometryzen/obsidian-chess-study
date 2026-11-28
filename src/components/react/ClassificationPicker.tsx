@@ -2,13 +2,13 @@ import { X } from 'lucide-react';
 import * as React from 'react';
 import {
 	CLASSIFICATION_ORDER,
-	CLASSIFICATIONS,
-	MoveClassification,
+	moveAnnotationMap,
+	MoveAnnotation,
 } from '../../lib/classification';
 
 interface ClassificationPickerProps {
-	classification: MoveClassification | null;
-	onClassify: (classification: MoveClassification | null) => void;
+	classification: MoveAnnotation | null;
+	onClassify: (classification: MoveAnnotation | null) => void;
 	disabled: boolean;
 }
 
@@ -17,14 +17,15 @@ export const ClassificationPicker = ({
 	onClassify,
 	disabled,
 }: ClassificationPickerProps) => {
+	console.log('classification', classification, 'disabled', disabled);
 	return (
 		<div
 			className="cs-classification-picker"
 			role="group"
-			aria-label="Move classification"
+			aria-label="Move annotation"
 		>
 			{CLASSIFICATION_ORDER.map((key) => {
-				const { label, glyph, color, shortcut } = CLASSIFICATIONS[key];
+				const { label, glyph, color, shortcut } = moveAnnotationMap[key];
 				const isActive = classification === key;
 
 				return (

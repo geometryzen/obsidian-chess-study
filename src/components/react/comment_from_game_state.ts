@@ -11,13 +11,13 @@ export function comment_from_game_state(
 	state: Readonly<GameState>,
 ): JSONContent | null {
 	if (state.repertoire) {
-		if (state.currentChessStudyMove) {
+		if (state.currentMove) {
 			// console.lg(`currentChessStudyMove is defined: ${state.currentChessStudyMove.san}`);
 		} else {
 			// console.lg('currentChessStudyMove is NOT defined');
 		}
 		const currentRepertoireMove = get_target_move(
-			state.currentChessStudyMove,
+			state.currentMove,
 			state.chessStudy,
 			state.repertoire,
 			null,
@@ -26,9 +26,9 @@ export function comment_from_game_state(
 			if (currentRepertoireMove.comment) {
 				return currentRepertoireMove.comment;
 			} else {
-				if (state.currentChessStudyMove) {
-					if (state.currentChessStudyMove.comment) {
-						return state.currentChessStudyMove.comment;
+				if (state.currentMove) {
+					if (state.currentMove.comment) {
+						return state.currentMove.comment;
 					} else {
 						return null;
 					}

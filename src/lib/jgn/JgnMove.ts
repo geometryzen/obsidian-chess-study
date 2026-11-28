@@ -1,4 +1,5 @@
 import { JSONContent } from '@tiptap/react';
+import { DrawShape } from 'chessground/draw';
 
 /**
  * This interface is part of the serialization structure and should not be changed.
@@ -21,7 +22,7 @@ export interface JgnVariation {
 export interface JgnMove {
 	moveId: string;
 	variants: JgnVariation[];
-	shapes: unknown[];
+	shapes: DrawShape[];
 	comment: JSONContent | null;
 	color: 'w' | 'b';
 	san: string;

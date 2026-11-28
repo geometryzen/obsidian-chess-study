@@ -25,7 +25,7 @@ export function display_relative_move(
 	const { offset } = options;
 
 	// Figure out where we are
-	const currentMove = state.currentChessStudyMove;
+	const currentMove = state.currentMove;
 
 	if (currentMove) {
 		nodeToDisplay = get_move_from_offset(

@@ -1,4 +1,5 @@
 import { JSONContent } from '@tiptap/react';
+import { DrawShape } from 'chessground/draw';
 
 export class NeoMove {
 	/**
@@ -44,7 +45,7 @@ export class NeoMove {
 	/**
 	 * The shapes that should be drawn after this move has been made.
 	 */
-	shapes: unknown[];
+	shapes: DrawShape[];
 	/**
 	 * The desination square of this move.
 	 */
@@ -101,7 +102,7 @@ export class NeoMove {
 		/**
 		 * The shapes that should be drawn after this move has been made.
 		 */
-		shapes: unknown[],
+		shapes: DrawShape[],
 		/**
 		 * The desination square of this move.
 		 */

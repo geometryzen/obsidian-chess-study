@@ -9,6 +9,7 @@ import { useEffect, useRef } from 'react';
 import { legal_moves } from '../../lib/chess-logic/legal_moves.js';
 import { make_move_handler } from '../../lib/chess-logic/make_move_handler.js';
 import { turn_color_white_or_black } from '../../lib/chess-logic/turn_color_white_or_black.js';
+import { BoardColor } from '../../main.js';
 
 /**
  * Strictly speaking, these are the React properties of our Chessground wrapper.
@@ -19,10 +20,13 @@ export interface ChessgroundProps {
 	chess: Chess;
 	onMove: (move: Move) => void;
 	syncShapes: (shapes: DrawShape[]) => void;
+	canDraw: boolean;
+	savesShapes: boolean;
 	isViewOnly: boolean;
 	shapes: DrawShape[];
+	autoShapes?: DrawShape[];
 	config?: Config;
-	boardColor?: 'brown' | 'green';
+	boardColor?: BoardColor;
 }
 
 export const ChessgroundWrapper = React.memo(
@@ -32,12 +36,17 @@ export const ChessgroundWrapper = React.memo(
 		chess,
 		onMove,
 		syncShapes: setShapes,
+		canDraw,
+		savesShapes,
 		isViewOnly,
 		shapes,
-		boardColor = 'green',
+		autoShapes,
+		boardColor = 'brown',
 		config = {},
 	}: ChessgroundProps) => {
 		const ref = useRef<HTMLDivElement>(null);
+
+		// TODO: Promotion
 
 		// Chessground Inititialization
 		useEffect(() => {
@@ -94,6 +103,11 @@ export const ChessgroundWrapper = React.memo(
 			api?.set({ viewOnly: isViewOnly });
 		}, [isViewOnly, api]);
 
+		//
+		useEffect(() => {
+			api?.set({ drawable: { enabled: canDraw } });
+		}, [api, canDraw]);
+
 		// Load Shapes
 		useEffect(() => {
 			if (shapes) {
@@ -101,8 +115,21 @@ export const ChessgroundWrapper = React.memo(
 			}
 		}, [api, shapes]);
 
+		// Plugin-owned decorations, kept apart from the user's own shapes.
+		useEffect(() => {
+			console.log('autoShapes', JSON.stringify(autoShapes));
+			try {
+				api?.setAutoShapes([...(autoShapes ?? [])]);
+			} catch (e) {
+				console.warn(`setAutoShapes Cause: ${e}`);
+			}
+		}, [api, autoShapes]);
+
+		// TODO: Promotion stuff.
+
 		return (
-			<div className={`cs-board ${boardColor}-board height-width-100 table`}>
+			//  height-width-100 table (removed)
+			<div className={`cs-board ${boardColor}-board`}>
 				<div ref={ref} className={`height-width-100`} />
 			</div>
 		);

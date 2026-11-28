@@ -24,13 +24,13 @@ function play_mainline_move(
 		const pos = new ChessPosition(mainline_move.after);
 		update_board_view_from_position(chessView, pos);
 		setChessLogic(pos);
-		state.currentChessStudyMove = mainline_move;
+		state.currentMove = mainline_move;
 		state.isNotationHidden = has_next_moves(mainline_move);
 	} else {
 		const pos = new ChessPosition(user_move.after);
 		update_board_view_from_position(chessView, pos);
 		setChessLogic(pos);
-		state.currentChessStudyMove = user_move;
+		state.currentMove = user_move;
 		state.isNotationHidden = false;
 	}
 }
@@ -81,10 +81,10 @@ export class MemorizeChessStudyEventHandler implements ChessStudyEventHandler {
 	playMove(state: GameState, m: Move): void {
 		if (!this.#chessView) return;
 		const root = state.chessStudy.root;
-		if (state.currentChessStudyMove) {
+		if (state.currentMove) {
 			const current_move = get_move_by_id(
 				state.chessStudy,
-				state.currentChessStudyMove.moveId,
+				state.currentMove.moveId,
 			);
 			// The user is expected to play the main line move.
 			const expected_move = get_next_move(current_move);
@@ -150,7 +150,7 @@ export class MemorizeChessStudyEventHandler implements ChessStudyEventHandler {
 		update_board_view_from_position(this.#chessView, pos);
 		// TODO: It seems a bit strange that the computation of the current move does not happen
 		// in a more coherent way with the initialization of the position.
-		state.currentChessStudyMove = initial_move_from_neo_study(
+		state.currentMove = initial_move_from_neo_study(
 			state.chessStudy,
 			initialPosition,
 		);

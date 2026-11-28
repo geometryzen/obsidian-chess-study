@@ -2,7 +2,7 @@ import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { MoveClassification } from '../../lib/classification';
+import { MoveAnnotation } from '../../lib/classification';
 import { ClassificationPicker } from './ClassificationPicker';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { hasComment } from '../../lib/comments';
@@ -13,8 +13,8 @@ interface CommentSectionProps {
 	/** Which move the note belongs to, e.g. `4... h6`. */
 	moveLabel: string | null;
 	defaultOpen: boolean;
-	classification: MoveClassification | null;
-	onClassify: (classification: MoveClassification | null) => void;
+	classification: MoveAnnotation | null;
+	onClassify: (classification: MoveAnnotation | null) => void;
 	/** Read-only: the note is shown but cannot be written to. */
 	isLocked: boolean;
 }
